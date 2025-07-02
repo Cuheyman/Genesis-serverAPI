@@ -2,6 +2,7 @@
 // SERVER.JS - Enhanced Main Application
 // ===============================================
 
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -102,38 +103,28 @@ const symbolStats = {
   lastError: null
 };
 
-/**
- * Fetch valid trading symbols from Binance with enhanced filtering
- * @returns {Promise<Object>} Object containing symbols and metadata
- */
+const Binance = require('binance-api-node').default;
+
+// Initialize Binance client (add this at the top of your file if not already there)
+const binanceClient = Binance({
+  apiKey: process.env.BINANCE_API_KEY,
+  apiSecret: process.env.BINANCE_API_SECRET,
+  test: false // Set to true for testnet
+});
+
 async function fetchValidSymbolsFromBinance() {
   try {
     logger.info('Fetching valid symbols from Binance API...');
     symbolStats.apiRefreshAttempts++;
-    
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-    
-    const response = await fetch('https://api.binance.com/api/v3/exchangeInfo', {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Enhanced-Signal-API/2.0'
-      }
-    });
-    
-    clearTimeout(timeout);
-    
-    if (!response.ok) {
-      throw new Error(`Binance API returned status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
+
+    // Use Binance SDK instead of fetch
+    const data = await binanceClient.exchangeInfo();
+
     // Enhanced filtering for USDT spot trading pairs
     const validSymbols = [];
     const symbolMetadata = {};
     const stablecoins = [];
-    
+
     data.symbols.forEach(symbol => {
       // Basic filtering
       if (symbol.status !== 'TRADING' || 
@@ -141,15 +132,15 @@ async function fetchValidSymbolsFromBinance() {
           !symbol.isSpotTradingAllowed) {
         return;
       }
-      
+
       // Exclude leveraged tokens and other derivatives
       const excludePatterns = ['BEAR', 'BULL', 'DOWN', 'UP', 'LONG', 'SHORT'];
       if (excludePatterns.some(pattern => symbol.symbol.includes(pattern))) {
         return;
       }
-      
+
       validSymbols.push(symbol.symbol);
-      
+
       // Store metadata for enhanced filtering
       symbolMetadata[symbol.symbol] = {
         baseAsset: symbol.baseAsset,
@@ -161,17 +152,17 @@ async function fetchValidSymbolsFromBinance() {
         tickSize: getTickSize(symbol.filters),
         stepSize: getStepSize(symbol.filters)
       };
-      
+
       // Identify stablecoins
       const stablecoinBases = ['USDC', 'BUSD', 'TUSD', 'USDP', 'DAI', 'FRAX', 'GUSD'];
       if (stablecoinBases.includes(symbol.baseAsset)) {
         stablecoins.push(symbol.symbol);
       }
     });
-    
-    logger.info(`Successfully fetched ${validSymbols.length} valid USDT trading pairs from Binance`);
+
+    logger.info(`Successfully fetched ${validSymbols.length} valid USDT trading pairs`);
     logger.info(`Identified ${stablecoins.length} stablecoin pairs`);
-    
+
     return {
       symbols: validSymbols.sort(),
       metadata: symbolMetadata,
@@ -180,7 +171,7 @@ async function fetchValidSymbolsFromBinance() {
   } catch (error) {
     symbolStats.apiRefreshFailures++;
     symbolStats.lastError = error.message;
-    
+
     if (error.name === 'AbortError') {
       logger.error('Binance API request timed out');
     } else {
@@ -188,6 +179,22 @@ async function fetchValidSymbolsFromBinance() {
     }
     throw error;
   }
+}
+
+// Helper functions (keep these if you don't already have them)
+function getMinNotionalValue(filters) {
+  const minNotionalFilter = filters.find(f => f.filterType === 'MIN_NOTIONAL');
+  return minNotionalFilter ? parseFloat(minNotionalFilter.minNotional) : null;
+}
+
+function getTickSize(filters) {
+  const priceFilter = filters.find(f => f.filterType === 'PRICE_FILTER');
+  return priceFilter ? parseFloat(priceFilter.tickSize) : null;
+}
+
+function getStepSize(filters) {
+  const lotSizeFilter = filters.find(f => f.filterType === 'LOT_SIZE');
+  return lotSizeFilter ? parseFloat(lotSizeFilter.stepSize) : null;
 }
 
 /**
@@ -219,21 +226,16 @@ function getStepSize(filters) {
  */
 async function fetchSymbolVolumes() {
   try {
-    const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch 24hr ticker data: ${response.status}`);
-    }
-    
-    const tickers = await response.json();
+    // Use Binance SDK to get 24hr ticker statistics
+    const tickers = await binanceClient.dailyStats();
     const volumeMap = {};
-    
+
     tickers.forEach(ticker => {
       if (ticker.symbol.endsWith('USDT')) {
         volumeMap[ticker.symbol] = parseFloat(ticker.quoteVolume);
       }
     });
-    
+
     return volumeMap;
   } catch (error) {
     logger.error('Failed to fetch symbol volumes:', error);
