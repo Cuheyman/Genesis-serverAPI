@@ -1,0 +1,20 @@
+2025-06-30 17:51:39,153 - ERROR - Error sending command: timed out
+2025-06-30 17:51:49,170 - INFO - Disconnected from NinjaTrader
+2025-06-30 17:52:49,864 - INFO - Starting Claude AI Energy Futures Trading Bot
+2025-06-30 17:52:49,864 - INFO - Account: DEMO4998310
+2025-06-30 17:52:49,865 - INFO - Instruments: ['CL 08-25', 'NG 08-25', 'RB 08-25', 'HO 08-25']
+2025-06-30 17:52:49,867 - INFO - Connected to NinjaTrader ATI
+2025-06-30 17:52:49,869 - INFO - Connected to account: DEMO4998310
+2025-06-30 17:52:49,869 - INFO - Bot started successfully!
+2025-06-30 17:52:49,869 - INFO - Press Ctrl+C to stop
+2025-06-30 17:52:49,870 - INFO - 
+Energy Futures Trading Cycle - 17:52:49
+2025-06-30 17:52:59,878 - ERROR - Error sending command: timed out
+2025-06-30 17:52:59,878 - INFO - Account: DEMO4998310
+2025-06-30 17:52:59,878 - INFO - Open Positions: 0
+2025-06-30 17:53:09,882 - ERROR - Error sending command: timed out
+2025-06-30 17:53:19,897 - ERROR - Error sending command: timed out
+2025-06-30 17:53:29,912 - ERROR - Error sending command: timed out
+2025-06-30 17:53:39,912 - INFO - 
+Bot stopped by user
+2025-06-30 17:53:39,912 - INFO - Disconnected from NinjaTrader
