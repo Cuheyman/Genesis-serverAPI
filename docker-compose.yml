@@ -1,0 +1,117 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # The Python Predictive ML Model (The "Quantitative Analyst")
+  predictive-model:
+    build: ./predictive-model
+    container_name: quantitative_analyst
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - REDIS_URL=redis://trading_cache:6379
+      - POSTGRES_URL=postgresql://trader:${DB_PASSWORD}@trading_database:5432/trading
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+    volumes:
+      - ./predictive-model/models:/app/models
+      - ./predictive-model/data:/app/data
+
+  # The main Node.js API Server (The "Master Strategist")
+  api-server:
+    build: ./api-server
+    container_name: master_strategist
+    ports:
+      - "3000:3000"
+    depends_on:
+      - predictive-model
+      - redis
+      - postgres
+    environment:
+      - NODE_ENV=production
+      - PREDICTIVE_MODEL_URL=http://quantitative_analyst:5001/predict
+      - REDIS_URL=redis://trading_cache:6379
+      - POSTGRES_URL=postgresql://trader:${DB_PASSWORD}@trading_database:5432/trading
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - API_KEY_SECRET=${API_KEY_SECRET}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
+    volumes:
+      - ./api-server/logs:/app/logs
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: trading_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading_metrics
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trading_dashboard
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+
+  # PostgreSQL for historical data
+  postgres:
+    image: postgres:15-alpine
+    container_name: trading_database
+    environment:
+      POSTGRES_DB: trading
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Nginx for load balancing (optional but recommended)
+  nginx:
+    image: nginx:alpine
+    container_name: trading_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api-server
+
+volumes:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  postgres_data:
