@@ -34,15 +34,101 @@ class CoinGeckoService {
     this.requestQueue = [];
     this.isProcessing = false;
     this.lastRequestTime = 0;
-    this.minRequestInterval = 5 * 60 * 1000; // 5 minutes between requests (for 2 per 10 minutes)
+    this.minRequestInterval = 100; // 100ms between requests (minimal delay)
     this.fallbackOnly = process.env.COINGECKO_FALLBACK_ONLY === 'true';
     this.rateLimitHit = false;
-    this.dailyRequestCount = 0;
-    this.lastResetTime = Date.now();
-    this.maxDailyRequests = 288; // 288 requests per day (12 per hour × 24 hours)
-    this.hourlyRequestCount = 0;
-    this.lastHourReset = Date.now();
-    this.maxHourlyRequests = 12; // 12 requests per hour (2 per 10 minutes)
+    
+    // Multiple API Key Support
+    this.apiKeys = [
+      process.env.COINGECKO_API_KEY_1,
+      process.env.COINGECKO_API_KEY_2,
+      process.env.COINGECKO_API_KEY_3
+    ].filter(key => key && key.trim() !== ''); // Remove undefined/empty keys
+    
+    this.currentKeyIndex = 0;
+    this.keyUsage = new Map(); // Track usage per key
+    
+    // Initialize key usage tracking
+    this.apiKeys.forEach((key, index) => {
+      this.keyUsage.set(index, {
+        dailyCount: 0,
+        hourlyCount: 0,
+        lastDailyReset: Date.now(),
+        lastHourlyReset: Date.now(),
+        lastRequestTime: 0,
+        rateLimitHit: false
+      });
+    });
+    
+    // Very aggressive limits - use API keys to the max
+    this.maxDailyRequestsPerKey = 10000; // Use full monthly limit per day
+    this.maxHourlyRequestsPerKey = 2000; // Very high hourly limit
+    
+    logger.info(`CoinGecko service initialized with ${this.apiKeys.length} API keys`);
+  }
+
+  // Get next available API key
+  getNextAvailableKey() {
+    if (this.apiKeys.length === 0) {
+      logger.warn('No CoinGecko API keys configured');
+      return null;
+    }
+
+    // Try each key starting from current index
+    for (let i = 0; i < this.apiKeys.length; i++) {
+      const keyIndex = (this.currentKeyIndex + i) % this.apiKeys.length;
+      const keyStats = this.keyUsage.get(keyIndex);
+      
+      if (!this.isKeyAtLimit(keyIndex)) {
+        this.currentKeyIndex = keyIndex;
+        // logger.info(`Using API key ${keyIndex + 1} for request`); // Reduced logging
+        return { key: this.apiKeys[keyIndex], index: keyIndex };
+      }
+    }
+    
+    logger.warn('All API keys are at their rate limits');
+    return null;
+  }
+
+  // Check if a specific key is at its rate limit
+  isKeyAtLimit(keyIndex) {
+    const keyStats = this.keyUsage.get(keyIndex);
+    if (!keyStats) return true;
+    
+    const now = Date.now();
+    
+    // Only check for actual rate limit hits from CoinGecko - NO OTHER LIMITS
+    if (keyStats.rateLimitHit) {
+      // Reset rate limit flag after 1 hour
+      if (now - keyStats.lastRequestTime > 60 * 60 * 1000) {
+        keyStats.rateLimitHit = false;
+        logger.info(`Key ${keyIndex + 1} rate limit flag reset after 1 hour`);
+        return false;
+      } else {
+        logger.info(`Key ${keyIndex + 1} previously hit rate limit`);
+        return true;
+      }
+    }
+    
+    // NO artificial rate limiting - key is always available unless CoinGecko says no
+    return false;
+  }
+
+  // Update key usage statistics
+  updateKeyUsage(keyIndex, success = true) {
+    const keyStats = this.keyUsage.get(keyIndex);
+    if (!keyStats) return;
+    
+    keyStats.lastRequestTime = Date.now();
+    
+    if (success) {
+      keyStats.dailyCount++;
+      keyStats.hourlyCount++;
+      // logger.info(`Key ${keyIndex + 1} usage updated: Daily ${keyStats.dailyCount}/${this.maxDailyRequestsPerKey}, Hourly ${keyStats.hourlyCount}/${this.maxHourlyRequestsPerKey}`); // Reduced logging
+    } else {
+      keyStats.rateLimitHit = true;
+      logger.warn(`Key ${keyIndex + 1} hit rate limit, marking as unavailable`);
+    }
   }
 
   // Queue system for rate limiting
@@ -56,42 +142,25 @@ class CoinGeckoService {
 
   // Check if we should use fallback based on rate limits
   shouldUseFallback() {
-    const now = Date.now();
-    
-    // Reset daily count if 24 hours have passed
-    if (now - this.lastResetTime > 24 * 60 * 60 * 1000) {
-      this.dailyRequestCount = 0;
-      this.lastResetTime = now;
-    }
-    
-    // Reset hourly count if 1 hour has passed
-    if (now - this.lastHourReset > 60 * 60 * 1000) {
-      this.hourlyRequestCount = 0;
-      this.lastHourReset = now;
-    }
-
-    // Calculate time-based rate limiting (2 requests per 10 minutes)
-    const timeSinceHourStart = now - this.lastHourReset;
-    const tenMinuteWindows = Math.floor(timeSinceHourStart / (10 * 60 * 1000));
-    const maxRequestsForCurrentTime = (tenMinuteWindows + 1) * 2; // 2 requests per 10-minute window, starting with 2
-    
-    // Use fallback if we're approaching any limits
-    if (this.dailyRequestCount >= this.maxDailyRequests) {
-      logger.info(`Daily request limit reached (${this.maxDailyRequests}), using fallback`);
+    // If no API keys configured, use fallback
+    if (this.apiKeys.length === 0) {
+      logger.info('No API keys configured, using fallback');
       return true;
     }
     
-    if (this.hourlyRequestCount >= this.maxHourlyRequests) {
-      logger.info(`Hourly request limit reached (${this.maxHourlyRequests}), using fallback`);
+    // If fallback mode is enabled, use fallback
+    if (this.fallbackOnly) {
+      logger.info('Fallback-only mode enabled, using fallback');
       return true;
     }
     
-    // Time-based rate limiting: only allow requests based on elapsed time
-    if (this.hourlyRequestCount >= maxRequestsForCurrentTime) {
-      logger.info(`Time-based rate limit: ${this.hourlyRequestCount} requests used, only ${maxRequestsForCurrentTime} allowed for current time period, using fallback`);
+    // Check if any API key is available
+    const availableKey = this.getNextAvailableKey();
+    if (!availableKey) {
+      logger.info('All API keys are at their limits, using fallback');
       return true;
     }
-
+    
     return false;
   }
 
@@ -105,35 +174,43 @@ class CoinGeckoService {
 
     while (this.requestQueue.length > 0) {
       const { requestFn, resolve, reject } = this.requestQueue.shift();
+      let keyInfo = null;
       
       try {
         // Check if we should use fallback
         if (this.shouldUseFallback()) {
-          logger.info('Using fallback due to daily limits');
+          logger.info('Using fallback due to rate limits');
           resolve(await this.getFallbackData());
           continue;
         }
 
-        // Ensure minimum interval between requests (5 minutes for 2 requests per 10 minutes)
-        const now = Date.now();
-        const timeSinceLastRequest = now - this.lastRequestTime;
-        const minInterval = 5 * 60 * 1000; // 5 minutes between requests (2 per 10 minutes)
-        
-        if (timeSinceLastRequest < minInterval) {
-          const delayTime = minInterval - timeSinceLastRequest;
-          logger.info(`Rate limiting: waiting ${delayTime}ms before next request (5-minute interval)`);
-          await this.delay(delayTime);
+        // Get next available API key
+        keyInfo = this.getNextAvailableKey();
+        if (!keyInfo) {
+          logger.info('No available API keys, using fallback');
+          resolve(await this.getFallbackData());
+          continue;
         }
+
+        // NO artificial delays - send requests immediately
         
-        logger.info(`Making CoinGecko request. Queue remaining: ${this.requestQueue.length}`);
-        const result = await requestFn();
-        this.lastRequestTime = Date.now();
-        this.dailyRequestCount++;
-        this.hourlyRequestCount++;
-        logger.info(`CoinGecko request successful. Queue remaining: ${this.requestQueue.length}, Daily: ${this.dailyRequestCount}/${this.maxDailyRequests}, Hourly: ${this.hourlyRequestCount}/${this.maxHourlyRequests}`);
+        logger.info(`Making CoinGecko request with key ${keyInfo.index + 1}. Queue remaining: ${this.requestQueue.length}`);
+        
+        // Execute the request with the selected API key
+        const result = await requestFn(keyInfo.key);
+        
+        // Update key usage on success
+        this.updateKeyUsage(keyInfo.index, true);
+        logger.info(`CoinGecko request successful with key ${keyInfo.index + 1}. Queue remaining: ${this.requestQueue.length}`);
         resolve(result);
       } catch (error) {
         logger.error(`CoinGecko request failed:`, error.message);
+        
+        // If we have key info and it's a rate limit error, mark the key as hit
+        if (error.response?.status === 429 && keyInfo) {
+          this.updateKeyUsage(keyInfo.index, false);
+        }
+        
         reject(error);
       }
     }
@@ -153,13 +230,13 @@ class CoinGeckoService {
   }
 
   async getCoinData(symbol) {
-    // If fallback-only mode is enabled or we've hit rate limits, use fallback immediately
-    if (this.fallbackOnly || this.rateLimitHit) {
-      logger.info(`Using fallback data for ${symbol} (fallback-only: ${this.fallbackOnly}, rate-limit-hit: ${this.rateLimitHit})`);
+    // Check if we should use fallback
+    if (this.shouldUseFallback()) {
+      logger.info(`Using fallback data for ${symbol} (rate limiting)`);
       return this.getFallbackCoinData(symbol);
     }
 
-    return this.queueRequest(async () => {
+    return this.queueRequest(async (apiKey) => {
       const cacheKey = `coin_${symbol}`;
       if (this.cache.has(cacheKey)) {
         const cached = this.cache.get(cacheKey);
@@ -176,18 +253,24 @@ class CoinGeckoService {
         }
         
         const url = `${this.baseURL}/coins/${id}`;
+        const headers = {
+          'Accept': 'application/json',
+          'User-Agent': 'GenesisAI-TradingBot/1.0'
+        };
+        
+        // Add API key to headers if available
+        if (apiKey) {
+          headers['x-cg-demo-api-key'] = apiKey;
+        }
+        
         const response = await axios.get(url, { 
           timeout: 10000,
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'GenesisAI-TradingBot/1.0'
-          }
+          headers: headers
         });
         
         if (response.status === 429) {
           logger.warn('CoinGecko rate limit hit, switching to fallback mode');
-          this.rateLimitHit = true;
-          return this.getFallbackCoinData(symbol);
+          throw new Error('Rate limit exceeded');
         }
         
         console.log('CoinGecko getCoinData raw response:', response.data ? 'Data received' : 'Empty response');
@@ -196,8 +279,8 @@ class CoinGeckoService {
         return data;
       } catch (error) {
         if (error.response?.status === 429) {
-          logger.warn('CoinGecko rate limit exceeded, switching to fallback mode');
-          this.rateLimitHit = true;
+          logger.warn('CoinGecko rate limit exceeded');
+          throw error;
         } else {
           logger.error('CoinGecko coin data request failed:', error?.response?.data || error?.message || error);
         }
@@ -207,13 +290,13 @@ class CoinGeckoService {
   }
 
   async getMarketMetrics(symbol) {
-    // If fallback-only mode is enabled or we've hit rate limits, use fallback immediately
-    if (this.fallbackOnly || this.rateLimitHit) {
-      logger.info(`Using fallback market data for ${symbol} (fallback-only: ${this.fallbackOnly}, rate-limit-hit: ${this.rateLimitHit})`);
+    // Check if we should use fallback
+    if (this.shouldUseFallback()) {
+      logger.info(`Using fallback market data for ${symbol} (rate limiting)`);
       return this.getFallbackMarketData();
     }
 
-    return this.queueRequest(async () => {
+    return this.queueRequest(async (apiKey) => {
       try {
         const coinId = this.symbolToId(symbol);
         if (!coinId) {
@@ -222,19 +305,24 @@ class CoinGeckoService {
         }
 
         const url = `https://api.coingecko.com/api/v3/coins/${coinId}`;
+        const headers = {
+          'Accept': 'application/json',
+          'User-Agent': 'GenesisAI-TradingBot/1.0'
+        };
+        
+        // Add API key to headers if available
+        if (apiKey) {
+          headers['x-cg-demo-api-key'] = apiKey;
+        }
         
         const response = await axios.get(url, {
           timeout: 10000,
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'GenesisAI-TradingBot/1.0'
-          }
+          headers: headers
         });
 
         if (response.status === 429) {
-          logger.warn('CoinGecko rate limit hit, switching to fallback mode');
-          this.rateLimitHit = true;
-          return this.getFallbackMarketData();
+          logger.warn('CoinGecko rate limit hit');
+          throw new Error('Rate limit exceeded');
         }
 
         const data = response.data;
@@ -265,8 +353,8 @@ class CoinGeckoService {
         };
       } catch (error) {
         if (error.response?.status === 429) {
-          logger.warn('CoinGecko rate limit exceeded, switching to fallback mode');
-          this.rateLimitHit = true;
+          logger.warn('CoinGecko rate limit exceeded');
+          throw error;
         } else {
           logger.error('CoinGecko market metrics request failed:', error.response?.data || error.message);
         }

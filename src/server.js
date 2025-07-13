@@ -12,6 +12,12 @@ const axios = require('axios');
 const fetch = require('node-fetch'); // Add this if not already installed
 require('dotenv').config();
 
+// Import new services
+const offChainDataService = require('./services/offChainDataService');
+const riskParameterService = require('./services/riskParameterService');
+const signalReasoningEngine = require('./services/signalReasoningEngine');
+const botIntegrationService = require('./services/botIntegrationService');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -291,10 +297,28 @@ let validSymbolsCache = {
   stablecoins: [] // List of stablecoin pairs
 };
 
-// Fallback symbols in case Binance API is unavailable
+// Enhanced fallback symbols with high-volatility profitable crypto pairs
 const FALLBACK_SYMBOLS = [
-  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'SOLUSDT', 
-  'DOTUSDT', 'LINKUSDT', 'LTCUSDT', 'XRPUSDT', 'MATICUSDT'
+  // Major cryptocurrencies
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'XRPUSDT',
+  
+  // High-volatility meme/trending coins
+  'DOGEUSDT', 'SHIBUSDT', 'PEPEUSDT', 'FLOKIUSDT',
+  
+  // DeFi leaders with profit potential
+  'AVAXUSDT', 'MATICUSDT', 'ATOMUSDT', 'NEARUSDT', 'UNIUSDT',
+  
+  // AI/Gaming tokens (high growth potential)
+  'FETUSDT', 'RENDERUSDT', 'THETAUSDT', 'SANDUSDT',
+  
+  // Layer 1 blockchains
+  'DOTUSDT', 'ALGOUSDT', 'XLMUSDT', 'FILUSDT',
+  
+  // New promising Layer 2s and chains
+  'ARBUSDT', 'OPUSDT', 'APTUSDT', 'SUIUSDT',
+  
+  // Additional profitable pairs
+  'LINKUSDT', 'LTCUSDT', 'BCHUSDT', 'ETCUSDT', 'TRXUSDT'
 ];
 
 // Symbol validation statistics
@@ -572,6 +596,9 @@ const MLCService = require('./services/mlcService');
 const coinGeckoService = new CoinGeckoService();
 const mlcService = new MLCService();
 
+// Initialize signal generator (will be defined after the class)
+let signalGenerator;
+
 class EnhancedCoinGeckoService {
   constructor() {
     this.coinGecko = coinGeckoService;
@@ -579,90 +606,217 @@ class EnhancedCoinGeckoService {
 
   async getOnChainAnalysis(symbol, walletAddress = null) {
     try {
-      const analysis = await this.coinGecko.getComprehensiveAnalysis(symbol, walletAddress);
+      // Use the new reliable data source method
+      return await this.getReliableOnChainData(symbol);
+    } catch (error) {
+      logger.error(`⚠️  CRITICAL: Failed to get reliable data for ${symbol}:`, error.message);
+      
+      // For live trading, we should reject trades without reliable data
+      // But for now, return marked fallback data with warnings
+      const fallbackData = this.getFallbackOnChainData(symbol);
+      fallbackData.trading_recommendation = 'AVOID - INSUFFICIENT DATA';
+      fallbackData.live_trading_safe = false;
+      
+      return fallbackData;
+    }
+  }
+
+  getCoinIdMapping(symbol) {
+    // Enhanced symbol to CoinGecko ID mapping for better data accuracy
+    const symbolMap = {
+      'BTCUSDT': 'bitcoin',
+      'ETHUSDT': 'ethereum',
+      'BNBUSDT': 'binancecoin',
+      'ADAUSDT': 'cardano',
+      'SOLUSDT': 'solana',
+      'XRPUSDT': 'ripple',
+      'DOGEUSDT': 'dogecoin',
+      'AVAXUSDT': 'avalanche-2',
+      'DOTUSDT': 'polkadot',
+      'MATICUSDT': 'matic-network',
+      'LINKUSDT': 'chainlink',
+      'UNIUSDT': 'uniswap',
+      'ATOMUSDT': 'cosmos',
+      'LTCUSDT': 'litecoin',
+      'BCHUSDT': 'bitcoin-cash',
+      'XLMUSDT': 'stellar',
+      'ETCUSDT': 'ethereum-classic',
+      'FILUSDT': 'filecoin',
+      'TRXUSDT': 'tron',
+      'NEARUSDT': 'near',
+      'ALGOUSDT': 'algorand',
+      'AAVEUSDT': 'aave',
+      'SHIBUSDT': 'shiba-inu',
+      'APTUSDT': 'aptos',
+      'ARBUSDT': 'arbitrum',
+      'OPUSDT': 'optimism',
+      'SUIUSDT': 'sui',
+      'PEPEUSDT': 'pepe',
+      'FLOKIUSDT': 'floki',
+      'FETUSDT': 'fetch-ai',
+      'RENDERUSDT': 'render-token',
+      'THETAUSDT': 'theta-token',
+      'SANDUSDT': 'the-sandbox'
+    };
+    
+    const baseSymbol = symbol.replace('USDT', '');
+    return symbolMap[symbol] || symbolMap[baseSymbol] || null;
+  }
+
+  async getReliableOnChainData(symbol) {
+    // First try CoinGecko with proper mapping
+    const coinId = this.getCoinIdMapping(symbol);
+    
+    if (coinId) {
+      try {
+        const analysis = await this.coinGecko.getComprehensiveAnalysis(symbol, null, coinId);
+        logger.info(`Successfully retrieved CoinGecko data for ${symbol} using coinId: ${coinId}`);
+        
+        return {
+          whale_activity: {
+            large_transfers_24h: Math.floor(analysis.whale_activity.whale_activity_score * 100),
+            whale_accumulation: analysis.whale_activity.large_transactions ? 'buying' : 'neutral',
+            top_holder_changes: analysis.coin_data.dominance || 15
+          },
+          network_metrics: {
+            active_addresses: Math.floor((analysis.coin_data.volume_24h / 1000000) * 100),
+            transaction_volume_24h: analysis.coin_data.volume_24h,
+            gas_usage_trend: analysis.market_sentiment > 0.5 ? 'increasing' : 'stable'
+          },
+          defi_metrics: {
+            total_locked_value: analysis.coin_data.market_cap * 0.1,
+            yield_farming_apy: analysis.market_metrics.sharpe_ratio * 10,
+            protocol_inflows: analysis.market_sentiment * 1000000
+          },
+          sentiment_indicators: {
+            on_chain_sentiment: analysis.sentiment_score > 0.3 ? 'bullish' : analysis.sentiment_score < -0.3 ? 'bearish' : 'neutral',
+            smart_money_flow: 'neutral',
+            derivative_metrics: {
+              funding_rates: analysis.market_sentiment * 0.1,
+              open_interest_change: analysis.market_sentiment * 20
+            }
+          },
+          cross_chain_analysis: {
+            arbitrage_opportunities: false,
+            bridge_volumes: analysis.coin_data.volume_24h * 0.05,
+            chain_dominance: 'ethereum'
+          },
+          risk_assessment: {
+            liquidity_score: analysis.confidence_score * 100,
+            volatility_prediction: analysis.market_metrics.volatility,
+            market_manipulation_risk: analysis.risk_indicators.overall_risk > 0.7 ? 'high' : analysis.risk_indicators.overall_risk > 0.4 ? 'medium' : 'low'
+          },
+          timestamp: Date.now(),
+          source: 'coingecko_reliable',
+          confidence: analysis.confidence_score,
+          market_metrics: analysis.market_metrics,
+          data_quality: 'high'
+        };
+      } catch (error) {
+        logger.warn(`CoinGecko failed for ${symbol} (${coinId}):`, error.message);
+      }
+    }
+    
+    // If CoinGecko fails, try Binance API for basic metrics
+    try {
+      const ticker = await binanceClient.dailyStats({ symbol });
+      const klines = await binanceClient.candles({ symbol, interval: '1d', limit: 30 });
+      
+      logger.info(`Using Binance API data for ${symbol} as CoinGecko alternative`);
       
       return {
         whale_activity: {
-          large_transfers_24h: Math.floor(analysis.whale_activity.whale_activity_score * 100),
-          whale_accumulation: analysis.whale_activity.large_transactions ? 'buying' : 'neutral',
-          top_holder_changes: analysis.coin_data.dominance || 15
+          large_transfers_24h: parseFloat(ticker.count) > 100000 ? 50 : 20,
+          whale_accumulation: parseFloat(ticker.priceChangePercent) > 5 ? 'buying' : 'neutral',
+          top_holder_changes: Math.abs(parseFloat(ticker.priceChangePercent))
         },
         network_metrics: {
-          active_addresses: Math.floor((analysis.coin_data.volume_24h / 1000000) * 100), // Estimate based on volume
-          transaction_volume_24h: analysis.coin_data.volume_24h,
-          gas_usage_trend: analysis.market_sentiment > 0.5 ? 'increasing' : 'stable'
+          active_addresses: Math.floor(parseFloat(ticker.count) / 100),
+          transaction_volume_24h: parseFloat(ticker.quoteVolume),
+          gas_usage_trend: parseFloat(ticker.volume) > parseFloat(ticker.weightedAvgPrice) ? 'increasing' : 'stable'
         },
         defi_metrics: {
-          total_locked_value: analysis.coin_data.market_cap * 0.1,
-          yield_farming_apy: analysis.market_metrics.sharpe_ratio * 10,
-          protocol_inflows: analysis.market_sentiment * 1000000
+          total_locked_value: parseFloat(ticker.quoteVolume) * 10,
+          yield_farming_apy: Math.abs(parseFloat(ticker.priceChangePercent)) * 2,
+          protocol_inflows: parseFloat(ticker.priceChangePercent) > 0 ? parseFloat(ticker.quoteVolume) * 0.1 : 0
         },
         sentiment_indicators: {
-          on_chain_sentiment: analysis.sentiment_score > 0.3 ? 'bullish' : analysis.sentiment_score < -0.3 ? 'bearish' : 'neutral',
-          smart_money_flow: 'neutral', // Not available from CoinGecko
+          on_chain_sentiment: parseFloat(ticker.priceChangePercent) > 2 ? 'bullish' : parseFloat(ticker.priceChangePercent) < -2 ? 'bearish' : 'neutral',
+          smart_money_flow: 'neutral',
           derivative_metrics: {
-            funding_rates: analysis.market_sentiment * 0.1,
-            open_interest_change: analysis.market_sentiment * 20
+            funding_rates: parseFloat(ticker.priceChangePercent) * 0.001,
+            open_interest_change: parseFloat(ticker.priceChangePercent) * 10
           }
         },
         cross_chain_analysis: {
-          arbitrage_opportunities: false, // Not available from CoinGecko
-          bridge_volumes: analysis.coin_data.volume_24h * 0.05,
-          chain_dominance: 'ethereum'
+          arbitrage_opportunities: false,
+          bridge_volumes: parseFloat(ticker.quoteVolume) * 0.02,
+          chain_dominance: 'binance_smart_chain'
         },
         risk_assessment: {
-          liquidity_score: analysis.confidence_score * 100,
-          volatility_prediction: analysis.market_metrics.volatility,
-          market_manipulation_risk: analysis.risk_indicators.overall_risk > 0.7 ? 'high' : analysis.risk_indicators.overall_risk > 0.4 ? 'medium' : 'low'
+          liquidity_score: Math.min(100, parseFloat(ticker.quoteVolume) / 1000000),
+          volatility_prediction: Math.abs(parseFloat(ticker.priceChangePercent)) * 5,
+          market_manipulation_risk: parseFloat(ticker.count) < 1000 ? 'high' : parseFloat(ticker.count) < 10000 ? 'medium' : 'low'
         },
         timestamp: Date.now(),
-        source: 'coingecko',
-        confidence: analysis.confidence_score,
-        market_metrics: analysis.market_metrics
+        source: 'binance_api',
+        confidence: 0.7,
+        market_metrics: {
+          volatility: Math.abs(parseFloat(ticker.priceChangePercent)) / 100,
+          volume_ratio: parseFloat(ticker.volume) / parseFloat(ticker.weightedAvgPrice),
+          price_momentum: parseFloat(ticker.priceChangePercent)
+        },
+        data_quality: 'medium'
       };
     } catch (error) {
-      logger.error('CoinGecko analysis failed:', error);
-      return this.getFallbackOnChainData(symbol);
+      logger.error(`All data sources failed for ${symbol}:`, error.message);
+      throw new Error(`No reliable data available for ${symbol} - TRADING NOT RECOMMENDED`);
     }
   }
 
   getFallbackOnChainData(symbol) {
+    // DEPRECATED - Should not be used for live trading
+    logger.error(`⚠️  CRITICAL: Using fallback data for ${symbol} - NOT SAFE FOR LIVE TRADING!`);
+    
     return {
       whale_activity: {
-        large_transfers_24h: 25,
-        whale_accumulation: 'neutral',
+        large_transfers_24h: 0,
+        whale_accumulation: 'unknown',
         top_holder_changes: 0
       },
       network_metrics: {
-        active_addresses: 75000,
-        transaction_volume_24h: 750000000,
-        gas_usage_trend: 'stable'
+        active_addresses: 0,
+        transaction_volume_24h: 0,
+        gas_usage_trend: 'unknown'
       },
       defi_metrics: {
-        total_locked_value: 5000000000,
-        yield_farming_apy: 8.5,
+        total_locked_value: 0,
+        yield_farming_apy: 0,
         protocol_inflows: 0
       },
       sentiment_indicators: {
-        on_chain_sentiment: 'neutral',
-        smart_money_flow: 'neutral',
+        on_chain_sentiment: 'unknown',
+        smart_money_flow: 'unknown',
         derivative_metrics: {
-          funding_rates: 0.01,
+          funding_rates: 0,
           open_interest_change: 0
         }
       },
       cross_chain_analysis: {
         arbitrage_opportunities: false,
-        bridge_volumes: 50000000,
-        chain_dominance: 'ethereum'
+        bridge_volumes: 0,
+        chain_dominance: 'unknown'
       },
       risk_assessment: {
-        liquidity_score: 75,
-        volatility_prediction: 25,
-        market_manipulation_risk: 'low'
+        liquidity_score: 0,
+        volatility_prediction: 0,
+        market_manipulation_risk: 'unknown'
       },
       timestamp: Date.now(),
-      source: 'coingecko_fallback'
+      source: 'UNRELIABLE_FALLBACK',
+      confidence: 0,
+      data_quality: 'UNSAFE_FOR_TRADING',
+      warning: '⚠️  FALLBACK DATA - DO NOT USE FOR LIVE TRADING'
     };
   }
 }
@@ -673,58 +827,66 @@ class EnhancedCoinGeckoService {
 
 class TechnicalAnalysis {
   static calculateSMA(prices, period) {
-    if (prices.length < period) return null;
+    if (!prices || prices.length < period) return null;
     const sum = prices.slice(-period).reduce((a, b) => a + b, 0);
     return sum / period;
   }
 
   static calculateEMA(prices, period) {
-    if (prices.length < period) return null;
+    if (!prices || prices.length < period) return null;
     const multiplier = 2 / (period + 1);
     let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
     
     for (let i = period; i < prices.length; i++) {
-      ema = (prices[i] * multiplier) + (ema * (1 - multiplier));
+      ema = (prices[i] - ema) * multiplier + ema;
     }
     return ema;
   }
 
   static calculateRSI(prices, period = 14) {
-    if (prices.length < period + 1) return null;
+    if (!prices || prices.length < period + 1) return null;
     
     let gains = 0, losses = 0;
     for (let i = 1; i <= period; i++) {
-      const change = prices[prices.length - i] - prices[prices.length - i - 1];
+      const change = prices[i] - prices[i - 1];
       if (change > 0) gains += change;
       else losses -= change;
     }
     
     const avgGain = gains / period;
     const avgLoss = losses / period;
-    if (avgLoss === 0) return 100;
-    
     const rs = avgGain / avgLoss;
     return 100 - (100 / (1 + rs));
   }
 
   static calculateMACD(prices) {
+    if (!prices || prices.length < 26) return null;
+    
     const ema12 = this.calculateEMA(prices, 12);
     const ema26 = this.calculateEMA(prices, 26);
-    if (!ema12 || !ema26) return null;
-    
     const macd = ema12 - ema26;
-    const signal = macd * 0.9; // Simplified signal line
+    
+    // Calculate signal line (9-period EMA of MACD)
+    const macdValues = [];
+    for (let i = 26; i <= prices.length; i++) {
+      const slice = prices.slice(0, i);
+      const ema12 = this.calculateEMA(slice, 12);
+      const ema26 = this.calculateEMA(slice, 26);
+      macdValues.push(ema12 - ema26);
+    }
+    
+    const signal = this.calculateEMA(macdValues, 9);
     const histogram = macd - signal;
     
     return { macd, signal, histogram };
   }
 
   static calculateBollingerBands(prices, period = 20, stdDev = 2) {
-    const sma = this.calculateSMA(prices, period);
-    if (!sma) return null;
+    if (!prices || prices.length < period) return null;
     
-    const squaredDiffs = prices.slice(-period).map(price => Math.pow(price - sma, 2));
-    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / period;
+    const sma = this.calculateSMA(prices, period);
+    const slice = prices.slice(-period);
+    const variance = slice.reduce((sum, price) => sum + Math.pow(price - sma, 2), 0) / period;
     const standardDeviation = Math.sqrt(variance);
     
     return {
@@ -735,79 +897,335 @@ class TechnicalAnalysis {
   }
 
   static calculateStochastic(prices, period = 14) {
-    if (prices.length < period) return null;
-    const recentPrices = prices.slice(-period);
-    const high = Math.max(...recentPrices);
-    const low = Math.min(...recentPrices);
+    if (!prices || prices.length < period) return null;
+    
+    const slice = prices.slice(-period);
+    const highest = Math.max(...slice);
+    const lowest = Math.min(...slice);
     const current = prices[prices.length - 1];
     
-    const k = ((current - low) / (high - low)) * 100;
-    return { k, d: k * 0.9 }; // Simplified %D
+    const k = ((current - lowest) / (highest - lowest)) * 100;
+    return { k, d: k }; // Simplified - normally D is 3-period SMA of K
   }
 
   static calculateATR(prices, period = 14) {
-    if (prices.length < period) return null;
-    const ranges = [];
+    if (!prices || prices.length < period + 1) return null;
     
-    for (let i = 1; i < period; i++) {
-      const high = Math.max(...prices.slice(-i-1, -i+1));
-      const low = Math.min(...prices.slice(-i-1, -i+1));
-      ranges.push(high - low);
+    let trSum = 0;
+    for (let i = 1; i <= period; i++) {
+      const high = prices[i] * 1.005; // Simulated high
+      const low = prices[i] * 0.995;  // Simulated low
+      const prevClose = prices[i - 1];
+      
+      const tr = Math.max(
+        high - low,
+        Math.abs(high - prevClose),
+        Math.abs(low - prevClose)
+      );
+      trSum += tr;
     }
     
-    return ranges.reduce((a, b) => a + b, 0) / ranges.length;
+    return trSum / period;
   }
 
   static calculateVolatility(prices, period = 20) {
-    if (prices.length < period) return null;
-    const returns = [];
+    if (!prices || prices.length < period + 1) return null;
     
-    for (let i = 1; i < period; i++) {
-      const idx = prices.length - i;
-      returns.push(Math.log(prices[idx] / prices[idx - 1]));
+    const returns = [];
+    for (let i = 1; i < prices.length; i++) {
+      returns.push(Math.log(prices[i] / prices[i - 1]));
     }
     
-    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
-    const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns.length;
+    const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+    const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - mean, 2), 0) / returns.length;
+    
     return Math.sqrt(variance * 252); // Annualized volatility
   }
 
-  static calculateAdvancedMetrics(prices, volumes) {
+  // NEW: Advanced Market Regime Detection
+  static detectMarketRegime(prices, volumes, technicalData) {
     const current = prices[prices.length - 1];
-    const sma20 = this.calculateSMA(prices, 20);
-    const sma50 = this.calculateSMA(prices, 50);
-    const ema12 = this.calculateEMA(prices, 12);
-    const ema26 = this.calculateEMA(prices, 26);
+    const sma20 = technicalData.sma_20;
+    const sma50 = technicalData.sma_50;
+    const sma200 = this.calculateSMA(prices, 200);
+    const rsi = technicalData.rsi;
+    const macd = technicalData.macd;
+    const volatility = technicalData.volatility;
+    const volumeRatio = technicalData.volume_ratio;
 
-    // Volume-based indicators
-    const avgVolume = volumes ? this.calculateSMA(volumes, 20) : null;
-    const currentVolume = volumes ? volumes[volumes.length - 1] : null;
-    const volumeRatio = avgVolume && currentVolume ? currentVolume / avgVolume : 1;
-
-    // Advanced momentum indicators
-    const roc = prices.length >= 10 ? ((current - prices[prices.length - 10]) / prices[prices.length - 10]) * 100 : 0;
-    const momentum = prices.length >= 5 ? current - prices[prices.length - 5] : 0;
+    // Trend Direction Analysis
+    const trendDirection = this.analyzeTrendDirection(prices, sma20, sma50, sma200);
+    
+    // Market Phase Analysis
+    const marketPhase = this.analyzeMarketPhase(prices, volumes, technicalData);
+    
+    // Volatility Regime
+    const volatilityRegime = this.analyzeVolatilityRegime(volatility, prices);
+    
+    // Volume Analysis
+    const volumeAnalysis = this.analyzeVolumePattern(volumes, prices);
+    
+    // Momentum Analysis
+    const momentumAnalysis = this.analyzeMomentum(rsi, macd, prices);
 
     return {
-      price: current,
-      sma_20: sma20,
-      sma_50: sma50,
-      ema_12: ema12,
-      ema_26: ema26,
-      rsi: this.calculateRSI(prices),
-      macd: this.calculateMACD(prices),
-      bollinger_bands: this.calculateBollingerBands(prices),
-      stochastic: this.calculateStochastic(prices),
-      atr: this.calculateATR(prices),
-      volatility: this.calculateVolatility(prices),
-      volume_ratio: volumeRatio,
-      rate_of_change: roc,
-      momentum: momentum,
-      trend_strength: sma20 ? Math.abs((current - sma20) / sma20) * 100 : 0,
-      market_regime: this.determineMarketRegime(prices, volumes)
+      primary_trend: trendDirection.primary,
+      secondary_trend: trendDirection.secondary,
+      market_phase: marketPhase,
+      volatility_regime: volatilityRegime,
+      volume_pattern: volumeAnalysis,
+      momentum_state: momentumAnalysis,
+      regime_confidence: this.calculateRegimeConfidence(trendDirection, marketPhase, volatilityRegime),
+      regime_strength: this.calculateRegimeStrength(prices, volumes, technicalData)
     };
   }
 
+  static analyzeTrendDirection(prices, sma20, sma50, sma200) {
+    const current = prices[prices.length - 1];
+    const prev20 = prices[prices.length - 21] || current;
+    const prev50 = prices[prices.length - 51] || current;
+    
+    // Primary trend (long-term)
+    let primaryTrend = 'NEUTRAL';
+    if (sma200 && current > sma200 && sma20 > sma50 && sma50 > sma200) {
+      primaryTrend = 'BULLISH';
+    } else if (sma200 && current < sma200 && sma20 < sma50 && sma50 < sma200) {
+      primaryTrend = 'BEARISH';
+    }
+    
+    // Secondary trend (short-term)
+    let secondaryTrend = 'NEUTRAL';
+    if (current > sma20 && sma20 > prev20) {
+      secondaryTrend = 'BULLISH';
+    } else if (current < sma20 && sma20 < prev20) {
+      secondaryTrend = 'BEARISH';
+    }
+    
+    return {
+      primary: primaryTrend,
+      secondary: secondaryTrend,
+      alignment: primaryTrend === secondaryTrend ? 'ALIGNED' : 'DIVERGENT'
+    };
+  }
+
+  static analyzeMarketPhase(prices, volumes, technicalData) {
+    const current = prices[prices.length - 1];
+    const priceRange = Math.max(...prices.slice(-50)) - Math.min(...prices.slice(-50));
+    const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+    const recentVolume = volumes.slice(-10).reduce((a, b) => a + b, 0) / 10;
+    const volatility = technicalData.volatility;
+    const rsi = technicalData.rsi;
+    
+    // Accumulation Phase: Low volatility, increasing volume, price consolidation
+    if (volatility < 0.3 && recentVolume > avgVolume * 1.1 && rsi > 30 && rsi < 70) {
+      const priceStability = this.calculatePriceStability(prices.slice(-20));
+      if (priceStability > 0.8) {
+        return 'ACCUMULATION';
+      }
+    }
+    
+    // Distribution Phase: High volatility, decreasing volume, price topping
+    if (volatility > 0.5 && recentVolume < avgVolume * 0.9 && rsi > 60) {
+      const isTopping = this.detectToppingPattern(prices.slice(-20));
+      if (isTopping) {
+        return 'DISTRIBUTION';
+      }
+    }
+    
+    // Markup Phase: Rising prices, increasing volume, strong momentum
+    if (current > prices[prices.length - 21] && recentVolume > avgVolume && rsi > 50) {
+      const momentum = this.calculateMomentum(prices.slice(-10));
+      if (momentum > 0.02) {
+        return 'MARKUP';
+      }
+    }
+    
+    // Markdown Phase: Falling prices, high volume, weak momentum
+    if (current < prices[prices.length - 21] && recentVolume > avgVolume && rsi < 50) {
+      const momentum = this.calculateMomentum(prices.slice(-10));
+      if (momentum < -0.02) {
+        return 'MARKDOWN';
+      }
+    }
+    
+    // Consolidation Phase: Sideways price action, low volatility
+    if (volatility < 0.4) {
+      const priceStability = this.calculatePriceStability(prices.slice(-30));
+      if (priceStability > 0.7) {
+        return 'CONSOLIDATION';
+      }
+    }
+    
+    return 'TRANSITION';
+  }
+
+  static analyzeVolatilityRegime(volatility, prices) {
+    const historicalVol = this.calculateHistoricalVolatility(prices, 60);
+    const currentVol = volatility;
+    
+    if (currentVol > historicalVol * 1.5) {
+      return 'HIGH_VOLATILITY';
+    } else if (currentVol < historicalVol * 0.7) {
+      return 'LOW_VOLATILITY';
+    } else {
+      return 'NORMAL_VOLATILITY';
+    }
+  }
+
+  static analyzeVolumePattern(volumes, prices) {
+    const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+    const recentVolume = volumes.slice(-5).reduce((a, b) => a + b, 0) / 5;
+    const volumeTrend = this.calculateVolumeTrend(volumes.slice(-10));
+    
+    if (recentVolume > avgVolume * 1.3 && volumeTrend > 0.05) {
+      return 'INCREASING_VOLUME';
+    } else if (recentVolume < avgVolume * 0.7 && volumeTrend < -0.05) {
+      return 'DECREASING_VOLUME';
+    } else {
+      return 'STABLE_VOLUME';
+    }
+  }
+
+  static analyzeMomentum(rsi, macd, prices) {
+    const priceChange = (prices[prices.length - 1] / prices[prices.length - 11] - 1) * 100;
+    const macdMomentum = macd ? macd.histogram : 0;
+    
+    if (rsi > 60 && macdMomentum > 0 && priceChange > 3) {
+      return 'STRONG_BULLISH';
+    } else if (rsi < 40 && macdMomentum < 0 && priceChange < -3) {
+      return 'STRONG_BEARISH';
+    } else if (rsi > 50 && macdMomentum > 0) {
+      return 'BULLISH';
+    } else if (rsi < 50 && macdMomentum < 0) {
+      return 'BEARISH';
+    } else {
+      return 'NEUTRAL';
+    }
+  }
+
+  // Helper methods for market phase analysis
+  static calculatePriceStability(prices) {
+    const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const variance = prices.reduce((sum, price) => sum + Math.pow(price - mean, 2), 0) / prices.length;
+    const stdDev = Math.sqrt(variance);
+    const coefficientOfVariation = stdDev / mean;
+    
+    return Math.max(0, 1 - coefficientOfVariation * 10); // Normalize to 0-1
+  }
+
+  static detectToppingPattern(prices) {
+    const recent = prices.slice(-5);
+    const earlier = prices.slice(-10, -5);
+    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+    const earlierAvg = earlier.reduce((a, b) => a + b, 0) / earlier.length;
+    
+    return recentAvg < earlierAvg * 0.98; // 2% decline suggests topping
+  }
+
+  static calculateMomentum(prices) {
+    if (prices.length < 2) return 0;
+    return (prices[prices.length - 1] / prices[0] - 1);
+  }
+
+  static calculateHistoricalVolatility(prices, period) {
+    if (prices.length < period) return 0.3; // Default
+    
+    const returns = [];
+    for (let i = 1; i < Math.min(prices.length, period + 1); i++) {
+      returns.push(Math.log(prices[i] / prices[i - 1]));
+    }
+    
+    const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+    const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - mean, 2), 0) / returns.length;
+    
+    return Math.sqrt(variance * 252); // Annualized
+  }
+
+  static calculateVolumeTrend(volumes) {
+    if (volumes.length < 2) return 0;
+    
+    const early = volumes.slice(0, Math.floor(volumes.length / 2));
+    const late = volumes.slice(Math.floor(volumes.length / 2));
+    
+    const earlyAvg = early.reduce((a, b) => a + b, 0) / early.length;
+    const lateAvg = late.reduce((a, b) => a + b, 0) / late.length;
+    
+    return (lateAvg / earlyAvg - 1);
+  }
+
+  static calculateRegimeConfidence(trendDirection, marketPhase, volatilityRegime) {
+    let confidence = 0.5;
+    
+    // Higher confidence when trends are aligned
+    if (trendDirection.alignment === 'ALIGNED') {
+      confidence += 0.2;
+    }
+    
+    // Adjust based on market phase clarity
+    if (['ACCUMULATION', 'DISTRIBUTION', 'MARKUP', 'MARKDOWN'].includes(marketPhase)) {
+      confidence += 0.15;
+    }
+    
+    // Adjust based on volatility regime
+    if (volatilityRegime === 'NORMAL_VOLATILITY') {
+      confidence += 0.1;
+    } else if (volatilityRegime === 'HIGH_VOLATILITY') {
+      confidence -= 0.1;
+    }
+    
+    return Math.max(0.2, Math.min(0.9, confidence));
+  }
+
+  static calculateRegimeStrength(prices, volumes, technicalData) {
+    const priceChange = (prices[prices.length - 1] / prices[prices.length - 21] - 1) * 100;
+    const volumeStrength = technicalData.volume_ratio || 1;
+    const rsi = technicalData.rsi || 50;
+    
+    let strength = Math.abs(priceChange) * 0.1; // Base strength from price movement
+    strength += Math.abs(volumeStrength - 1) * 0.3; // Volume confirmation
+    strength += Math.abs(rsi - 50) * 0.01; // RSI deviation
+    
+    return Math.max(0.1, Math.min(1.0, strength));
+  }
+
+  static calculateAdvancedMetrics(prices, volumes) {
+    const sma_20 = this.calculateSMA(prices, 20);
+    const sma_50 = this.calculateSMA(prices, 50);
+    const ema_12 = this.calculateEMA(prices, 12);
+    const ema_26 = this.calculateEMA(prices, 26);
+    const rsi = this.calculateRSI(prices);
+    const macd = this.calculateMACD(prices);
+    const bollinger_bands = this.calculateBollingerBands(prices);
+    const stochastic = this.calculateStochastic(prices);
+    const atr = this.calculateATR(prices);
+    const volatility = this.calculateVolatility(prices);
+    
+    // Enhanced volume analysis
+    const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+    const recentVolume = volumes.slice(-5).reduce((a, b) => a + b, 0) / 5;
+    const volume_ratio = recentVolume / avgVolume;
+    
+    // Rate of change and momentum
+    const rate_of_change = prices.length > 10 ? 
+      ((prices[prices.length - 1] / prices[prices.length - 11]) - 1) * 100 : 0;
+    const momentum = prices.length > 10 ? 
+      prices[prices.length - 1] - prices[prices.length - 11] : 0;
+
+    const baseMetrics = {
+      sma_20, sma_50, ema_12, ema_26, rsi, macd, bollinger_bands,
+      stochastic, atr, volatility, volume_ratio, rate_of_change, momentum
+    };
+
+    // NEW: Advanced market regime detection
+    const marketRegime = this.detectMarketRegime(prices, volumes, baseMetrics);
+    
+    return {
+      ...baseMetrics,
+      market_regime: marketRegime
+    };
+  }
+
+  // Keep existing determineMarketRegime for backward compatibility
   static determineMarketRegime(prices, volumes) {
     const volatility = this.calculateVolatility(prices) || 0.02;
     const sma20 = this.calculateSMA(prices, 20);
@@ -979,8 +1397,10 @@ class MarketDataService {
     return {
       symbol,
       current_price: prices[prices.length - 1],
-      price_history: prices,
-      volume_history: volumes,
+      prices: prices,  // Fixed: changed from price_history to prices
+      volumes: volumes,  // Fixed: changed from volume_history to volumes
+      price_history: prices,  // Keep for backward compatibility
+      volume_history: volumes,  // Keep for backward compatibility
       volume_24h: volumes.slice(-24).reduce((a, b) => a + b, 0),
       price_change_24h: priceChange24h,
       market_cap: currentPrice * this.getCirculatingSupply(symbol),
@@ -1143,37 +1563,63 @@ class EnhancedAISignalGenerator {
   constructor() {
     this.coinGeckoService = new EnhancedCoinGeckoService();
     this.mlcService = mlcService;
+    this.offChainService = require('./services/offChainDataService');
   }
 
   async generateAdvancedSignal(marketData, technicalData, onChainData, requestParams) {
     try {
-      // Generate signal using both Claude and CoinGecko insights
-      const claudeAnalysis = await this.generateClaudeSignal(marketData, technicalData, onChainData, requestParams);
+      // Get comprehensive off-chain data
+      const offChainData = await this.offChainService.getComprehensiveOffChainData(marketData.symbol);
       
-      // Get ML predictions
-      const mlResults = await this.mlcService.getMLPredictions(
-        requestParams.symbol || 'BTCUSDT', 
+      // Detect current market regime
+      const marketRegime = technicalData.market_regime;
+      
+      // Generate signal using market-adaptive strategy
+      const adaptiveSignal = await this.generateMarketAdaptiveSignal(
         marketData, 
-        technicalData
+        technicalData, 
+        onChainData, 
+        offChainData, 
+        requestParams
       );
+      
+      // Use deterministic ML data for real analysis, randomized only for fallback
+      const isRealData = onChainData.source === 'coingecko' && onChainData.source !== 'coingecko_fallback';
+      const mlResults = isRealData ? 
+        this.mlcService.getDeterministicMLData() : 
+        this.mlcService.getFallbackMLData();
       
       // Log data source information
       const dataSource = onChainData.source || 'unknown';
-      const mlSource = mlResults.timestamp ? 'ml_models' : 'fallback';
-      const isRealData = dataSource === 'coingecko' && onChainData.source !== 'coingecko_fallback';
-      logger.info(`Signal generation data sources: onchain=${dataSource}, ml=${mlSource}`, {
+      const mlSource = isRealData ? 'deterministic_ml' : 'fallback_ml';
+      logger.info(`Signal generation data sources: onchain=${dataSource}, ml=${mlSource}, offchain=${offChainData.data_quality.quality_score}%`, {
         symbol: requestParams.symbol,
+        market_regime: marketRegime,  // Fixed: Log full regime object
+        primary_trend: marketRegime.primary_trend,
         onchain_score: isRealData ? 'real_data' : 'fallback_data',
         ml_confidence: mlResults.ml_confidence
       });
       
-      // Enhance with on-chain specific insights
-      const enhancedSignal = this.enhanceWithOnChainData(claudeAnalysis, onChainData);
+      // Enhance with comprehensive data analysis
+      const enhancedSignal = this.enhanceWithComprehensiveData(
+        adaptiveSignal, 
+        onChainData, 
+        offChainData, 
+        marketRegime
+      );
       
       // Enhance with ML insights
-      const mlEnhancedSignal = this.mlcService.enhanceSignalWithML(enhancedSignal, mlResults);
+      const finalSignal = this.mlcService.enhanceSignalWithML(enhancedSignal, mlResults);
       
-      return mlEnhancedSignal;
+      // Add market regime context and reasoning
+      finalSignal.market_context = {
+        regime: marketRegime,
+        off_chain_quality: offChainData.data_quality,
+        strategy_type: this.determineStrategyType(marketRegime, offChainData),
+        risk_environment: this.assessRiskEnvironment(marketRegime, offChainData, requestParams.risk_level)
+      };
+      
+      return finalSignal;
       
     } catch (error) {
       logger.error('Enhanced signal generation failed:', error);
@@ -1182,219 +1628,709 @@ class EnhancedAISignalGenerator {
     }
   }
 
-  async generateClaudeSignal(marketData, technicalData, onChainData, requestParams) {
-    const prompt = this.buildAdvancedPrompt(marketData, technicalData, onChainData, requestParams);
+  async generateMarketAdaptiveSignal(marketData, technicalData, onChainData, offChainData, requestParams) {
+    const marketRegime = technicalData.market_regime;
+    const riskLevel = requestParams.risk_level || 'moderate';
     
-    try {
-      const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        temperature: 0.3,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
-      });
-      let responseText = message.content[0].text;
-      // Strip Markdown code block if present
-      if (responseText.startsWith('```json')) {
-        responseText = responseText.replace(/^```json\s*/, '').replace(/```\s*$/, '');
-      } else if (responseText.startsWith('```')) {
-        responseText = responseText.replace(/^```\s*/, '').replace(/```\s*$/, '');
+    // Choose strategy based on market phase
+    switch (marketRegime.market_phase) {
+      case 'ACCUMULATION':
+        return this.generateAccumulationStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+      
+      case 'DISTRIBUTION':
+        return this.generateDistributionStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+      
+      case 'MARKUP':
+        return this.generateMarkupStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+      
+      case 'MARKDOWN':
+        return this.generateMarkdownStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+      
+      case 'CONSOLIDATION':
+        return this.generateConsolidationStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+      
+      default:
+        return this.generateNeutralStrategy(marketData, technicalData, onChainData, offChainData, riskLevel);
+    }
+  }
+
+  generateAccumulationStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const volatility = technicalData.volatility;
+    const volumeRatio = technicalData.volume_ratio;
+    const fundingRate = offChainData.funding_rates.current_funding_rate;
+    const sentiment = offChainData.sentiment_indicators.long_short_ratio;
+    
+    // Accumulation phase: Look for gradual buying opportunities
+    let signal = 'HOLD';
+    let confidence = 45;
+    let reasoning = 'Accumulation phase detected - monitoring for entry opportunities';
+    
+    // Positive signals for accumulation
+    if (rsi < 45 && volumeRatio > 1.1 && fundingRate < 0.0005) {
+      signal = 'BUY';
+      confidence = 65;
+      reasoning = 'Accumulation phase with oversold conditions and increasing volume';
+    }
+    
+    // Risk-off signals
+    if (volatility > 0.6 || sentiment > 1.5) {
+      signal = 'HOLD';
+      confidence = 35;
+      reasoning = 'High volatility or excessive bullish sentiment - waiting for better entry';
+    }
+    
+    // Adjust for risk level
+    if (riskLevel === 'conservative') {
+      confidence = Math.max(25, confidence - 10);
+    } else if (riskLevel === 'aggressive') {
+      confidence = Math.min(80, confidence + 10);
+    }
+    
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'ACCUMULATION', { market_phase: 'ACCUMULATION' });
+  }
+
+  generateDistributionStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const volatility = technicalData.volatility;
+    const volumeRatio = technicalData.volume_ratio;
+    const fundingRate = offChainData.funding_rates.current_funding_rate;
+    const sentiment = offChainData.sentiment_indicators.long_short_ratio;
+    const fearGreed = offChainData.market_sentiment.fear_greed_index;
+    
+    // Distribution phase: Look for exit opportunities and short setups
+    let signal = 'HOLD';
+    let confidence = 40;
+    let reasoning = 'Distribution phase detected - monitoring for exit signals';
+    
+    // Bearish signals for distribution
+    if (rsi > 65 && volumeRatio < 0.9 && fundingRate > 0.001) {
+      signal = 'SELL';
+      confidence = 70;
+      reasoning = 'Distribution phase with overbought conditions and decreasing volume';
+    }
+    
+    // Extreme greed signals
+    if (fearGreed > 75 && sentiment > 1.3) {
+      signal = 'SELL';
+      confidence = 75;
+      reasoning = 'Extreme greed levels during distribution - high probability reversal';
+    }
+    
+    // Conservative approach in distribution
+    if (riskLevel === 'conservative') {
+      if (signal === 'SELL') {
+        signal = 'HOLD';
+        confidence = 50;
+        reasoning = 'Conservative approach - holding cash during distribution phase';
       }
-      return JSON.parse(responseText);
-    } catch (error) {
-      logger.error('Claude API call failed:', error);
-      throw error;
     }
-  }
-
-  buildAdvancedPrompt(marketData, technicalData, onChainData, requestParams) {
-    return `You are an institutional-grade cryptocurrency trading AI with access to both traditional technical analysis and advanced on-chain data. Generate a comprehensive trading signal.
-
-MARKET DATA:
-- Symbol: ${marketData.symbol}
-- Current Price: $${marketData.current_price.toFixed(8)}
-- 24h Change: ${marketData.price_change_24h.toFixed(2)}%
-- Volume 24h: $${(marketData.volume_24h / 1e6).toFixed(2)}M
-- Market Cap: $${(marketData.market_cap / 1e9).toFixed(2)}B
-- Volume Ratio: ${technicalData.volume_ratio?.toFixed(2)}x
-- Market Regime: ${technicalData.market_regime}
-
-TECHNICAL INDICATORS:
-- RSI: ${technicalData.rsi?.toFixed(2)}
-- MACD: ${technicalData.macd?.macd?.toFixed(4)}
-- MACD Signal: ${technicalData.macd?.signal?.toFixed(4)}
-- MACD Histogram: ${technicalData.macd?.histogram?.toFixed(4)}
-- SMA 20: $${technicalData.sma_20?.toFixed(8)}
-- SMA 50: $${technicalData.sma_50?.toFixed(8)}
-- EMA 12: $${technicalData.ema_12?.toFixed(8)}
-- EMA 26: $${technicalData.ema_26?.toFixed(8)}
-- Bollinger Upper: $${technicalData.bollinger_bands?.upper?.toFixed(8)}
-- Bollinger Lower: $${technicalData.bollinger_bands?.lower?.toFixed(8)}
-- Stochastic %K: ${technicalData.stochastic?.k?.toFixed(2)}
-- ATR: ${technicalData.atr?.toFixed(8)}
-- Volatility: ${(technicalData.volatility * 100)?.toFixed(2)}%
-- Rate of Change: ${technicalData.rate_of_change?.toFixed(2)}%
-- Momentum: ${technicalData.momentum?.toFixed(8)}
-
-ON-CHAIN DATA (LunarCrush):
-- Whale Activity: ${onChainData.whale_activity?.large_transfers_24h} large transfers, ${onChainData.whale_activity?.whale_accumulation} trend
-- Network Health: ${onChainData.network_metrics?.active_addresses} active addresses, ${onChainData.network_metrics?.gas_usage_trend} gas trend
-- DeFi Metrics: $${(onChainData.defi_metrics?.total_locked_value / 1e9)?.toFixed(2)}B TVL, ${onChainData.defi_metrics?.yield_farming_apy?.toFixed(2)}% APY
-- Smart Money: ${onChainData.sentiment_indicators?.smart_money_flow} flow, ${onChainData.sentiment_indicators?.on_chain_sentiment} sentiment
-- Funding Rates: ${(onChainData.sentiment_indicators?.derivative_metrics?.funding_rates * 100)?.toFixed(3)}%
-- Cross-chain: ${onChainData.cross_chain_analysis?.arbitrage_opportunities ? 'Arbitrage available' : 'No arbitrage'}
-- Risk Level: ${onChainData.risk_assessment?.market_manipulation_risk}, Liquidity: ${onChainData.risk_assessment?.liquidity_score?.toFixed(0)}/100
-
-REQUEST PARAMETERS:
-- Analysis Depth: ${requestParams.analysis_depth}
-- Risk Level: ${requestParams.risk_level}
-- Timeframe: ${requestParams.timeframe}
-
-Generate a comprehensive trading signal with this EXACT JSON structure:
-
-{
-  "signal": "BUY" | "SELL" | "HOLD",
-  "confidence": 0-100,
-  "strength": "WEAK" | "MODERATE" | "STRONG" | "VERY_STRONG",
-  "timeframe": "SCALP" | "INTRADAY" | "SWING" | "POSITION",
-  "entry_price": number,
-  "stop_loss": number,
-  "take_profit_1": number,
-  "take_profit_2": number,
-  "take_profit_3": number,
-  "risk_reward_ratio": number,
-  "position_size_percent": 1-25,
-  "market_sentiment": "BULLISH" | "BEARISH" | "NEUTRAL",
-  "volatility_rating": "LOW" | "MEDIUM" | "HIGH" | "EXTREME",
-  "key_levels": {
-    "support": [number, number],
-    "resistance": [number, number]
-  },
-  "technical_score": 0-100,
-  "momentum_score": 0-100,
-  "trend_score": 0-100,
-  "onchain_score": 0-100,
-  "volume_confirmation": true | false,
-  "whale_influence": "POSITIVE" | "NEGATIVE" | "NEUTRAL",
-  "defi_impact": "SUPPORTIVE" | "BEARISH" | "NEUTRAL",
-  "cross_chain_factor": "BULLISH" | "BEARISH" | "NEUTRAL",
-  "risk_factors": ["factor1", "factor2", "factor3"],
-  "catalysts": ["catalyst1", "catalyst2"],
-  "time_horizon_hours": number,
-  "max_drawdown_percent": number,
-  "probability_success": 0-100,
-  "reasoning": "comprehensive analysis combining technical and on-chain factors",
-  "next_review_timestamp": timestamp_number,
-  "confluence_factors": number,
-  "market_structure": "TRENDING" | "RANGING" | "BREAKOUT" | "REVERSAL",
-  "institutional_flow": "BUYING" | "SELLING" | "NEUTRAL",
-  "liquidity_analysis": {
-    "depth_score": 0-100,
-    "slippage_risk": "LOW" | "MEDIUM" | "HIGH",
-    "execution_feasibility": "EXCELLENT" | "GOOD" | "FAIR" | "POOR"
-  }
-}
-
-IMPORTANT: Weight on-chain data heavily in your analysis. Whale accumulation, smart money flows, and DeFi metrics often predict price movements before technical indicators. Consider the full market context including cross-chain dynamics.
-
-Respond with ONLY the JSON object. No additional text.`;
-  }
-
-  enhanceWithOnChainData(claudeSignal, onChainData) {
-    // Apply on-chain data adjustments to Claude's signal
-    let adjustedConfidence = claudeSignal.confidence;
     
-    // Whale activity adjustments
-    if (onChainData.whale_activity?.whale_accumulation === 'buying' && claudeSignal.signal === 'BUY') {
-      adjustedConfidence = Math.min(100, adjustedConfidence + 10);
-    } else if (onChainData.whale_activity?.whale_accumulation === 'selling' && claudeSignal.signal === 'SELL') {
-      adjustedConfidence = Math.min(100, adjustedConfidence + 10);
-    } else if (onChainData.whale_activity?.whale_accumulation !== 'neutral' && 
-               ((onChainData.whale_activity?.whale_accumulation === 'buying' && claudeSignal.signal === 'SELL') ||
-                (onChainData.whale_activity?.whale_accumulation === 'selling' && claudeSignal.signal === 'BUY'))) {
-      adjustedConfidence = Math.max(10, adjustedConfidence - 15);
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'DISTRIBUTION', { market_phase: 'DISTRIBUTION' });
+  }
+
+  generateMarkupStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const macd = technicalData.macd;
+    const volatility = technicalData.volatility;
+    const volumeRatio = technicalData.volume_ratio;
+    const momentum = technicalData.momentum_state;
+    
+    // Markup phase: Trend following with risk management
+    let signal = 'BUY';
+    let confidence = 60;
+    let reasoning = 'Markup phase - trend following strategy';
+    
+    // Strong momentum signals
+    if (momentum === 'STRONG_BULLISH' && volumeRatio > 1.2 && rsi < 75) {
+      signal = 'BUY';
+      confidence = 80;
+      reasoning = 'Strong bullish momentum in markup phase with volume confirmation';
+    }
+    
+    // Weakening momentum
+    if (momentum === 'NEUTRAL' || rsi > 80) {
+      signal = 'HOLD';
+      confidence = 45;
+      reasoning = 'Momentum weakening in markup phase - taking profits';
+    }
+    
+    // Risk management in markup
+    if (volatility > 0.8) {
+      confidence = Math.max(30, confidence - 20);
+      reasoning += ' - reduced confidence due to high volatility';
+    }
+    
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'MARKUP', { market_phase: 'MARKUP' });
+  }
+
+  generateMarkdownStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const volatility = technicalData.volatility;
+    const volumeRatio = technicalData.volume_ratio;
+    const momentum = technicalData.momentum_state;
+    const fearGreed = offChainData.market_sentiment.fear_greed_index;
+    
+    // Markdown phase: Defensive positioning and short opportunities
+    let signal = 'HOLD';
+    let confidence = 40;
+    let reasoning = 'Markdown phase - defensive positioning';
+    
+    // Short opportunities
+    if (momentum === 'STRONG_BEARISH' && volumeRatio > 1.1 && rsi > 25) {
+      signal = 'SELL';
+      confidence = 75;
+      reasoning = 'Strong bearish momentum in markdown phase with volume confirmation';
+    }
+    
+    // Oversold bounce potential
+    if (rsi < 25 && fearGreed < 30) {
+      signal = 'BUY';
+      confidence = 55;
+      reasoning = 'Oversold bounce opportunity in markdown phase';
+    }
+    
+    // Risk-off approach
+    if (riskLevel === 'conservative') {
+      if (signal === 'SELL') {
+        signal = 'HOLD';
+        confidence = 35;
+        reasoning = 'Conservative approach - holding cash during markdown phase';
+      }
+    }
+    
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'MARKDOWN', { market_phase: 'MARKDOWN' });
+  }
+
+  generateConsolidationStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const bollinger = technicalData.bollinger_bands;
+    const volatility = technicalData.volatility;
+    const orderBookImbalance = offChainData.order_book_analysis.order_book_imbalance;
+    const liquidityDepth = offChainData.order_book_analysis.liquidity_depth;
+    
+    // Consolidation phase: Range trading and breakout preparation
+    let signal = 'HOLD';
+    let confidence = 35;
+    let reasoning = 'Consolidation phase - range trading strategy';
+    
+    // Range trading signals
+    if (bollinger && price < bollinger.lower && rsi < 40) {
+      signal = 'BUY';
+      confidence = 60;
+      reasoning = 'Range trading - buying at support level';
+    } else if (bollinger && price > bollinger.upper && rsi > 60) {
+      signal = 'SELL';
+      confidence = 60;
+      reasoning = 'Range trading - selling at resistance level';
+    }
+    
+    // Breakout preparation
+    if (volatility < 0.2 && Math.abs(orderBookImbalance) < 0.1) {
+      signal = 'HOLD';
+      confidence = 30;
+      reasoning = 'Low volatility consolidation - waiting for breakout direction';
+    }
+    
+    // High liquidity advantage
+    if (liquidityDepth.total_depth > 500000) {
+      confidence += 10;
+      reasoning += ' - high liquidity supports strategy';
+    }
+    
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'CONSOLIDATION', { market_phase: 'CONSOLIDATION' });
+  }
+
+  generateNeutralStrategy(marketData, technicalData, onChainData, offChainData, riskLevel) {
+    const price = marketData.current_price;
+    const rsi = technicalData.rsi;
+    const volatility = technicalData.volatility;
+    const sentiment = offChainData.sentiment_indicators.long_short_ratio;
+    const fearGreed = offChainData.market_sentiment.fear_greed_index;
+    
+    // Neutral/Transition phase: Cautious approach with multiple confirmations
+    let signal = 'HOLD';
+    let confidence = 30;
+    let reasoning = 'Market in transition - awaiting clear direction';
+    
+    // Multiple confirmation signals
+    let bullishSignals = 0;
+    let bearishSignals = 0;
+    
+    if (rsi < 35) bullishSignals++;
+    if (rsi > 65) bearishSignals++;
+    if (sentiment < 0.8) bullishSignals++;
+    if (sentiment > 1.2) bearishSignals++;
+    if (fearGreed < 35) bullishSignals++;
+    if (fearGreed > 65) bearishSignals++;
+    
+    // Require multiple confirmations in neutral phase
+    if (bullishSignals >= 2 && bearishSignals === 0) {
+      signal = 'BUY';
+      confidence = 55;
+      reasoning = 'Multiple bullish confirmations in neutral market';
+    } else if (bearishSignals >= 2 && bullishSignals === 0) {
+      signal = 'SELL';
+      confidence = 55;
+      reasoning = 'Multiple bearish confirmations in neutral market';
+    }
+    
+    // Volatility adjustment
+    if (volatility > 0.5) {
+      confidence = Math.max(20, confidence - 15);
+      reasoning += ' - reduced confidence due to high volatility';
+    }
+    
+    return this.buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, 'NEUTRAL', { market_phase: 'NEUTRAL' });
+  }
+
+  // New method for signal filtering and quality assessment
+  assessSignalQuality(signal, confidence, volatility, marketRegime) {
+    const qualityMetrics = {
+      confidence_grade: this.getConfidenceGrade(confidence),
+      volatility_suitability: this.getVolatilitySuitability(volatility),
+      regime_alignment: this.getRegimeAlignment(signal, marketRegime),
+      overall_quality: 'PENDING',
+      tradeable: false,
+      quality_score: 0,
+      recommendations: []
+    };
+
+    // Calculate overall quality score
+    let qualityScore = 0;
+    
+    // Confidence scoring (40% weight)
+    if (confidence >= 40) qualityScore += 40;
+    else if (confidence >= 35) qualityScore += 30;
+    else if (confidence >= 30) qualityScore += 20;
+    else if (confidence >= 25) qualityScore += 10;
+    
+    // Volatility scoring (30% weight)
+    if (volatility > 0.02 && volatility < 0.06) qualityScore += 30;
+    else if (volatility >= 0.015 && volatility <= 0.07) qualityScore += 20;
+    else qualityScore += 10;
+    
+    // Market regime scoring (30% weight)
+    if (marketRegime) {
+      if ((signal.signal === 'BUY' && marketRegime.market_phase === 'MARKUP') ||
+          (signal.signal === 'BUY' && marketRegime.market_phase === 'ACCUMULATION')) {
+        qualityScore += 30;
+      } else if ((signal.signal === 'SELL' && marketRegime.market_phase === 'DISTRIBUTION') ||
+                 (signal.signal === 'SELL' && marketRegime.market_phase === 'MARKDOWN')) {
+        qualityScore += 30;
+      } else if (marketRegime.market_phase === 'CONSOLIDATION') {
+        qualityScore += 15;
+      } else {
+        qualityScore += 5;
+      }
+    } else {
+      qualityScore += 15; // Neutral if no regime data
     }
 
-    // Smart money flow adjustments
-    if (onChainData.sentiment_indicators?.smart_money_flow === 'inflow' && claudeSignal.signal === 'BUY') {
-      adjustedConfidence = Math.min(100, adjustedConfidence + 8);
-    } else if (onChainData.sentiment_indicators?.smart_money_flow === 'outflow' && claudeSignal.signal === 'SELL') {
-      adjustedConfidence = Math.min(100, adjustedConfidence + 8);
+    qualityMetrics.quality_score = qualityScore;
+    qualityMetrics.tradeable = qualityScore >= 50; // Minimum 50% quality score to be tradeable
+    
+    // Determine overall quality
+    if (qualityScore >= 80) qualityMetrics.overall_quality = 'EXCELLENT';
+    else if (qualityScore >= 70) qualityMetrics.overall_quality = 'GOOD';
+    else if (qualityScore >= 50) qualityMetrics.overall_quality = 'FAIR';
+    else qualityMetrics.overall_quality = 'POOR';
+
+    // Generate recommendations
+    if (confidence < 30) {
+      qualityMetrics.recommendations.push('Consider waiting for higher confidence signals');
+    }
+    if (volatility > 0.06) {
+      qualityMetrics.recommendations.push('High volatility - use smaller position sizes');
+    }
+    if (!qualityMetrics.tradeable) {
+      qualityMetrics.recommendations.push('Signal quality below minimum threshold - avoid trading');
+    }
+    if (qualityScore >= 70) {
+      qualityMetrics.recommendations.push('High quality signal suitable for active trading');
     }
 
-    // Risk assessment adjustments
-    if (onChainData.risk_assessment?.market_manipulation_risk === 'high') {
-      adjustedConfidence = Math.max(20, adjustedConfidence - 20);
-    } else if (onChainData.risk_assessment?.liquidity_score < 30) {
-      adjustedConfidence = Math.max(15, adjustedConfidence - 15);
+    return qualityMetrics;
+  }
+
+  getConfidenceGrade(confidence) {
+    if (confidence >= 45) return 'A';
+    if (confidence >= 40) return 'B+';
+    if (confidence >= 35) return 'B';
+    if (confidence >= 30) return 'B-';
+    if (confidence >= 25) return 'C';
+    return 'D';
+  }
+
+  getVolatilitySuitability(volatility) {
+    if (volatility < 0.015) return 'LOW_OPPORTUNITY';
+    if (volatility <= 0.05) return 'SUITABLE';
+    if (volatility <= 0.07) return 'HIGH_RISK';
+    return 'EXTREME_RISK';
+  }
+
+  getRegimeAlignment(signal, marketRegime) {
+    if (!marketRegime) return 'UNKNOWN';
+    
+    const phase = marketRegime.market_phase;
+    
+    if (signal.signal === 'BUY') {
+      if (phase === 'MARKUP' || phase === 'ACCUMULATION') return 'ALIGNED';
+      if (phase === 'CONSOLIDATION') return 'NEUTRAL';
+      return 'MISALIGNED';
+    } else if (signal.signal === 'SELL') {
+      if (phase === 'DISTRIBUTION' || phase === 'MARKDOWN') return 'ALIGNED';
+      if (phase === 'CONSOLIDATION') return 'NEUTRAL';
+      return 'MISALIGNED';
     }
+    
+    return 'NEUTRAL';
+  }
+
+  buildSignalResponse(signal, confidence, reasoning, price, volatility, riskLevel, phase, marketRegime = null) {
+    const stopLossDistance = price * (volatility * 1.5);
+    const takeProfitDistance = stopLossDistance * 2;
+
+    // Calculate proper stop loss and take profit based on signal
+    let stopLoss, takeProfit1, takeProfit2, takeProfit3;
+    
+    if (signal === 'BUY') {
+      stopLoss = price - stopLossDistance;
+      takeProfit1 = price + takeProfitDistance * 0.6;
+      takeProfit2 = price + takeProfitDistance;
+      takeProfit3 = price + takeProfitDistance * 1.5;
+    } else if (signal === 'SELL') {
+      stopLoss = price + stopLossDistance;
+      takeProfit1 = price - takeProfitDistance * 0.6;
+      takeProfit2 = price - takeProfitDistance;
+      takeProfit3 = price - takeProfitDistance * 1.5;
+    } else {
+      // HOLD signal - set reasonable levels for potential breakout
+      stopLoss = price - stopLossDistance * 0.8;
+      takeProfit1 = price + takeProfitDistance * 0.4;
+      takeProfit2 = price + takeProfitDistance * 0.8;
+      takeProfit3 = price + takeProfitDistance * 1.2;
+    }
+
+    // Enhanced position sizing with market regime consideration
+    const positionSize = this.calculatePositionSize(confidence, volatility, riskLevel, marketRegime);
+    const positionSizingRecommendations = this.getPositionSizingRecommendations(confidence, volatility, marketRegime, riskLevel);
+    
+    // Enhanced volatility analysis
+    const volatilityMetrics = this.getVolatilityMetrics(volatility, price);
+    
+    // Short-term opportunity indicators
+    const opportunityIndicators = this.getOpportunityIndicators(confidence, volatility, marketRegime, signal);
+    
+    // Signal quality assessment
+    const signalQuality = this.assessSignalQuality({ signal }, confidence, volatility, marketRegime);
 
     return {
-      ...claudeSignal,
-      confidence: Math.round(adjustedConfidence),
-      onchain_score: this.calculateOnChainScore(onChainData),
-      whale_influence: this.determineWhaleInfluence(onChainData),
-      defi_impact: this.determineDeFiImpact(onChainData),
-      cross_chain_factor: this.determineCrossChainFactor(onChainData),
-      enhanced_by: 'lunarcrush_integration'
+      signal,
+      confidence: Math.round(confidence),
+      strength: confidence > 70 ? 'STRONG' : confidence > 55 ? 'MODERATE' : 'WEAK',
+      timeframe: this.mapTimeframe('1h'), // Default timeframe
+      entry_price: price,
+      stop_loss: stopLoss,
+      take_profit_1: takeProfit1,
+      take_profit_2: takeProfit2,
+      take_profit_3: takeProfit3,
+      risk_reward_ratio: takeProfitDistance / stopLossDistance,
+      
+      // Enhanced position sizing
+      position_size_percent: positionSize,
+      position_sizing: positionSizingRecommendations,
+      
+      // Enhanced market analysis
+      market_sentiment: signal === 'BUY' ? 'BULLISH' : signal === 'SELL' ? 'BEARISH' : 'NEUTRAL',
+      volatility_rating: volatility < 0.02 ? 'LOW' : volatility < 0.04 ? 'MEDIUM' : volatility < 0.06 ? 'HIGH' : 'EXTREME',
+      volatility_metrics: volatilityMetrics,
+      
+      // Short-term opportunity analysis
+      opportunity_indicators: opportunityIndicators,
+      
+      // Signal quality assessment
+      signal_quality: signalQuality,
+      
+      reasoning,
+      market_phase: phase,
+      strategy_type: this.getStrategyType(phase, signal),
+      timestamp: Date.now()
     };
   }
 
-  calculateOnChainScore(onChainData) {
-    let score = 50; // Base neutral score
+  // New method for enhanced volatility metrics
+  getVolatilityMetrics(volatility, price) {
+    const volatilityPercent = volatility * 100;
     
-    // Whale activity scoring
-    if (onChainData.whale_activity?.whale_accumulation === 'buying') score += 15;
-    else if (onChainData.whale_activity?.whale_accumulation === 'selling') score -= 15;
-    
-    // Smart money flow scoring
-    if (onChainData.sentiment_indicators?.smart_money_flow === 'inflow') score += 10;
-    else if (onChainData.sentiment_indicators?.smart_money_flow === 'outflow') score -= 10;
-    
-    // Network health scoring
-    if (onChainData.network_metrics?.gas_usage_trend === 'increasing') score += 5;
-    else if (onChainData.network_metrics?.gas_usage_trend === 'decreasing') score -= 5;
-    
-    // Risk adjustments
-    if (onChainData.risk_assessment?.market_manipulation_risk === 'high') score -= 20;
-    else if (onChainData.risk_assessment?.market_manipulation_risk === 'low') score += 10;
-    
-    // Liquidity adjustments
-    if (onChainData.risk_assessment?.liquidity_score > 80) score += 10;
-    else if (onChainData.risk_assessment?.liquidity_score < 30) score -= 15;
-    
-    return Math.max(0, Math.min(100, score));
+    return {
+      current_volatility: parseFloat(volatilityPercent.toFixed(2)),
+      volatility_rank: this.getVolatilityRank(volatility),
+      expected_daily_range: parseFloat((price * volatility * Math.sqrt(24)).toFixed(2)),
+      profit_potential: this.getProfitPotential(volatility),
+      risk_level: volatility > 0.06 ? 'VERY_HIGH' : volatility > 0.04 ? 'HIGH' : volatility > 0.02 ? 'MODERATE' : 'LOW'
+    };
   }
 
-  determineWhaleInfluence(onChainData) {
-    const accumulation = onChainData.whale_activity?.whale_accumulation;
-    const transfers = onChainData.whale_activity?.large_transfers_24h || 0;
-    
-    if (accumulation === 'buying' && transfers > 20) return 'POSITIVE';
-    if (accumulation === 'selling' && transfers > 20) return 'NEGATIVE';
-    return 'NEUTRAL';
+  getVolatilityRank(volatility) {
+    if (volatility < 0.015) return 'VERY_LOW';
+    if (volatility < 0.025) return 'LOW';
+    if (volatility < 0.04) return 'MODERATE';
+    if (volatility < 0.06) return 'HIGH';
+    return 'EXTREME';
   }
 
-  determineDeFiImpact(onChainData) {
-    const inflows = onChainData.defi_metrics?.protocol_inflows || 0;
-    const apy = onChainData.defi_metrics?.yield_farming_apy || 0;
-    
-    if (inflows > 0 && apy > 10) return 'SUPPORTIVE';
-    if (inflows < -50000000) return 'BEARISH';
-    return 'NEUTRAL';
+  getProfitPotential(volatility) {
+    if (volatility > 0.05) return 'VERY_HIGH';
+    if (volatility > 0.035) return 'HIGH';
+    if (volatility > 0.025) return 'MODERATE';
+    return 'LOW';
   }
 
-  determineCrossChainFactor(onChainData) {
-    const arbitrage = onChainData.cross_chain_analysis?.arbitrage_opportunities;
-    const bridgeVolumes = onChainData.cross_chain_analysis?.bridge_volumes || 0;
+  // New method for short-term opportunity indicators
+  getOpportunityIndicators(confidence, volatility, marketRegime, signal) {
+    const indicators = {
+      short_term_score: this.calculateShortTermScore(confidence, volatility, marketRegime),
+      scalping_suitable: volatility > 0.02 && confidence > 30,
+      day_trading_suitable: volatility > 0.015 && confidence > 25,
+      swing_trading_suitable: confidence > 35,
+      recommended_timeframes: this.getRecommendedTimeframes(volatility, confidence),
+      profit_taking_strategy: this.getProfitTakingStrategy(volatility, signal),
+      risk_factors: this.getVolatilityRiskFactors(volatility, marketRegime)
+    };
     
-    if (arbitrage && bridgeVolumes > 100000000) return 'BULLISH';
-    if (bridgeVolumes < 10000000) return 'BEARISH';
-    return 'NEUTRAL';
+    return indicators;
+  }
+
+  calculateShortTermScore(confidence, volatility, marketRegime) {
+    let score = confidence; // Base score from confidence
+    
+    // Volatility bonus for short-term opportunities
+    if (volatility > 0.03) score += 15;
+    else if (volatility > 0.02) score += 10;
+    else if (volatility > 0.015) score += 5;
+    
+    // Market regime bonus
+    if (marketRegime) {
+      if (marketRegime.market_phase === 'MARKUP') score += 10;
+      else if (marketRegime.market_phase === 'ACCUMULATION') score += 5;
+      else if (marketRegime.market_phase === 'MARKDOWN') score -= 10;
+    }
+    
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  getRecommendedTimeframes(volatility, confidence) {
+    const timeframes = [];
+    
+    if (volatility > 0.025 && confidence > 35) timeframes.push('5m', '15m');
+    if (volatility > 0.02 && confidence > 30) timeframes.push('30m', '1h');
+    if (confidence > 35) timeframes.push('4h');
+    if (confidence > 40) timeframes.push('1d');
+    
+    return timeframes.length > 0 ? timeframes : ['1h'];
+  }
+
+  getProfitTakingStrategy(volatility, signal) {
+    if (volatility > 0.04) {
+      return 'AGGRESSIVE_SCALING'; // Take profits quickly in high volatility
+    } else if (volatility > 0.025) {
+      return 'MODERATE_SCALING'; // Standard profit taking
+    } else {
+      return 'PATIENT_HOLDING'; // Hold longer in low volatility
+    }
+  }
+
+  getVolatilityRiskFactors(volatility, marketRegime) {
+    const factors = [];
+    
+    if (volatility > 0.05) factors.push('Extreme volatility increases slippage risk');
+    if (volatility > 0.035) factors.push('High volatility may cause stop loss hunting');
+    if (marketRegime && marketRegime.market_phase === 'TRANSITION') {
+      factors.push('Market regime transition increases uncertainty');
+    }
+    
+    return factors;
+  }
+
+  enhanceWithComprehensiveData(signal, onChainData, offChainData, marketRegime) {
+    let adjustedConfidence = signal.confidence;
+    let enhancedReasoning = signal.reasoning;
+    
+    // On-chain data adjustments
+    if (onChainData.whale_activity?.whale_accumulation === 'buying' && signal.signal === 'BUY') {
+      adjustedConfidence = Math.min(100, adjustedConfidence + 8);
+      enhancedReasoning += ' | Whale accumulation supports BUY signal';
+    } else if (onChainData.whale_activity?.whale_accumulation === 'selling' && signal.signal === 'SELL') {
+      adjustedConfidence = Math.min(100, adjustedConfidence + 8);
+      enhancedReasoning += ' | Whale distribution supports SELL signal';
+    }
+    
+    // Off-chain data adjustments
+    const fundingRate = offChainData.funding_rates.current_funding_rate;
+    const fearGreed = offChainData.market_sentiment.fear_greed_index;
+    const liquidationRisk = offChainData.liquidation_data.liquidation_pressure;
+    
+    // Funding rate adjustments
+    if (Math.abs(fundingRate) > 0.001) {
+      if (fundingRate > 0 && signal.signal === 'SELL') {
+        adjustedConfidence = Math.min(100, adjustedConfidence + 5);
+        enhancedReasoning += ' | High funding rate supports short bias';
+      } else if (fundingRate < 0 && signal.signal === 'BUY') {
+        adjustedConfidence = Math.min(100, adjustedConfidence + 5);
+        enhancedReasoning += ' | Negative funding rate supports long bias';
+      }
+    }
+    
+    // Fear & Greed adjustments
+    if (fearGreed < 25 && signal.signal === 'BUY') {
+      adjustedConfidence = Math.min(100, adjustedConfidence + 10);
+      enhancedReasoning += ' | Extreme fear creates contrarian buy opportunity';
+    } else if (fearGreed > 75 && signal.signal === 'SELL') {
+      adjustedConfidence = Math.min(100, adjustedConfidence + 10);
+      enhancedReasoning += ' | Extreme greed creates contrarian sell opportunity';
+    }
+    
+    // Liquidation risk adjustments
+    if (liquidationRisk > 60) {
+      adjustedConfidence = Math.max(20, adjustedConfidence - 15);
+      enhancedReasoning += ' | High liquidation risk reduces confidence';
+    }
+    
+    // Market regime confidence
+    if (marketRegime.regime_confidence > 0.7) {
+      adjustedConfidence = Math.min(100, adjustedConfidence + 5);
+      enhancedReasoning += ' | High regime confidence';
+    }
+
+    return {
+      ...signal,
+      confidence: Math.round(adjustedConfidence),
+      reasoning: enhancedReasoning,
+      data_sources: {
+        on_chain: onChainData.source,
+        off_chain_quality: offChainData.data_quality.quality_score,
+        regime_confidence: marketRegime.regime_confidence
+      }
+    };
+  }
+
+  determineStrategyType(marketRegime, offChainData) {
+    const phase = marketRegime.market_phase;
+    const volatility = marketRegime.volatility_regime;
+    const sentiment = offChainData.market_sentiment.fear_greed_index;
+    
+    if (phase === 'ACCUMULATION') return 'ACCUMULATION_STRATEGY';
+    if (phase === 'DISTRIBUTION') return 'DISTRIBUTION_STRATEGY';
+    if (phase === 'MARKUP') return 'TREND_FOLLOWING';
+    if (phase === 'MARKDOWN') return 'DEFENSIVE_POSITIONING';
+    if (phase === 'CONSOLIDATION') return 'RANGE_TRADING';
+    
+    // Fallback based on sentiment
+    if (sentiment < 30) return 'CONTRARIAN_BULLISH';
+    if (sentiment > 70) return 'CONTRARIAN_BEARISH';
+    
+    return 'MARKET_NEUTRAL';
+  }
+
+  assessRiskEnvironment(marketRegime, offChainData, riskLevel) {
+    let riskScore = 50; // Base risk score
+    
+    // Market regime risk factors
+    if (marketRegime.volatility_regime === 'HIGH_VOLATILITY') riskScore += 20;
+    if (marketRegime.market_phase === 'DISTRIBUTION') riskScore += 15;
+    if (marketRegime.market_phase === 'MARKDOWN') riskScore += 10;
+    
+    // Off-chain risk factors
+    const liquidationPressure = offChainData.liquidation_data.liquidation_pressure;
+    const fundingRate = Math.abs(offChainData.funding_rates.current_funding_rate);
+    
+    if (liquidationPressure > 60) riskScore += 15;
+    if (fundingRate > 0.002) riskScore += 10;
+    
+    // Risk level adjustment
+    if (riskLevel === 'conservative') riskScore += 10;
+    else if (riskLevel === 'aggressive') riskScore -= 10;
+    
+    riskScore = Math.max(0, Math.min(100, riskScore));
+    
+    let riskEnvironment = 'MODERATE';
+    if (riskScore > 70) riskEnvironment = 'HIGH_RISK';
+    else if (riskScore < 30) riskEnvironment = 'LOW_RISK';
+    
+    return {
+      risk_score: riskScore,
+      risk_environment: riskEnvironment,
+      risk_factors: this.identifyRiskFactors(marketRegime, offChainData)
+    };
+  }
+
+  identifyRiskFactors(marketRegime, offChainData) {
+    const factors = [];
+    
+    if (marketRegime.volatility_regime === 'HIGH_VOLATILITY') {
+      factors.push('High market volatility');
+    }
+    
+    if (marketRegime.market_phase === 'DISTRIBUTION') {
+      factors.push('Distribution phase - potential top');
+    }
+    
+    if (offChainData.liquidation_data.liquidation_pressure > 60) {
+      factors.push('High liquidation pressure');
+    }
+    
+    if (Math.abs(offChainData.funding_rates.current_funding_rate) > 0.001) {
+      factors.push('Extreme funding rates');
+    }
+    
+    if (offChainData.market_sentiment.fear_greed_index > 80) {
+      factors.push('Extreme greed levels');
+    }
+    
+    return factors;
+  }
+
+  getStrategyType(phase, signal) {
+    const strategies = {
+      'ACCUMULATION': {
+        'BUY': 'Accumulation Entry',
+        'SELL': 'Risk Management',
+        'HOLD': 'Accumulation Wait'
+      },
+      'DISTRIBUTION': {
+        'BUY': 'Contrarian Entry',
+        'SELL': 'Distribution Exit',
+        'HOLD': 'Distribution Wait'
+      },
+      'MARKUP': {
+        'BUY': 'Trend Following',
+        'SELL': 'Profit Taking',
+        'HOLD': 'Momentum Wait'
+      },
+      'MARKDOWN': {
+        'BUY': 'Oversold Bounce',
+        'SELL': 'Trend Following',
+        'HOLD': 'Defensive Hold'
+      },
+      'CONSOLIDATION': {
+        'BUY': 'Range Support',
+        'SELL': 'Range Resistance',
+        'HOLD': 'Breakout Wait'
+      },
+      'NEUTRAL': {
+        'BUY': 'Opportunistic Entry',
+        'SELL': 'Opportunistic Exit',
+        'HOLD': 'Market Neutral'
+      }
+    };
+    
+    return strategies[phase]?.[signal] || 'Standard Strategy';
   }
 
   generateFallbackSignal(marketData, technicalData, requestParams) {
@@ -1428,7 +2364,7 @@ Respond with ONLY the JSON object. No additional text.`;
     confidence = Math.max(20, Math.min(85, confidence));
 
     const stopLossDistance = price * (volatility * 1.5);
-    const takeProfitDistance = stopLossDistance * (2 + Math.random());
+    const takeProfitDistance = stopLossDistance * 2; // Remove randomization, use fixed 2:1 ratio
 
     // Calculate proper stop loss and take profit based on signal
     let stopLoss, takeProfit1, takeProfit2, takeProfit3;
@@ -1468,7 +2404,7 @@ Respond with ONLY the JSON object. No additional text.`;
       technical_score: Math.round(50 + (confidence - 50) * 0.8),
       momentum_score: Math.round(50 + (macd * 1000)),
       trend_score: Math.round(50 + ((price - technicalData.sma_20) / technicalData.sma_20) * 200),
-      onchain_score: 50 + Math.round((Math.random() - 0.5) * 20), // Add variation to onchain score
+      onchain_score: 50, // Base score for fallback analysis - no randomization
       reasoning,
       source: 'fallback_analysis',
       timestamp: Date.now()
@@ -1487,20 +2423,196 @@ Respond with ONLY the JSON object. No additional text.`;
     return mapping[timeframe] || 'SWING';
   }
 
-  calculatePositionSize(confidence, volatility, riskLevel) {
+  calculatePositionSize(confidence, volatility, riskLevel, marketRegime = null) {
     const baseSize = {
       'conservative': 2,
       'moderate': 5,
       'aggressive': 10
     };
     
-    const base = baseSize[riskLevel] || 5;
-    const confidenceMultiplier = confidence / 100;
-    const volatilityAdjustment = 1 / (1 + volatility * 10);
+    let base = baseSize[riskLevel] || 5;
     
-    return Math.max(1, Math.min(25, Math.round(base * confidenceMultiplier * volatilityAdjustment)));
+    // Enhanced confidence scaling
+    let confidenceMultiplier = 1.0;
+    if (confidence >= 40) {
+      confidenceMultiplier = 1.5;  // 150% for high confidence (40%+)
+    } else if (confidence >= 35) {
+      confidenceMultiplier = 1.25; // 125% for good confidence (35-39%)
+    } else if (confidence >= 30) {
+      confidenceMultiplier = 1.0;  // 100% for normal confidence (30-34%)
+    } else if (confidence >= 25) {
+      confidenceMultiplier = 0.75; // 75% for low confidence (25-29%)
+    } else {
+      return 0; // Skip signals below 25% confidence
+    }
+    
+    // Market regime adjustments
+    let regimeMultiplier = 1.0;
+    if (marketRegime) {
+      const regimeMultipliers = {
+        'MARKUP': 1.5,      // Bullish trends - larger positions
+        'ACCUMULATION': 1.3, // Building phase - moderate increase
+        'CONSOLIDATION': 1.0, // Normal sizing
+        'TRANSITION': 0.8,   // Uncertain - smaller positions
+        'MARKDOWN': 0.5      // Bearish - very small positions
+      };
+      regimeMultiplier = regimeMultipliers[marketRegime.market_phase] || 1.0;
+    }
+    
+    // Volatility adjustment - more nuanced
+    let volatilityAdjustment = 1.0;
+    if (volatility < 0.02) {
+      volatilityAdjustment = 1.2; // Low volatility - can afford larger positions
+    } else if (volatility < 0.04) {
+      volatilityAdjustment = 1.0; // Normal volatility
+    } else if (volatility < 0.06) {
+      volatilityAdjustment = 0.8; // High volatility - reduce size
+    } else {
+      volatilityAdjustment = 0.6; // Extreme volatility - very small positions
+    }
+    
+    const finalSize = base * confidenceMultiplier * regimeMultiplier * volatilityAdjustment;
+    
+    return Math.max(1, Math.min(25, Math.round(finalSize)));
+  }
+
+  // New method for enhanced position sizing recommendations
+  getPositionSizingRecommendations(confidence, volatility, marketRegime, riskLevel) {
+    const baseRecommendation = this.calculatePositionSize(confidence, volatility, riskLevel, marketRegime);
+    
+    const recommendations = {
+      recommended_size: baseRecommendation,
+      min_confidence_threshold: 25,
+      confidence_tier: this.getConfidenceTier(confidence),
+      market_regime_factor: this.getRegimeFactor(marketRegime),
+      volatility_factor: this.getVolatilityFactor(volatility),
+      scaling_rationale: this.getScalingRationale(confidence, marketRegime, volatility),
+      risk_adjusted_max: Math.min(baseRecommendation * 1.5, 25),
+      conservative_size: Math.max(1, Math.round(baseRecommendation * 0.7))
+    };
+    
+    return recommendations;
+  }
+
+  getConfidenceTier(confidence) {
+    if (confidence >= 40) return 'HIGH';
+    if (confidence >= 35) return 'GOOD';
+    if (confidence >= 30) return 'MODERATE';
+    if (confidence >= 25) return 'LOW';
+    return 'INSUFFICIENT';
+  }
+
+  getRegimeFactor(marketRegime) {
+    if (!marketRegime) return 1.0;
+    
+    const factors = {
+      'MARKUP': 1.5,
+      'ACCUMULATION': 1.3,
+      'CONSOLIDATION': 1.0,
+      'TRANSITION': 0.8,
+      'MARKDOWN': 0.5
+    };
+    
+    return factors[marketRegime.market_phase] || 1.0;
+  }
+
+  getVolatilityFactor(volatility) {
+    if (volatility < 0.02) return 1.2;
+    if (volatility < 0.04) return 1.0;
+    if (volatility < 0.06) return 0.8;
+    return 0.6;
+  }
+
+  getScalingRationale(confidence, marketRegime, volatility) {
+    const reasons = [];
+    
+    if (confidence >= 35) {
+      reasons.push(`High confidence (${confidence}%) increases position size`);
+    } else if (confidence < 30) {
+      reasons.push(`Lower confidence (${confidence}%) reduces position size`);
+    }
+    
+    if (marketRegime) {
+      if (marketRegime.market_phase === 'MARKUP') {
+        reasons.push('Bullish market regime supports larger positions');
+      } else if (marketRegime.market_phase === 'MARKDOWN') {
+        reasons.push('Bearish market regime requires smaller positions');
+      }
+    }
+    
+    if (volatility > 0.04) {
+      reasons.push(`High volatility (${(volatility * 100).toFixed(1)}%) requires position size reduction`);
+    } else if (volatility < 0.02) {
+      reasons.push(`Low volatility (${(volatility * 100).toFixed(1)}%) allows larger positions`);
+    }
+    
+    return reasons.join('; ');
+  }
+
+  // New method for short-term market outlook
+  getShortTermOutlook(signal, marketRegime, volatility) {
+    let outlook = 'NEUTRAL';
+    let confidence = 'MODERATE';
+    
+    // Determine outlook based on signal and market regime
+    if (signal.signal === 'BUY') {
+      if (marketRegime.market_phase === 'MARKUP' || marketRegime.market_phase === 'ACCUMULATION') {
+        outlook = 'BULLISH';
+        confidence = 'HIGH';
+      } else if (marketRegime.market_phase === 'CONSOLIDATION') {
+        outlook = 'CAUTIOUSLY_BULLISH';
+        confidence = 'MODERATE';
+      }
+    } else if (signal.signal === 'SELL') {
+      if (marketRegime.market_phase === 'DISTRIBUTION' || marketRegime.market_phase === 'MARKDOWN') {
+        outlook = 'BEARISH';
+        confidence = 'HIGH';
+      } else if (marketRegime.market_phase === 'CONSOLIDATION') {
+        outlook = 'CAUTIOUSLY_BEARISH';
+        confidence = 'MODERATE';
+      }
+    }
+    
+    // Adjust confidence based on volatility
+    if (volatility > 0.05) {
+      confidence = 'LOW'; // High volatility reduces confidence
+    } else if (volatility < 0.015) {
+      confidence = 'LOW'; // Very low volatility also reduces confidence for short-term
+    }
+    
+    return {
+      direction: outlook,
+      confidence: confidence,
+      timeframe: '1-24h',
+      key_factors: this.getOutlookFactors(signal, marketRegime, volatility)
+    };
+  }
+
+  getOutlookFactors(signal, marketRegime, volatility) {
+    const factors = [];
+    
+    if (marketRegime.market_phase === 'MARKUP') {
+      factors.push('Strong bullish market regime');
+    } else if (marketRegime.market_phase === 'MARKDOWN') {
+      factors.push('Strong bearish market regime');
+    }
+    
+    if (volatility > 0.04) {
+      factors.push('High volatility creates opportunities');
+    } else if (volatility < 0.015) {
+      factors.push('Low volatility may limit movements');
+    }
+    
+    if (signal.confidence > 40) {
+      factors.push('High signal confidence');
+    }
+    
+    return factors;
   }
 }
+
+// Initialize signal generator instance
+signalGenerator = new EnhancedAISignalGenerator();
 
 // ===============================================
 // AUTHENTICATION MIDDLEWARE
@@ -1794,323 +2906,764 @@ app.get('/api/v1/admin/symbol-stats', authenticateAPI, async (req, res) => {
 });
 
 // Enhanced signal generation endpoint
-app.post('/api/v1/signals/generate', authenticateAPI, validateSignalRequest, async (req, res) => {
+app.post('/api/v1/signal', authenticateAPI, validateSignalRequest, async (req, res) => {
   const startTime = Date.now();
-  const requestId = `req_${startTime}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Extract variables outside try block to make them available in catch block
+  const {
+    symbol,
+    timeframe = '1h',
+    risk_level = 'balanced',
+    custom_risk_params = null,
+    include_reasoning = true,
+    include_alternatives = false
+  } = req.body;
   
   try {
-    const {
-      symbol,
-      timeframe = '1h',
-      analysis_depth = 'comprehensive',
-      risk_level = 'moderate',
-      bars = 100,
-      wallet_address = null
-    } = req.body;
 
-    logger.info(`Enhanced signal generation request: ${requestId}`, { 
-      symbol, timeframe, analysis_depth, risk_level 
+    logger.info(`Enhanced signal request for ${symbol}`, {
+      timeframe,
+      risk_level,
+      custom_risk_params: !!custom_risk_params,
+      include_reasoning,
+      include_alternatives
     });
 
-    // Generate enhanced market data with volumes
-    const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, bars);
+    // Generate comprehensive market data
+    const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, 100);
+    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
     
-    // Calculate comprehensive technical indicators
-    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(
-      marketData.price_history, 
-      marketData.volume_history
+    // Get comprehensive on-chain data with reliability check
+    const onChainData = await signalGenerator.coinGeckoService.getOnChainAnalysis(symbol);
+    
+    // CRITICAL: Check data reliability for live trading
+    if (onChainData.live_trading_safe === false || onChainData.source === 'UNRELIABLE_FALLBACK') {
+      logger.error(`⚠️  CRITICAL: Rejecting ${symbol} - data not reliable for live trading`);
+      return res.status(400).json({
+        success: false,
+        error: 'Symbol not safe for live trading',
+        message: `${symbol} does not have reliable data sources. Trading this symbol is not recommended.`,
+        data_quality: onChainData.data_quality || 'UNSAFE',
+        data_source: onChainData.source,
+        recommendation: 'Use symbols with reliable data sources for live trading',
+        safe_alternatives: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'XRPUSDT'],
+        timestamp: Date.now()
+      });
+    }
+    
+    // Get comprehensive off-chain data
+    const offChainData = await offChainDataService.getComprehensiveOffChainData(symbol);
+    
+    // Get risk parameters based on user preference and market conditions
+    const riskParams = custom_risk_params ? 
+      riskParameterService.getCustomRiskParameters(custom_risk_params, risk_level) :
+      riskParameterService.getRiskParameters(risk_level, technicalData.market_regime);
+    
+    // Generate market-adaptive signal
+    const signal = await signalGenerator.generateAdvancedSignal(
+      marketData, 
+      technicalData, 
+      onChainData, 
+      { 
+        symbol, 
+      timeframe,
+        risk_level,
+        custom_risk_params,
+        include_reasoning,
+        include_alternatives 
+      }
     );
     
-    // Initialize enhanced AI signal generator
-    const aiGenerator = new EnhancedAISignalGenerator();
+    // Validate signal against risk parameters
+    const riskValidation = riskParameterService.validateSignalAgainstRiskParameters(
+      signal, 
+      riskParams, 
+      marketData
+    );
     
-    // Get on-chain analysis from LunarCrush
-    logger.info(`Fetching on-chain data for ${symbol}`, { requestId });
-    const onChainData = await aiGenerator.coinGeckoService.getOnChainAnalysis(symbol, wallet_address);
+    // Generate comprehensive reasoning if requested
+    let reasoning = null;
+    if (include_reasoning) {
+      reasoning = signalReasoningEngine.generateComprehensiveReasoning(
+        signal,
+        technicalData,
+        onChainData,
+        offChainData,
+        technicalData.market_regime,
+        riskParams
+      );
+    }
     
-    // Generate advanced AI signal combining Claude + LunarCrush
-    logger.info(`Generating enhanced AI signal`, { requestId });
-    const aiSignal = await aiGenerator.generateAdvancedSignal(marketData, technicalData, onChainData, {
-      timeframe,
-      analysis_depth,
-      risk_level
-    });
-    
-    const processingTime = Date.now() - startTime;
+    // Generate risk report
+    const riskReport = riskParameterService.generateRiskReport(
+      riskParams,
+      technicalData.market_regime,
+      { symbol, current_price: marketData.current_price }
+    );
     
     // Build comprehensive response
     const response = {
-      success: true,
-      request_id: requestId,
-      timestamp: Date.now(),
-      data: {
-        ...aiSignal,
-        market_data: {
-          symbol: marketData.symbol,
-          price: marketData.current_price,
-          volume_24h: marketData.volume_24h,
-          price_change_24h: marketData.price_change_24h,
-          market_cap: marketData.market_cap,
-          timeframe: marketData.timeframe
-        },
-        technical_indicators: {
+      signal: signal.signal,
+      confidence: signal.confidence,
+      strength: signal.strength,
+      entry_price: signal.entry_price,
+      stop_loss: signal.stop_loss,
+      take_profit_1: signal.take_profit_1,
+      take_profit_2: signal.take_profit_2,
+      take_profit_3: signal.take_profit_3,
+      position_size_percent: signal.position_size_percent,
+      risk_reward_ratio: signal.risk_reward_ratio,
+      timeframe: signal.timeframe,
+      
+      // Enhanced market context
+      market_context: {
+        current_price: marketData.current_price,
+        market_regime: technicalData.market_regime,
+        strategy_type: signal.market_context?.strategy_type,
+        risk_environment: signal.market_context?.risk_environment,
+        regime_strength: technicalData.market_regime.regime_confidence || 0.5,
+        volatility_environment: technicalData.volatility > 0.04 ? 'HIGH_VOLATILITY' : 
+                               technicalData.volatility > 0.02 ? 'MODERATE_VOLATILITY' : 'LOW_VOLATILITY',
+        short_term_outlook: signalGenerator.getShortTermOutlook(signal, technicalData.market_regime, technicalData.volatility),
+        data_quality: {
+          onchain: onChainData.source,
+          offchain: offChainData.data_quality.quality_score,
+          technical: 'real_time'
+        }
+      },
+      
+      // Risk management
+      risk_management: {
+        risk_level: risk_level,
+        risk_validation: riskValidation,
+        risk_report: riskReport,
+        position_sizing: {
+          recommended: signal.position_size_percent,
+          max_allowed: riskParams.max_position_size,
+          risk_per_trade: riskParams.risk_per_trade
+        }
+      },
+      
+      // Technical analysis summary
+      technical_analysis: {
           rsi: technicalData.rsi,
           macd: technicalData.macd,
-          sma_20: technicalData.sma_20,
-          sma_50: technicalData.sma_50,
-          ema_12: technicalData.ema_12,
-          ema_26: technicalData.ema_26,
-          bollinger_bands: technicalData.bollinger_bands,
-          stochastic: technicalData.stochastic,
-          atr: technicalData.atr,
           volatility: technicalData.volatility,
           volume_ratio: technicalData.volume_ratio,
-          market_regime: technicalData.market_regime
-        },
-        onchain_analysis: {
-          ...onChainData,
-          data_source: onChainData.source
-        },
-        metadata: {
-          processing_time_ms: processingTime,
-          ai_models: ['claude-4-sonnet', 'lunarcrush-api'],
-          data_sources: ['technical_analysis', 'onchain_data', 'market_data'],
-          analysis_depth,
-          risk_level,
-          confidence_factors: aiSignal.confluence_factors || 8,
-          symbol_metadata: getSymbolMetadata(symbol)
+        trend_alignment: technicalData.market_regime.primary_trend === technicalData.market_regime.secondary_trend
+      },
+      
+      // Key market data
+      market_data: {
+        symbol: symbol,
+        current_price: marketData.current_price,
+        volume_24h: marketData.volume_24h,
+        market_cap: marketData.market_cap,
+        price_change_24h: marketData.price_change_24h
+      },
+      
+      // Reasoning and analysis
+      reasoning: reasoning,
+      
+      // Performance metrics
+      performance: {
+        generation_time_ms: Date.now() - startTime,
+        data_sources: {
+          technical: 'real_time',
+          onchain: onChainData.source,
+          offchain: offChainData.data_quality.success_rate + '%'
         }
-      }
+      },
+      
+      timestamp: Date.now()
     };
     
-    logger.info(`Enhanced signal generated successfully: ${requestId}`, {
-      signal: aiSignal.signal,
-      confidence: aiSignal.confidence,
-      onchain_score: aiSignal.onchain_score,
-      processing_time: processingTime
+    // Log successful signal generation
+    logger.info(`Enhanced signal generated for ${symbol}`, {
+      signal: signal.signal,
+      confidence: signal.confidence,
+      market_regime: technicalData.market_regime,  // Fixed: Log full regime object
+      risk_level: risk_level,
+      generation_time: Date.now() - startTime,
+      data_quality: {
+        onchain: onChainData.source,
+        offchain: offChainData.data_quality.quality_score
+      }
     });
     
     res.json(response);
     
   } catch (error) {
-    logger.error(`Enhanced signal generation failed: ${requestId}`, {
-      error: error.message,
-      stack: error.stack,
-      symbol: req.body.symbol
+    logger.error('Enhanced signal generation failed:', error);
+    
+    // Fallback to basic signal generation
+    try {
+      const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, 100);
+      const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
+      const onChainData = await signalGenerator.coinGeckoService.getOnChainAnalysis(symbol);
+      
+      const fallbackSignal = await signalGenerator.generateAdvancedSignal(
+        marketData, 
+        technicalData, 
+        onChainData, 
+        { symbol, timeframe, risk_level }
+      );
+      
+      logger.info(`Fallback signal generated for ${symbol}`, {
+        signal: fallbackSignal.signal,
+        confidence: fallbackSignal.confidence
+      });
+      
+      res.json({
+        signal: fallbackSignal.signal,
+        confidence: fallbackSignal.confidence,
+        strength: fallbackSignal.strength,
+        entry_price: fallbackSignal.entry_price,
+        stop_loss: fallbackSignal.stop_loss,
+        take_profit_1: fallbackSignal.take_profit_1,
+        take_profit_2: fallbackSignal.take_profit_2,
+        take_profit_3: fallbackSignal.take_profit_3,
+        position_size_percent: fallbackSignal.position_size_percent,
+        risk_reward_ratio: fallbackSignal.risk_reward_ratio,
+        timeframe: fallbackSignal.timeframe,
+        market_context: {
+          current_price: marketData.current_price,
+          fallback_mode: true,
+          error: 'Enhanced features unavailable'
+        },
+        timestamp: Date.now()
+      });
+      
+    } catch (fallbackError) {
+      logger.error('Fallback signal generation also failed:', fallbackError);
+      res.status(500).json({
+        error: 'Signal generation failed',
+        message: 'Unable to generate signal due to system error',
+        symbol: req.body.symbol,  // Fixed: Added symbol from request
+        timestamp: Date.now()
+      });
+    }
+  }
+});
+
+// New endpoint for symbol validation (LIVE TRADING SAFETY)
+app.get('/api/v1/validate-symbol/:symbol', authenticateAPI, async (req, res) => {
+  const { symbol } = req.params;
+  const startTime = Date.now();
+  
+  try {
+    logger.info(`Validating ${symbol} for live trading safety`);
+    
+    // Check if symbol exists on Binance
+    const isValid = await isValidSymbol(symbol);
+    if (!isValid) {
+      return res.status(400).json({
+        success: false,
+        safe_for_live_trading: false,
+        error: 'Invalid symbol',
+        message: `${symbol} is not a valid trading pair on Binance`,
+        timestamp: Date.now()
+      });
+    }
+    
+    // Check data reliability
+    const onChainData = await signalGenerator.coinGeckoService.getOnChainAnalysis(symbol);
+    const marketData = MarketDataService.generateEnhancedData(symbol, '1h', 24);
+    
+    const validation = {
+      symbol,
+      safe_for_live_trading: true,
+      data_quality: 'high',
+      data_sources: [],
+      risk_factors: [],
+      reliability_score: 100,
+      recommendations: []
+    };
+    
+    // Evaluate data sources
+    if (onChainData.source === 'coingecko_reliable') {
+      validation.data_sources.push('CoinGecko API (High Quality)');
+      validation.reliability_score = 100;
+    } else if (onChainData.source === 'binance_api') {
+      validation.data_sources.push('Binance API (Medium Quality)');
+      validation.reliability_score = 75;
+      validation.data_quality = 'medium';
+      validation.recommendations.push('Limited on-chain data available');
+    } else if (onChainData.source === 'UNRELIABLE_FALLBACK') {
+      validation.safe_for_live_trading = false;
+      validation.data_quality = 'UNSAFE';
+      validation.reliability_score = 0;
+      validation.risk_factors.push('No reliable data sources available');
+      validation.recommendations.push('⚠️  DO NOT USE FOR LIVE TRADING');
+    }
+    
+    // Check volume and liquidity
+    if (marketData.volume_24h < 1000000) { // Less than $1M daily volume
+      validation.reliability_score -= 25;
+      validation.risk_factors.push('Low trading volume - potential liquidity issues');
+      validation.recommendations.push('Consider higher volume alternatives');
+    }
+    
+    // Check price stability
+    if (Math.abs(marketData.price_change_24h) > 20) { // More than 20% daily change
+      validation.reliability_score -= 15;
+      validation.risk_factors.push('High price volatility - increased risk');
+      validation.recommendations.push('Use smaller position sizes');
+    }
+    
+    // Final safety determination
+    if (validation.reliability_score < 50) {
+      validation.safe_for_live_trading = false;
+      validation.data_quality = 'RISKY';
+      validation.recommendations.push('Not recommended for live trading');
+    }
+    
+    // Add safe alternatives if symbol is not recommended
+    if (!validation.safe_for_live_trading) {
+      validation.safe_alternatives = [
+        'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 
+        'ADAUSDT', 'XRPUSDT', 'AVAXUSDT', 'DOTUSDT'
+      ];
+    }
+    
+    res.json({
+      success: true,
+      validation,
+      performance: {
+        validation_time_ms: Date.now() - startTime
+      },
+      timestamp: Date.now()
     });
     
+  } catch (error) {
+    logger.error(`Symbol validation failed for ${symbol}:`, error);
     res.status(500).json({
       success: false,
-      request_id: requestId,
-      error: 'Internal server error',
-      message: 'Signal generation failed',
-      debug: process.env.NODE_ENV === 'development' ? {
-        error: error.message,
-        stack: error.stack
-      } : undefined,
+      safe_for_live_trading: false,
+      error: 'Validation failed',
+      message: `Unable to validate ${symbol} - assume unsafe for live trading`,
       timestamp: Date.now()
     });
   }
 });
 
-// Batch signal generation with AI enhancement
-app.post('/api/v1/signals/batch', authenticateAPI, validateBatchSignalRequest, async (req, res) => {
+// New endpoint for high-volatility opportunities discovery
+app.get('/api/v1/opportunities/high-volatility', authenticateAPI, async (req, res) => {
   const startTime = Date.now();
-  const requestId = `batch_${startTime}_${Math.random().toString(36).substr(2, 9)}`;
   
-  const { symbols, timeframe = '1h', analysis_depth = 'advanced', risk_level = 'moderate' } = req.body;
-  
-  logger.info(`Batch signal request: ${requestId}`, {
-    symbols_count: symbols.length,
-    timeframe,
-    analysis_depth,
-    risk_level
-  });
-  
-  const results = [];
-  const aiGenerator = new EnhancedAISignalGenerator();
-  
-  // Process symbols in parallel with concurrency limit
-  const concurrencyLimit = 3;
-  const symbolChunks = [];
-  
-  for (let i = 0; i < symbols.length; i += concurrencyLimit) {
-    symbolChunks.push(symbols.slice(i, i + concurrencyLimit));
-  }
-  
-  for (const chunk of symbolChunks) {
-    const chunkPromises = chunk.map(async (symbol) => {
+  try {
+    const { 
+      min_confidence = 25, 
+      min_volatility = 0.02, 
+      max_pairs = 10,
+      risk_level = 'moderate' 
+    } = req.query;
+    
+    logger.info('High-volatility opportunities request', {
+      min_confidence: parseFloat(min_confidence),
+      min_volatility: parseFloat(min_volatility),
+      max_pairs: parseInt(max_pairs),
+      risk_level
+    });
+
+    // Get high-volume symbols for analysis, prioritizing reliable ones
+    const symbols = await getValidSymbols();
+    const reliableSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'XRPUSDT', 
+                            'AVAXUSDT', 'DOTUSDT', 'MATICUSDT', 'LINKUSDT', 'UNIUSDT', 'ATOMUSDT',
+                            'DOGEUSDT', 'SHIBUSDT', 'PEPEUSDT', 'FLOKIUSDT', 'AAVEUSDT'];
+    
+    // Prioritize reliable symbols but include some high-volume alternatives
+    const topReliable = reliableSymbols.filter(symbol => symbols.includes(symbol)).slice(0, Math.max(5, parseInt(max_pairs)));
+    const topVolume = getTopSymbolsByVolume(parseInt(max_pairs) * 2).filter(symbol => !reliableSymbols.includes(symbol)).slice(0, 5);
+    const topSymbols = [...topReliable, ...topVolume].slice(0, parseInt(max_pairs) * 2);
+    
+    const opportunities = [];
+    const validatedSymbols = [];
+    
+    // Analyze each symbol for volatility and profit potential (with data validation)
+    for (const symbol of topSymbols) {
       try {
-        const marketData = MarketDataService.generateEnhancedData(symbol, timeframe);
-        const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(
-          marketData.price_history,
-          marketData.volume_history
-        );
-        const onChainData = await aiGenerator.coinGeckoService.getOnChainAnalysis(symbol);
-        const aiSignal = await aiGenerator.generateAdvancedSignal(marketData, technicalData, onChainData, {
-          timeframe, analysis_depth, risk_level
-        });
+        const marketData = MarketDataService.generateEnhancedData(symbol, '1h', 100);
+        const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
         
-        return {
+        // Skip if volatility is too low
+        if (technicalData.volatility < parseFloat(min_volatility)) continue;
+        
+        // Generate quick signal with data validation
+        const onChainData = await signalGenerator.coinGeckoService.getOnChainAnalysis(symbol);
+        
+        // CRITICAL: Validate data quality for live trading
+        const isReliable = onChainData.source !== 'UNRELIABLE_FALLBACK' && 
+                          onChainData.live_trading_safe !== false &&
+                          onChainData.data_quality !== 'UNSAFE_FOR_TRADING';
+        
+        if (!isReliable) {
+          logger.warn(`Skipping ${symbol} in opportunities - unreliable data (source: ${onChainData.source})`);
+          continue;
+        }
+        
+        validatedSymbols.push(symbol);
+        
+        const signal = await signalGenerator.generateAdvancedSignal(
+          marketData, 
+          technicalData, 
+          onChainData, 
+          { symbol, timeframe: '1h', risk_level }
+        );
+        
+        // Filter by minimum confidence
+        if (signal.confidence < parseFloat(min_confidence)) continue;
+        
+        // Calculate opportunity score
+        const opportunityScore = signalGenerator.calculateShortTermScore(
+          signal.confidence, 
+          technicalData.volatility, 
+          technicalData.market_regime
+        );
+        
+        opportunities.push({
           symbol,
-          success: true,
-          signal: aiSignal.signal,
-          confidence: aiSignal.confidence,
-          onchain_score: aiSignal.onchain_score,
-          entry_price: aiSignal.entry_price,
-          whale_influence: aiSignal.whale_influence,
-          stop_loss: aiSignal.stop_loss,
-          take_profit_1: aiSignal.take_profit_1
-        };
+          signal: signal.signal,
+          confidence: signal.confidence,
+          volatility: parseFloat((technicalData.volatility * 100).toFixed(2)),
+          opportunity_score: opportunityScore,
+          current_price: marketData.current_price,
+          price_change_24h: marketData.price_change_24h,
+          volume_24h: marketData.volume_24h,
+          market_regime: technicalData.market_regime.market_phase,
+          profit_potential: signalGenerator.getProfitPotential(technicalData.volatility),
+          recommended_timeframes: signalGenerator.getRecommendedTimeframes(technicalData.volatility, signal.confidence),
+          position_sizing: signalGenerator.getPositionSizingRecommendations(
+            signal.confidence, 
+            technicalData.volatility, 
+            technicalData.market_regime, 
+            risk_level
+          ),
+          data_quality: onChainData.data_quality || 'high',
+          data_source: onChainData.source,
+          live_trading_safe: true
+        });
       } catch (error) {
-        logger.error(`Batch signal failed for ${symbol}:`, error);
-        return {
-          symbol,
-          success: false,
-          error: error.message
-        };
+        logger.warn(`Failed to analyze ${symbol} for opportunities:`, error.message);
       }
+    }
+    
+    // Sort by opportunity score and limit results
+    opportunities.sort((a, b) => b.opportunity_score - a.opportunity_score);
+    const topOpportunities = opportunities.slice(0, parseInt(max_pairs));
+    
+    res.json({
+      success: true,
+      opportunities: topOpportunities,
+      analysis_summary: {
+        symbols_analyzed: topSymbols.length,
+        symbols_validated: validatedSymbols.length,
+        symbols_rejected: topSymbols.length - validatedSymbols.length,
+        opportunities_found: opportunities.length,
+        top_opportunities: topOpportunities.length,
+        criteria: {
+          min_confidence: parseFloat(min_confidence),
+          min_volatility: parseFloat(min_volatility),
+          risk_level
+        },
+        data_quality_filter: {
+          reliable_sources_only: true,
+          fallback_data_excluded: true,
+          live_trading_safe: true
+        },
+        market_overview: {
+          high_volatility_count: opportunities.filter(o => o.volatility > 4).length,
+          bullish_signals: topOpportunities.filter(o => o.signal === 'BUY').length,
+          bearish_signals: topOpportunities.filter(o => o.signal === 'SELL').length,
+          high_quality_data: topOpportunities.filter(o => o.data_quality === 'high').length,
+          medium_quality_data: topOpportunities.filter(o => o.data_quality === 'medium').length
+        }
+      },
+      performance: {
+        generation_time_ms: Date.now() - startTime,
+        data_sources: 'real_time'
+      },
+      timestamp: Date.now()
     });
     
-    const chunkResults = await Promise.all(chunkPromises);
-    results.push(...chunkResults);
+  } catch (error) {
+    logger.error('High-volatility opportunities discovery failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to discover opportunities',
+      message: error.message,
+      timestamp: Date.now()
+    });
   }
-  
-  const processingTime = Date.now() - startTime;
-  const successCount = results.filter(r => r.success).length;
-  
-  logger.info(`Batch signal completed: ${requestId}`, {
-    total_symbols: symbols.length,
-    successful: successCount,
-    failed: symbols.length - successCount,
-    processing_time_ms: processingTime
-  });
-  
-  res.json({
-    success: true,
-    request_id: requestId,
-    timestamp: Date.now(),
-    ai_models: ['claude-4-sonnet', 'lunarcrush-api'],
-    processing_time_ms: processingTime,
-    summary: {
-      total: symbols.length,
-      successful: successCount,
-      failed: symbols.length - successCount
-    },
-    results
-  });
 });
 
-// API documentation endpoint (enhanced)
-app.get('/api/docs', (req, res) => {
-  res.json({
-    name: 'Enhanced Crypto Signal API',
-    version: '2.0.0',
-    description: 'AI-powered cryptocurrency trading signal generation with Claude + LunarCrush integration',
-    symbol_validation: {
-      mode: 'dynamic',
-      source: 'binance_api',
-      update_frequency: 'hourly',
-      supported_count: validSymbolsCache.symbols.length || 'Loading...'
-    },
-    ai_models: {
-      claude: 'Claude 4 Sonnet for general market analysis and pattern recognition',
-      lunarcrush: 'LunarCrush API for social sentiment, market metrics, and on-chain data analysis'
-    },
-    endpoints: {
-      'GET /api/v1/symbols': {
-        description: 'Get list of all valid trading symbols',
-        auth_required: true,
-        response: {
-          symbols: 'Array of valid USDT trading pairs',
-          count: 'Total number of symbols',
-          top_by_volume: 'Top symbols sorted by 24h volume',
-          stablecoins: 'List of stablecoin pairs'
-        }
-      },
-      'GET /api/v1/symbols/search': {
-        description: 'Search for symbols by query',
-        auth_required: true,
-        parameters: {
-          query: 'Search query (min 1 character)'
-        }
-      },
-      'POST /api/v1/signals/generate': {
-        description: 'Generate enhanced trading signal with AI analysis',
-        auth_required: true,
-        parameters: {
-          symbol: 'String - Trading pair (dynamically validated)',
-          timeframe: 'String - Time period (1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d)',
-          analysis_depth: 'String - Analysis level (basic, advanced, comprehensive)',
-          risk_level: 'String - Risk tolerance (conservative, moderate, aggressive)',
-          wallet_address: 'String - Optional wallet address for personalized analysis'
-        },
-        features: [
-          'Real-time on-chain whale tracking',
-          'Multi-chain DeFi analysis',
-          'Smart money flow detection',
-          'Cross-chain arbitrage opportunities',
-          'Advanced technical analysis',
-          'AI-powered pattern recognition',
-          'Dynamic symbol validation'
-        ],
-        rate_limit: '100 requests/hour'
-      },
-      'POST /api/v1/signals/batch': {
-        description: 'Generate signals for multiple symbols simultaneously',
-        max_symbols: 10,
-        concurrency: 3
-      },
-      'POST /api/v1/admin/refresh-symbols': {
-        description: 'Force refresh the symbol cache (admin only)',
-        auth_required: true
-      },
-      'GET /api/v1/admin/symbol-stats': {
-        description: 'Get symbol validation statistics (admin only)',
-        auth_required: true
+// New endpoint for risk parameter management
+app.get('/api/v1/risk-parameters/:level', authenticateAPI, async (req, res) => {
+  try {
+    const { level } = req.params;
+    const { market_conditions } = req.query;
+    
+    let marketConditions = {};
+    if (market_conditions) {
+      try {
+        marketConditions = JSON.parse(market_conditions);
+      } catch (parseError) {
+        logger.warn('Invalid market_conditions JSON:', parseError);
       }
-    },
-    data_sources: [
-      'Real-time blockchain data (2,500+ EVM chains)',
-      'Whale wallet movements',
-      'DeFi protocol metrics',
-      'Cross-chain bridge volumes',
-      'Technical indicators',
-      'Market microstructure',
-      'Dynamic Binance symbol list'
-    ],
-    support: 'api@yourcompany.com'
-  });
+    }
+    
+    const riskParams = riskParameterService.getRiskParameters(level, marketConditions);
+    
+    res.json({
+      risk_level: level,
+      parameters: riskParams,
+      market_conditions: marketConditions,
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    logger.error('Risk parameter retrieval failed:', error);
+    res.status(500).json({
+      error: 'Risk parameter retrieval failed',
+      message: error.message,
+      timestamp: Date.now()
+    });
+  }
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found',
-    available_endpoints: [
-      'GET /api/health',
-      'GET /api/docs',
-      'GET /api/v1/symbols',
-      'GET /api/v1/symbols/search',
-      'POST /api/v1/signals/generate',
-      'POST /api/v1/signals/batch',
-      'POST /api/v1/admin/refresh-symbols',
-      'GET /api/v1/admin/symbol-stats'
-    ]
-  });
+// New endpoint for market regime analysis
+app.get('/api/v1/market-regime/:symbol', authenticateAPI, async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const { timeframe = '1h' } = req.query;
+    
+    const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, 100);
+    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
+    
+    res.json({
+      symbol: symbol,
+      market_regime: technicalData.market_regime,
+      current_price: marketData.current_price,
+      analysis_timeframe: timeframe,
+      timestamp: Date.now()
+    });
+    
+      } catch (error) {
+    logger.error('Market regime analysis failed:', error);
+    res.status(500).json({
+      error: 'Market regime analysis failed',
+      message: error.message,
+      timestamp: Date.now()
+    });
+  }
 });
 
-// Error handling middleware
-app.use((error, req, res, next) => {
-  logger.error('Unhandled error:', error);
+// New endpoint for comprehensive market analysis
+app.get('/api/v1/market-analysis/:symbol', authenticateAPI, async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const { timeframe = '1h' } = req.query;
+    
+    const startTime = Date.now();
+    
+    // Get all data sources in parallel
+    const [marketData, onChainData, offChainData] = await Promise.all([
+      Promise.resolve(MarketDataService.generateEnhancedData(symbol, timeframe, 100)),
+      signalGenerator.coinGeckoService.getOnChainAnalysis(symbol),
+      offChainDataService.getComprehensiveOffChainData(symbol)
+    ]);
+    
+    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
   
+  res.json({
+      symbol: symbol,
+      current_price: marketData.current_price,
+      market_regime: technicalData.market_regime,
+      technical_analysis: {
+        rsi: technicalData.rsi,
+        macd: technicalData.macd,
+        bollinger_bands: technicalData.bollinger_bands,
+        volatility: technicalData.volatility,
+        volume_ratio: technicalData.volume_ratio
+      },
+      onchain_analysis: {
+        source: onChainData.source,
+        whale_activity: onChainData.whale_activity,
+        sentiment_indicators: onChainData.sentiment_indicators,
+        network_metrics: onChainData.network_metrics
+      },
+      offchain_analysis: {
+        data_quality: offChainData.data_quality,
+        funding_rates: offChainData.funding_rates,
+        market_sentiment: offChainData.market_sentiment,
+        volatility_indexes: offChainData.volatility_indexes,
+        order_book_analysis: offChainData.order_book_analysis
+      },
+      analysis_performance: {
+        generation_time_ms: Date.now() - startTime,
+        data_completeness: this.calculateDataCompleteness(onChainData, offChainData)
+      },
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    logger.error('Comprehensive market analysis failed:', error);
+    res.status(500).json({
+      error: 'Market analysis failed',
+      message: error.message,
+      timestamp: Date.now()
+    });
+  }
+});
+
+// Helper function for data completeness calculation
+function calculateDataCompleteness(onChainData, offChainData) {
+  let completeness = 0;
+  let totalSources = 0;
+  
+  // On-chain data completeness
+  if (onChainData.whale_activity) { completeness++; totalSources++; }
+  if (onChainData.sentiment_indicators) { completeness++; totalSources++; }
+  if (onChainData.network_metrics) { completeness++; totalSources++; }
+  
+  // Off-chain data completeness
+  if (offChainData.funding_rates) { completeness++; totalSources++; }
+  if (offChainData.market_sentiment) { completeness++; totalSources++; }
+  if (offChainData.order_book_analysis) { completeness++; totalSources++; }
+  
+  return Math.round((completeness / totalSources) * 100);
+}
+
+// New endpoint for bot execution instructions
+app.post('/api/v1/bot-instructions', authenticateAPI, validateSignalRequest, async (req, res) => {
+  try {
+    const { 
+      symbol, 
+      timeframe = '1h', 
+      risk_level = 'balanced',
+      bot_type = 'python',
+      custom_risk_params = null
+    } = req.body;
+
+    logger.info(`Bot instruction request for ${symbol}`, {
+      timeframe,
+      risk_level,
+      bot_type
+    });
+
+    // Generate signal and context
+    const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, 100);
+    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
+    const onChainData = await signalGenerator.coinGeckoService.getOnChainAnalysis(symbol);
+    const offChainData = await offChainDataService.getComprehensiveOffChainData(symbol);
+    
+    const riskParams = custom_risk_params ? 
+      riskParameterService.getCustomRiskParameters(custom_risk_params, risk_level) :
+      riskParameterService.getRiskParameters(risk_level, technicalData.market_regime);
+    
+    const signal = await signalGenerator.generateAdvancedSignal(
+      marketData, 
+      technicalData, 
+      onChainData, 
+      { symbol, timeframe, risk_level }
+    );
+    
+    // Generate bot-specific instructions
+    const botInstructions = botIntegrationService.translateSignalToBotInstructions(
+      signal,
+      riskParams,
+      {
+        symbol: symbol,
+        market_regime: technicalData.market_regime,
+        current_price: marketData.current_price
+      }
+    );
+
+    res.json({
+      symbol: symbol,
+      bot_type: bot_type,
+      signal_summary: {
+        action: signal.signal,
+        confidence: signal.confidence,
+        market_phase: technicalData.market_regime.market_phase,
+        strategy_type: botInstructions.trading_instruction.strategy_type
+      },
+      execution_instructions: botInstructions,
+      implementation_guide: {
+        python: botInstructions.bot_instructions.python_bot,
+        ninjatrader: botInstructions.bot_instructions.ninjatrader,
+        mt4_mt5: botInstructions.bot_instructions.mt4_mt5,
+        custom_api: botInstructions.bot_instructions.custom_api
+      },
+      quick_start: {
+        entry_method: botInstructions.position_management.entry_method,
+        position_size: botInstructions.position_management.position_size,
+        risk_management: botInstructions.risk_management,
+        monitoring_points: botInstructions.monitoring.key_levels
+      },
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    logger.error('Bot instruction generation failed:', error);
+    res.status(500).json({
+      error: 'Bot instruction generation failed',
+      message: error.message,
+      timestamp: Date.now()
+    });
+  }
+});
+
+// New endpoint for strategy validation
+app.post('/api/v1/validate-strategy', authenticateAPI, async (req, res) => {
+  try {
+    const { 
+      signal, 
+      risk_params, 
+      account_balance,
+      existing_positions = []
+    } = req.body;
+
+    // Validate the strategy execution
+    const validation = {
+      signal_validation: {
+        confidence_check: signal.confidence >= (risk_params.confidence_threshold || 50),
+        position_size_check: signal.position_size_percent <= (risk_params.max_position_size || 5),
+        risk_reward_check: signal.risk_reward_ratio >= 1.5
+      },
+      risk_validation: {
+        account_balance_sufficient: account_balance > 0,
+        position_size_appropriate: (signal.position_size_percent / 100) * account_balance < account_balance * 0.1,
+        correlation_acceptable: existing_positions.length < 5 // Simplified check
+      },
+      execution_validation: {
+        market_hours_appropriate: true, // Would check actual market hours
+        liquidity_adequate: true, // Would check actual liquidity
+        volatility_acceptable: signal.volatility_rating !== 'EXTREME'
+      }
+    };
+
+    const overall_valid = Object.values(validation.signal_validation).every(v => v) &&
+                         Object.values(validation.risk_validation).every(v => v) &&
+                         Object.values(validation.execution_validation).every(v => v);
+
+    res.json({
+      valid: overall_valid,
+      validation_details: validation,
+      recommendations: overall_valid ? 
+        ['Strategy validated - proceed with execution'] :
+        ['Review failed validation points before execution'],
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    logger.error('Strategy validation failed:', error);
   res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : error.message,
-    request_id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  });
+      error: 'Strategy validation failed',
+      message: error.message,
+      timestamp: Date.now()
+    });
+  }
 });
 
 // ===============================================
@@ -2136,45 +3689,45 @@ async function startServer() {
     await logStartupStatus();
     
     // Start the server
-    const server = app.listen(PORT, () => {
-      logger.info(`Enhanced Crypto Signal API server running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  logger.info(`Enhanced Crypto Signal API server running on port ${PORT}`);
       logger.info(`AI Models: Claude 4 Sonnet + LunarCrush API`);
-      logger.info(`Blockchain Coverage: 2,500+ EVM Networks`);
-      logger.info(`Symbol Validation: Dynamic (Binance API)`);
-      logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`Health check: http://localhost:${PORT}/api/health`);
-      logger.info(`Documentation: http://localhost:${PORT}/api/docs`);
-      
-      // Initialize symbols after server starts
-      initializeSymbols();
-      
-      // Set up periodic symbol updates
-      setInterval(async () => {
-        try {
-          await updateValidSymbols();
-          logger.info('Periodic symbol update completed');
-        } catch (error) {
-          logger.error('Periodic symbol update failed:', error);
-        }
+  logger.info(`Blockchain Coverage: 2,500+ EVM Networks`);
+  logger.info(`Symbol Validation: Dynamic (Binance API)`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`Health check: http://localhost:${PORT}/api/health`);
+  logger.info(`Documentation: http://localhost:${PORT}/api/docs`);
+  
+  // Initialize symbols after server starts
+  initializeSymbols();
+  
+  // Set up periodic symbol updates
+  setInterval(async () => {
+    try {
+      await updateValidSymbols();
+      logger.info('Periodic symbol update completed');
+    } catch (error) {
+      logger.error('Periodic symbol update failed:', error);
+    }
       }, 3600000); // Update every hour
-    });
-    
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
       logger.info('SIGTERM received, shutting down gracefully...');
-      server.close(() => {
+  server.close(() => {
         logger.info('Server closed');
-        process.exit(0);
-      });
-    });
-    
-    process.on('SIGINT', () => {
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
       logger.info('SIGINT received, shutting down gracefully...');
-      server.close(() => {
+  server.close(() => {
         logger.info('Server closed');
-        process.exit(0);
-      });
-    });
+    process.exit(0);
+  });
+});
     
   } catch (error) {
     logger.error('Failed to start server:', error);

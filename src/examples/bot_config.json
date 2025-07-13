@@ -1,0 +1,156 @@
+{
+  "api_settings": {
+    "base_url": "http://localhost:3000",
+    "api_key": "your-api-key-here",
+    "timeout": 30,
+    "retry_attempts": 3
+  },
+  "risk_profiles": {
+    "conservative": {
+      "max_position_size": 0.02,
+      "risk_per_trade": 0.01,
+      "confidence_threshold": 65,
+      "max_positions": 3,
+      "max_portfolio_risk": 0.15,
+      "correlation_threshold": 0.6
+    },
+    "balanced": {
+      "max_position_size": 0.05,
+      "risk_per_trade": 0.02,
+      "confidence_threshold": 50,
+      "max_positions": 5,
+      "max_portfolio_risk": 0.20,
+      "correlation_threshold": 0.7
+    },
+    "aggressive": {
+      "max_position_size": 0.10,
+      "risk_per_trade": 0.03,
+      "confidence_threshold": 40,
+      "max_positions": 8,
+      "max_portfolio_risk": 0.30,
+      "correlation_threshold": 0.8
+    }
+  },
+  "trading_settings": {
+    "symbols": ["BTCUSDT", "ETHUSDT", "ADAUSDT", "SOLUSDT", "DOTUSDT"],
+    "timeframe": "1h",
+    "cycle_interval": 300,
+    "market_hours_only": false,
+    "enable_short_selling": true,
+    "enable_leverage": false
+  },
+  "strategy_settings": {
+    "accumulation": {
+      "scaling_orders": 3,
+      "order_spacing": "1%",
+      "time_spacing": "15min",
+      "volume_threshold": "1.2x"
+    },
+    "distribution": {
+      "exit_percentage": 0.75,
+      "short_threshold": 70,
+      "risk_off_mode": true
+    },
+    "markup": {
+      "trend_following": true,
+      "momentum_threshold": 0.6,
+      "trailing_stop": true
+    },
+    "markdown": {
+      "defensive_mode": true,
+      "oversold_bounce": true,
+      "stop_loss_tightening": 0.8
+    },
+    "consolidation": {
+      "range_trading": true,
+      "breakout_detection": true,
+      "support_resistance_levels": 5
+    }
+  },
+  "risk_management": {
+    "stop_loss": {
+      "type": "trailing",
+      "initial_distance": "2%",
+      "trail_distance": "1%",
+      "activation_threshold": "1.5%"
+    },
+    "take_profit": {
+      "levels": [
+        {"percentage": 30, "target": "1.5R"},
+        {"percentage": 50, "target": "2.5R"},
+        {"percentage": 20, "target": "4R"}
+      ],
+      "trailing_profit": true
+    },
+    "position_sizing": {
+      "method": "risk_based",
+      "volatility_adjustment": true,
+      "correlation_adjustment": true
+    },
+    "emergency_exits": {
+      "volatility_spike": "50%",
+      "correlation_breakdown": "0.8",
+      "liquidity_crisis": "2%_spread",
+      "drawdown_limit": "15%"
+    }
+  },
+  "monitoring": {
+    "key_indicators": [
+      "RSI",
+      "MACD",
+      "Volume",
+      "Bollinger_Bands",
+      "Support_Resistance"
+    ],
+    "alert_conditions": {
+      "high_volatility": "30%",
+      "low_liquidity": "2x_spread",
+      "correlation_spike": "0.8",
+      "drawdown_warning": "10%"
+    },
+    "logging": {
+      "level": "INFO",
+      "file": "enhanced_trading_bot.log",
+      "max_size": "10MB",
+      "backup_count": 5
+    }
+  },
+  "backtesting": {
+    "enabled": true,
+    "data_source": "historical_api",
+    "lookback_period": "30d",
+    "benchmark": "BTCUSDT",
+    "metrics": [
+      "total_return",
+      "sharpe_ratio",
+      "max_drawdown",
+      "win_rate",
+      "profit_factor"
+    ]
+  },
+  "notifications": {
+    "enabled": true,
+    "methods": ["log", "email", "webhook"],
+    "conditions": {
+      "trade_executed": true,
+      "stop_loss_hit": true,
+      "take_profit_hit": true,
+      "high_volatility": true,
+      "emergency_exit": true
+    },
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "port": 587,
+      "username": "your-email@gmail.com",
+      "password": "your-app-password"
+    },
+    "webhook": {
+      "url": "https://your-webhook-url.com/trading-alerts",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer your-webhook-token"
+      }
+    }
+  }
+} 
