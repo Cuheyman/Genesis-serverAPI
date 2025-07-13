@@ -12,11 +12,15 @@ const axios = require('axios');
 const fetch = require('node-fetch'); // Add this if not already installed
 require('dotenv').config();
 
-// Import new services
+// Import standard services
 const offChainDataService = require('./services/offChainDataService');
 const riskParameterService = require('./services/riskParameterService');
 const signalReasoningEngine = require('./services/signalReasoningEngine');
 const botIntegrationService = require('./services/botIntegrationService');
+
+let EnhancedSignalGenerator = null;
+let TaapiService = null;
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -536,6 +540,7 @@ async function updateValidSymbols(force = false) {
     validSymbolsCache.isUpdating = false;
   }
 }
+
 
 /**
  * Get valid symbols (from cache or fetch if needed)
@@ -1303,6 +1308,7 @@ class MarketDataService {
       'PIXELUSDT': 0.25,  // Added this missing symbol
       'UNIUSDT': 8.5,     // Added this missing symbol
       'APTUSDT': 12,      // Added this missing symbol
+      'HYPERUSDT': 3.25,  // Added this missing symbol
       
       // DeFi tokens
       'AVAXUSDT': 36,
@@ -1439,6 +1445,7 @@ class MarketDataService {
       'PIXELUSDT': 0.08,  // Added missing symbols
       'UNIUSDT': 0.045,
       'APTUSDT': 0.055,
+      'HYPERUSDT': 0.085,  // Added missing symbol
       
       // Very small caps - highest volatility
       'NEIROUSDT': 0.12,
@@ -1491,6 +1498,7 @@ class MarketDataService {
       'APTUSDT': 3500000,
       'PIXELUSDT': 2500000,  // Added missing symbols
       'UNIUSDT': 8000000,
+      'HYPERUSDT': 1800000,  // Added missing symbol
       
       // Tier 4 - Lower volume
       'PENGUUSDT': 800000,
@@ -1539,6 +1547,7 @@ class MarketDataService {
       'PIXELUSDT': 5e9,    // Added missing symbols
       'UNIUSDT': 1e9,
       'APTUSDT': 1e9,
+      'HYPERUSDT': 350e6,  // Added missing symbol
       
       // Default estimates for missing symbols
       'NEIROUSDT': 420e12,
@@ -3501,7 +3510,7 @@ app.get('/api/v1/market-analysis/:symbol', authenticateAPI, async (req, res) => 
       },
       analysis_performance: {
         generation_time_ms: Date.now() - startTime,
-        data_completeness: this.calculateDataCompleteness(onChainData, offChainData)
+        data_completeness: calculateDataCompleteness(onChainData, offChainData)
       },
       timestamp: Date.now()
     });
@@ -3533,6 +3542,314 @@ function calculateDataCompleteness(onChainData, offChainData) {
   
   return Math.round((completeness / totalSources) * 100);
 }
+
+// Load enhanced services
+try {
+  EnhancedSignalGenerator = require('./services/enhancedSignalGenerator');
+  TaapiService = require('./services/taapiService');
+  console.log('Enhanced services loaded successfully');
+} catch (error) {
+  console.warn('Enhanced services not available:', error.message);
+  console.warn('API will run with base functionality only');
+  EnhancedSignalGenerator = null;
+  TaapiService = null;
+}
+
+// Initialize enhanced signal generator
+let enhancedSignalGenerator = null;
+
+if (EnhancedSignalGenerator) {
+  try {
+    enhancedSignalGenerator = new EnhancedSignalGenerator();
+    console.log('Enhanced Signal Generator initialized');
+  } catch (error) {
+    console.error('Failed to initialize Enhanced Signal Generator:', error.message);
+    enhancedSignalGenerator = null;
+  }
+}
+
+// ===============================================
+// ENHANCED SIGNAL ENDPOINT
+// ===============================================
+
+app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    let { 
+      symbol, 
+      timeframe = '1h',
+      risk_level = 'balanced',
+      use_taapi = true,
+      avoid_bad_entries = true,
+      include_reasoning = true
+    } = req.body;
+
+    logger.info(`Enhanced signal request for ${symbol}`, { 
+      timeframe, 
+      risk_level, 
+      use_taapi,
+      avoid_bad_entries 
+    });
+
+    // Validate symbol
+    const isValid = await isValidSymbol(symbol);
+    if (!isValid) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid symbol: ${symbol}`,
+        suggestion: 'Use an active USDT trading pair (e.g., BTCUSDT, ETHUSDT)',
+        timestamp: Date.now()
+      });
+    }
+
+    // Check if Taapi services are available
+    if (use_taapi && (!enhancedSignalGenerator || !TaapiService)) {
+      logger.warn('Taapi services not available, falling back to base signal');
+      use_taapi = false; // Fix: Changed from const to let and properly reassign
+    }
+
+    // Check if we should avoid entry (only if Taapi is active)
+    let entryAvoidanceCheck = null;
+    if (avoid_bad_entries && use_taapi && enhancedSignalGenerator) {
+      try {
+        entryAvoidanceCheck = await enhancedSignalGenerator.shouldAvoidEntry(symbol, timeframe);
+        
+        if (entryAvoidanceCheck.should_avoid) {
+          return res.json({
+            signal: 'AVOID',
+            confidence: 0,
+            reasoning: `Entry avoided: ${entryAvoidanceCheck.reasons.join(', ')}`,
+            recommendation: entryAvoidanceCheck.recommendation,
+            avoidance_factors: entryAvoidanceCheck.reasons,
+            symbol,
+            timeframe,
+            enhanced_by: 'entry_avoidance_system',
+            timestamp: Date.now(),
+            processing_time_ms: Date.now() - startTime
+          });
+        }
+      } catch (error) {
+        logger.warn('Entry avoidance check failed:', error.message);
+      }
+    }
+
+    // Get base market data
+    const marketData = MarketDataService.generateEnhancedData(symbol, timeframe, 100);
+    const technicalData = TechnicalAnalysis.calculateAdvancedMetrics(marketData.prices, marketData.volumes);
+    
+    // Get on-chain and off-chain data
+    const [onChainData, offChainData] = await Promise.all([
+      signalGenerator.coinGeckoService.getOnChainAnalysis(symbol),
+      offChainDataService.getComprehensiveOffChainData(symbol)
+    ]);
+
+    // Generate base signal with existing system
+    const baseSignal = await signalGenerator.generateAdvancedSignal(
+      marketData, 
+      technicalData, 
+      onChainData, 
+      { symbol, timeframe, risk_level }
+    );
+
+    let finalSignal = baseSignal;
+
+    // If Taapi is enabled and available, enhance the signal
+    if (use_taapi && enhancedSignalGenerator) {
+      try {
+        finalSignal = await enhancedSignalGenerator.enhanceSignalWithTaapi(
+          baseSignal,
+          marketData,
+          symbol,
+          timeframe,
+          risk_level
+        );
+        logger.info(`Signal enhanced with Taapi for ${symbol}`);
+      } catch (error) {
+        logger.warn('Taapi enhancement failed, using base signal:', error.message);
+        finalSignal = baseSignal;
+        finalSignal.warnings = finalSignal.warnings || [];
+        finalSignal.warnings.push('Taapi enhancement unavailable - using base signal only');
+        finalSignal.enhanced_by = 'fallback_mode';
+      }
+    } else {
+      finalSignal.enhanced_by = 'base_system_only';
+      if (use_taapi) {
+        finalSignal.warnings = finalSignal.warnings || [];
+        finalSignal.warnings.push('Taapi services not available');
+      }
+    }
+
+    // Get risk parameters
+    const riskParams = riskParameterService.getRiskParameters(risk_level, technicalData.market_regime);
+
+    // Validate signal against risk parameters  
+    const riskValidation = riskParameterService.validateSignalAgainstRiskParameters(
+      finalSignal, 
+      riskParams, 
+      marketData
+    );
+
+    // Generate comprehensive reasoning
+    let reasoning = null;
+    if (include_reasoning) {
+      reasoning = signalReasoningEngine.generateComprehensiveReasoning(
+        finalSignal,
+        technicalData,
+        onChainData,
+        offChainData,
+        technicalData.market_regime,
+        riskParams
+      );
+    }
+
+    // Build comprehensive response
+    const response = {
+      // Core signal data
+      signal: finalSignal.signal,
+      confidence: finalSignal.confidence,
+      entry_price: finalSignal.entry_price,
+      stop_loss: finalSignal.stop_loss,
+      take_profit_1: finalSignal.take_profit_1,
+      take_profit_2: finalSignal.take_profit_2,
+      take_profit_3: finalSignal.take_profit_3,
+      position_size_percent: finalSignal.position_size_percent,
+      
+      // Enhanced analysis (only if Taapi was used)
+      ...(use_taapi && finalSignal.taapi_analysis && {
+        taapi_analysis: {
+          bullish_signals: finalSignal.taapi_analysis.bullish_signals,
+          bearish_signals: finalSignal.taapi_analysis.bearish_signals,
+          neutral_signals: finalSignal.taapi_analysis.neutral_signals,
+          market_strength: finalSignal.taapi_analysis.market_strength,
+          trend_direction: finalSignal.taapi_analysis.trend_direction
+        },
+        indicator_confirmation: finalSignal.indicator_confirmation,
+        signal_quality: finalSignal.signal_quality,
+        risk_factors: finalSignal.risk_factors,
+      }),
+
+      // Signal validation
+      ...(finalSignal.validation && {
+        validation: finalSignal.validation
+      }),
+
+      // Market context
+      market_context: {
+        current_price: marketData.current_price,
+        market_regime: technicalData.market_regime,
+        volatility_environment: technicalData.volatility > 0.04 ? 'HIGH_VOLATILITY' : 
+                               technicalData.volatility > 0.02 ? 'MODERATE_VOLATILITY' : 'LOW_VOLATILITY',
+      },
+
+      // Risk management
+      risk_management: {
+        risk_level: risk_level,
+        risk_validation: riskValidation,
+        max_position_size: riskParams.max_position_size,
+        risk_per_trade: riskParams.risk_per_trade
+      },
+
+      // Entry quality assessment
+      entry_quality: {
+        should_avoid: entryAvoidanceCheck?.should_avoid || false,
+        avoidance_factors: entryAvoidanceCheck?.reasons || [],
+        recommendation: entryAvoidanceCheck?.recommendation || 'PROCEED',
+        quality_score: finalSignal.signal_quality?.overall_score,
+        quality_grade: finalSignal.signal_quality?.overall_grade
+      },
+
+      // Signal comparison (only if Taapi was used)
+      ...(use_taapi && finalSignal.base_signal && {
+        signal_comparison: {
+          base_signal: finalSignal.base_signal,
+          taapi_signal: finalSignal.taapi_signal,
+          enhancement_method: finalSignal.enhanced_by
+        }
+      }),
+
+      // Reasoning
+      ...(reasoning && { reasoning }),
+
+      // Warnings
+      ...(finalSignal.warnings && { warnings: finalSignal.warnings }),
+
+      // Technical summary
+      technical_summary: {
+        rsi: technicalData.rsi,
+        macd: technicalData.macd,
+        volatility: technicalData.volatility,
+        volume_ratio: technicalData.volume_ratio
+      },
+
+      // Metadata
+      metadata: {
+        symbol,
+        timeframe,
+        taapi_enabled: use_taapi,
+        taapi_available: !!(enhancedSignalGenerator && TaapiService),
+        avoidance_check_enabled: avoid_bad_entries,
+        processing_time_ms: Date.now() - startTime,
+        api_version: 'v1.1_enhanced',
+        enhanced_by: finalSignal.enhanced_by,
+        timestamp: Date.now()
+      }
+    };
+
+    // Log successful enhanced signal generation
+    logger.info(`Enhanced signal generated for ${symbol}`, {
+      signal: finalSignal.signal,
+      confidence: finalSignal.confidence,
+      taapi_used: use_taapi,
+      taapi_available: !!(enhancedSignalGenerator && TaapiService),
+      quality_score: finalSignal.signal_quality?.overall_score,
+      processing_time: Date.now() - startTime
+    });
+
+    res.json(response);
+
+  } catch (error) {
+    logger.error('Enhanced signal generation failed:', error);
+    
+    res.status(500).json({
+      success: false,
+      error: 'Enhanced signal generation failed',
+      message: error.message,
+      fallback_suggestion: 'Try using /api/v1/signal endpoint without Taapi enhancement',
+      timestamp: Date.now()
+    });
+  }
+});
+
+// ===============================================
+// TAAPI HEALTH CHECK ENDPOINT
+// ===============================================
+
+app.get('/api/v1/taapi/health', authenticateAPI, async (req, res) => {
+  try {
+    if (!TaapiService) {
+      return res.json({
+        taapi_status: 'unavailable',
+        message: 'Taapi service not loaded',
+        timestamp: Date.now()
+      });
+    }
+    
+    const isHealthy = await TaapiService.testConnection();
+    
+    res.json({
+      taapi_status: isHealthy ? 'healthy' : 'unhealthy',
+      timestamp: Date.now(),
+      message: isHealthy ? 'Taapi.io connection successful' : 'Taapi.io connection failed'
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      taapi_status: 'error',
+      error: error.message,
+      timestamp: Date.now()
+    });
+  }
+});
 
 // New endpoint for bot execution instructions
 app.post('/api/v1/bot-instructions', authenticateAPI, validateSignalRequest, async (req, res) => {
