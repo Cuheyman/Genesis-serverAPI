@@ -6,7 +6,7 @@ class TaapiService {
   constructor() {
     this.baseURL = 'https://api.taapi.io';
     this.secret = process.env.TAAPI_SECRET || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjg1NDFjNDI4MDZmZjE2NTFlNTY4ZGNhIiwiaWF0IjoxNzUyNDIyMzg4LCJleHAiOjMzMjU2ODg2Mzg4fQ.Q4GOQ6s32PcS3S8zBNTGxJXHtoAt6bveeav8aIegmTU'; // Tilføj til .env fil
-    this.rateLimitDelay = 1000; // 1 sekund mellem calls på gratis plan
+    this.rateLimitDelay = 15000; // 1 sekund mellem calls på gratis plan
     this.lastCallTime = 0;
   }
 
@@ -384,4 +384,4 @@ class TaapiService {
   }
 }
 
-module.exports = new TaapiService();
+module.exports = TaapiService;

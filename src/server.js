@@ -19,7 +19,8 @@ const signalReasoningEngine = require('./services/signalReasoningEngine');
 const botIntegrationService = require('./services/botIntegrationService');
 
 let EnhancedSignalGenerator = null;
-let TaapiService = null;
+let TaapiServiceClass = null;
+let taapiService = null;
 
 
 const app = express();
@@ -3546,21 +3547,31 @@ function calculateDataCompleteness(onChainData, offChainData) {
 // Load enhanced services
 try {
   EnhancedSignalGenerator = require('./services/enhancedSignalGenerator');
-  TaapiService = require('./services/taapiService');
+  TaapiServiceClass = require('./services/taapiService');
+  // Debug log for TAAPI_SECRET
+  const taapiSecret = process.env.TAAPI_SECRET;
+  if (taapiSecret) {
+    console.log('TAAPI_SECRET is set:', taapiSecret.slice(0, 6) + '...' + taapiSecret.slice(-4));
+  } else {
+    console.warn('TAAPI_SECRET is NOT set!');
+  }
+  taapiService = new TaapiServiceClass();
+  console.log('taapiService instance created:', !!taapiService);
+  enhancedSignalGenerator = new EnhancedSignalGenerator(taapiService);
+  console.log('enhancedSignalGenerator instance created:', !!enhancedSignalGenerator);
   console.log('Enhanced services loaded successfully');
 } catch (error) {
   console.warn('Enhanced services not available:', error.message);
-  console.warn('API will run with base functionality only');
   EnhancedSignalGenerator = null;
-  TaapiService = null;
+  TaapiServiceClass = null;
+  taapiService = null;
+  enhancedSignalGenerator = null;
 }
 
-// Initialize enhanced signal generator
-let enhancedSignalGenerator = null;
 
-if (EnhancedSignalGenerator) {
+if (EnhancedSignalGenerator && taapiService) {
   try {
-    enhancedSignalGenerator = new EnhancedSignalGenerator();
+    enhancedSignalGenerator = new EnhancedSignalGenerator(taapiService);
     console.log('Enhanced Signal Generator initialized');
   } catch (error) {
     console.error('Failed to initialize Enhanced Signal Generator:', error.message);
@@ -3603,9 +3614,9 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
     }
 
     // Check if Taapi services are available
-    if (use_taapi && (!enhancedSignalGenerator || !TaapiService)) {
+    if (use_taapi && (!enhancedSignalGenerator || !taapiService)) {
       logger.warn('Taapi services not available, falling back to base signal');
-      use_taapi = false; // Fix: Changed from const to let and properly reassign
+      use_taapi = true; // Fix: Changed from const to let and properly reassign
     }
 
     // Check if we should avoid entry (only if Taapi is active)
@@ -3786,7 +3797,7 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
         symbol,
         timeframe,
         taapi_enabled: use_taapi,
-        taapi_available: !!(enhancedSignalGenerator && TaapiService),
+        taapi_available: !!(enhancedSignalGenerator && taapiService),
         avoidance_check_enabled: avoid_bad_entries,
         processing_time_ms: Date.now() - startTime,
         api_version: 'v1.1_enhanced',
@@ -3800,7 +3811,7 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
       signal: finalSignal.signal,
       confidence: finalSignal.confidence,
       taapi_used: use_taapi,
-      taapi_available: !!(enhancedSignalGenerator && TaapiService),
+      taapi_available: !!(enhancedSignalGenerator && taapiService),
       quality_score: finalSignal.signal_quality?.overall_score,
       processing_time: Date.now() - startTime
     });
@@ -3826,7 +3837,7 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
 
 app.get('/api/v1/taapi/health', authenticateAPI, async (req, res) => {
   try {
-    if (!TaapiService) {
+    if (!taapiService) {
       return res.json({
         taapi_status: 'unavailable',
         message: 'Taapi service not loaded',
@@ -3834,7 +3845,7 @@ app.get('/api/v1/taapi/health', authenticateAPI, async (req, res) => {
       });
     }
     
-    const isHealthy = await TaapiService.testConnection();
+    const isHealthy = await taapiService.testConnection();
     
     res.json({
       taapi_status: isHealthy ? 'healthy' : 'unhealthy',

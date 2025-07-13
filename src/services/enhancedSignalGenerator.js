@@ -1,10 +1,9 @@
 // src/services/enhancedSignalGenerator.js
-const TaapiService = require('./taapiService');
 const logger = require('../utils/logger');
 
 class EnhancedSignalGenerator {
-  constructor() {
-    this.taapiService = TaapiService;
+  constructor(taapiService) {
+    this.taapiService = taapiService;
     this.signalHistory = new Map(); // Track signal quality over time
   }
 
@@ -449,4 +448,4 @@ class EnhancedSignalGenerator {
   }
 }
 
-module.exports = new EnhancedSignalGenerator();
+module.exports = EnhancedSignalGenerator;
