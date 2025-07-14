@@ -1366,3 +1366,646 @@
 2025-07-13T17:56:47.252Z [ERROR] Signal enhancement failed, falling back to base signal:
 2025-07-13T17:56:47.254Z [ERROR] Taapi bulk indicators failed: {"message":"Request failed with status code 429","name":"AxiosError","stack":"AxiosError: Request failed with status code 429\n    at settle (C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\node_modules\\axios\\dist\\node\\axios.cjs:2053:12)\n    at IncomingMessage.handleStreamEnd (C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\node_modules\\axios\\dist\\node\\axios.cjs:3170:11)\n    at IncomingMessage.emit (node:events:519:35)\n    at endReadableNT (node:internal/streams/readable:1696:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)\n    at Axios.request (C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\node_modules\\axios\\dist\\node\\axios.cjs:4280:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async TaapiService.getBulkIndicators (C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\services\\taapiService.js:136:24)\n    at async EnhancedSignalGenerator.enhanceSignalWithTaapi (C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\services\\enhancedSignalGenerator.js:16:31)\n    at async C:\\Users\\cuhey\\OneDrive\\Skrivebord\\API-ENDPOINT-GENESISAI\\src\\server.js:3670:23","config":{"transitional":{"silentJSONParsing":true,"forcedJSONParsing":true,"clarifyTimeoutError":false},"adapter":["xhr","http","fetch"],"transformRequest":[null],"transformResponse":[null],"timeout":10000,"xsrfCookieName":"XSRF-TOKEN","xsrfHeaderName":"X-XSRF-TOKEN","maxContentLength":-1,"maxBodyLength":-1,"env":{},"headers":{"Accept":"application/json, text/plain, */*","Content-Type":"application/json","User-Agent":"axios/1.10.0","Content-Length":"1494","Accept-Encoding":"gzip, compress, deflate, br"},"method":"post","url":"https://api.taapi.io/bulk","data":"{\"secret\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjg1NDFjNDI4MDZmZjE2NTFlNTY4ZGNhIiwiaWF0IjoxNzUyNDIyMzg4LCJleHAiOjMzMjU2ODg2Mzg4fQ.Q4GOQ6s32PcS3S8zBNTGxJXHtoAt6bveeav8aIegmTU\",\"construct\":[{\"indicator\":\"rsi\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\",\"optInTimePeriod\":14},{\"indicator\":\"macd\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"stoch\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"ema\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\",\"optInTimePeriod\":20},{\"indicator\":\"ema\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\",\"optInTimePeriod\":50},{\"indicator\":\"ema\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\",\"optInTimePeriod\":200},{\"indicator\":\"adx\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"obv\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"mfi\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"bbands\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"atr\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"cdlhammer\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"cdlengulfing\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"cdldoji\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"},{\"indicator\":\"cdlshootingstar\",\"exchange\":\"binance\",\"symbol\":\"HYPERUSDT\",\"interval\":\"1h\"}]}","allowAbsoluteUrls":true},"code":"ERR_BAD_REQUEST","status":429}
 2025-07-13T17:56:47.255Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:21:24.731Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:21:24.732Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:21:40.719Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:21:40.720Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:21:40.721Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:26:12.894Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:26:12.895Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:26:28.910Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:26:28.910Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:26:28.912Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:28:13.351Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:28:13.352Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:28:29.362Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT: "Request failed with status code 400"
+2025-07-14T07:28:29.363Z [ERROR] DEBUG: TAAPI client error (400) for BTCUSDT: Request failed with status code 400
+2025-07-14T07:28:29.364Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:33:54.528Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT
+2025-07-14T07:33:54.529Z [ERROR] DEBUG: Request URL: https://api.taapi.io/bulk
+2025-07-14T07:33:54.530Z [ERROR] Entry avoidance check failed:
+2025-07-14T07:34:10.500Z [ERROR] DEBUG: TAAPI request FAILED for BTCUSDT
+2025-07-14T07:34:10.501Z [ERROR] DEBUG: Request URL: https://api.taapi.io/bulk
+2025-07-14T07:34:10.501Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:37:26.947Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Request failed with status code 400
+2025-07-14T07:37:26.947Z [ERROR] 🚫 DEBUG: TAAPI client error (400) for BTCUSDT
+2025-07-14T07:37:42.933Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Request failed with status code 400
+2025-07-14T07:37:42.934Z [ERROR] 🚫 DEBUG: TAAPI client error (400) for BTCUSDT
+2025-07-14T07:37:42.935Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:39:26.444Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Cannot read properties of undefined (reading 'length')
+2025-07-14T07:39:26.445Z [ERROR] Taapi service error for BTCUSDT: "Cannot read properties of undefined (reading 'length')"
+2025-07-14T07:39:42.456Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Cannot read properties of undefined (reading 'length')
+2025-07-14T07:39:42.457Z [ERROR] Taapi service error for BTCUSDT: "Cannot read properties of undefined (reading 'length')"
+2025-07-14T07:39:42.458Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:41:59.132Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Cannot read properties of undefined (reading 'length')
+2025-07-14T07:41:59.132Z [ERROR] Taapi service error for BTCUSDT: "Cannot read properties of undefined (reading 'length')"
+2025-07-14T07:43:08.675Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Request failed with status code 400
+2025-07-14T07:43:08.676Z [ERROR] 🚫 DEBUG: TAAPI client error (400) for BTCUSDT
+2025-07-14T07:43:24.632Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Request failed with status code 400
+2025-07-14T07:43:24.633Z [ERROR] 🚫 DEBUG: TAAPI client error (400) for BTCUSDT
+2025-07-14T07:43:24.635Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:45:38.976Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:45:47.482Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:46:59.031Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T07:59:50.613Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: Request failed with status code 429
+2025-07-14T07:59:51.166Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: TAAPI currently rate limited
+2025-07-14T07:59:51.167Z [ERROR] Taapi service error for BTCUSDT: "TAAPI currently rate limited"
+2025-07-14T07:59:51.168Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T07:59:51.169Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T08:01:55.994Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: TAAPI currently rate limited
+2025-07-14T08:01:55.994Z [ERROR] Taapi service error for BTCUSDT: "TAAPI currently rate limited"
+2025-07-14T08:01:56.360Z [ERROR] ❌ TAAPI request FAILED for BTCUSDT: TAAPI currently rate limited
+2025-07-14T08:01:56.360Z [ERROR] Taapi service error for BTCUSDT: "TAAPI currently rate limited"
+2025-07-14T08:01:56.361Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T08:01:56.361Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T08:12:53.904Z [ERROR] Taapi service error for BTCUSDT: "Cannot read properties of undefined (reading 'toFixed')"
+2025-07-14T09:08:04.049Z [ERROR] Error fetching order book data:
+2025-07-14T09:32:32.527Z [ERROR] Taapi service error for LINKUSDT: "Request failed with status code 403"
+2025-07-14T09:32:32.579Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:32.579Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:32.596Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:32.596Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:48.548Z [ERROR] ❌ DEBUG: Signal enhancement failed for SUIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:48.548Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:48.560Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:48.560Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:48.577Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:32:48.578Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:48.579Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:48.599Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:32:48.601Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:48.601Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:49.080Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:49.081Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:52.093Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:52.094Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:53.822Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:53.823Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:53.852Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:53.853Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:53.888Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:53.888Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:53.920Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:53.920Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:53.955Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:53.956Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.375Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.376Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.387Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.387Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.400Z [ERROR] ❌ DEBUG: Signal enhancement failed for SUIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.400Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.754Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.754Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.784Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.785Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.852Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.852Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:54.883Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:54.884Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:55.130Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:55.130Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:32:55.250Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:32:55.250Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:09.157Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:09.157Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.160Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.161Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.312Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.313Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.352Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.352Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.386Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.387Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.417Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.417Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.597Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.597Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.630Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.631Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:10.647Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:10.648Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:11.074Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:11.075Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:11.081Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:11.081Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:11.114Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:11.114Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:11.122Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:11.122Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:11.152Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:11.152Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:13.204Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:13.204Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:31.648Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:31.649Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:32.526Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:32.526Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:32.566Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:32.566Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:32.926Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:32.927Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:32.957Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:32.957Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:32.988Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:32.988Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.003Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.004Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.198Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.198Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.440Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.440Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.474Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.475Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.586Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.586Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:33.993Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:33.993Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:34.432Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:34.432Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:34.459Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:34.459Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:50.763Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:50.764Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:51.768Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:51.768Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.008Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.008Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.257Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.257Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.397Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.397Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.486Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.486Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.724Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.724Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.736Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.736Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.765Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.765Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.796Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.796Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.824Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.825Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:52.850Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:52.850Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:33:55.344Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:33:55.344Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:40:49.561Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:40:49.562Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:05.528Z [ERROR] Taapi service error for LINKUSDT: "Request failed with status code 403"
+2025-07-14T09:41:05.529Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:05.530Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:05.547Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:41:05.559Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:05.559Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:05.566Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:05.567Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:05.570Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:41:06.073Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:06.073Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:06.083Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:06.084Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:09.110Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:09.110Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.059Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.060Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.094Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.095Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.121Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.122Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.147Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.147Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.194Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.194Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.207Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.208Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.213Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.213Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.617Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.617Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.648Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.648Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.689Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.689Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:10.708Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:10.709Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:28.312Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:28.313Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.529Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.529Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.741Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.741Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.748Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.748Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.754Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.754Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.766Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.766Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.797Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.797Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.833Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.834Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:29.977Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:29.978Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:30.231Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:30.231Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:30.245Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:30.245Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:31.914Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:31.914Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:50.560Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:50.560Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:50.880Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:50.880Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:50.899Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:50.900Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.048Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.048Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.056Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.056Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.099Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.099Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.166Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.166Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.199Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.200Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.294Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.294Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.332Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.332Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:41:51.538Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:41:51.538Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:08.982Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:08.982Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.354Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.355Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.420Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.421Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.429Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.430Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.501Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.502Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.660Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.660Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.695Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.696Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.841Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.841Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.850Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.850Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.877Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.877Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:10.909Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:10.909Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:28.660Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:28.661Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.381Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.382Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.411Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.411Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.718Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.719Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.727Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.727Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.732Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.733Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.751Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.752Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.776Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.777Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.802Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.802Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:29.827Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:29.827Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:42:30.192Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:42:30.192Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:50.085Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:50.085Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:50.994Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:50.995Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.163Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.163Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.175Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.176Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.182Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.182Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.531Z [ERROR] ❌ DEBUG: Signal enhancement failed for RENDERUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.531Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.662Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.662Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.855Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.855Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.881Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.882Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:51.906Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:51.906Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:44:52.243Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:44:52.244Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:07.876Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:07.876Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:08.863Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:08.864Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.318Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.318Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.346Z [ERROR] ❌ DEBUG: Signal enhancement failed for RSRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.346Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.618Z [ERROR] ❌ DEBUG: Signal enhancement failed for RENDERUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.618Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.655Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.655Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.814Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.814Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.823Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.823Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.842Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.842Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:09.873Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:09.873Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:45:10.094Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:45:10.094Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:03.488Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEIROUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:03.489Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:03.558Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:03.559Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:03.565Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:19.498Z [ERROR] Taapi service error for LINKUSDT: "Request failed with status code 403"
+2025-07-14T09:52:19.500Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:19.500Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:19.523Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:19.523Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:19.525Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:19.526Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:19.527Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:19.528Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:19.531Z [ERROR] ❌ DEBUG: Signal enhancement failed for MKRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:19.532Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:19.534Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:19.535Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:19.536Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:19.537Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:35.540Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:35.540Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:35.550Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:35.551Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:35.561Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:35.562Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:35.574Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:35.575Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:51.513Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:51.513Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:51.520Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:51.520Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:51.522Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:51.523Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:51.529Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:51.529Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:51.531Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:51.532Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:51.550Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:51.551Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:51.553Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:51.553Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:52:51.557Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:52:51.557Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:52:51.559Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:52:51.559Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:07.556Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:53:07.556Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:07.559Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:53:07.559Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:07.576Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:53:07.576Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:07.580Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:07.580Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:23.548Z [ERROR] Taapi service error for ADAUSDT: "Request failed with status code 403"
+2025-07-14T09:53:23.548Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:23.550Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:23.550Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:23.576Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:23.577Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:23.579Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:53:23.580Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:23.581Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:23.581Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:23.583Z [ERROR] Taapi circuit breaker opened due to repeated rate limits
+2025-07-14T09:53:23.583Z [ERROR] Taapi circuit breaker opened due to consecutive errors
+2025-07-14T09:53:23.585Z [ERROR] ❌ DEBUG: Signal enhancement failed for LINKUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:23.585Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T09:53:23.588Z [ERROR] ❌ DEBUG: Signal enhancement failed for NEARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T09:53:23.589Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:08:58.376Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:08:58.376Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:09:32.784Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:09:32.784Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:09:33.555Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:33.566Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:33.586Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:34.102Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:34.103Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:09:34.104Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:09:34.359Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:34.360Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:09:34.360Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:09:34.387Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:09:34.387Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:09:34.388Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:07.889Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:07.890Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:08.650Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:08.656Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:08.661Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:08.991Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:08.992Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:08.992Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:08.997Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.151Z [ERROR] ❌ QUEUE ERROR for ENAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.152Z [ERROR] ❌ DEBUG: Signal enhancement failed for ENAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.152Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:09.157Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.159Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.159Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:09.162Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.335Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.336Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.336Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:09.635Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.636Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.637Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:09.644Z [ERROR] ❌ QUEUE ERROR for VIRTUALUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.646Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.646Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:09.664Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:09.666Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:09.666Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:18.447Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:18.447Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:43.409Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:43.410Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:45.280Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.286Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.784Z [ERROR] ❌ QUEUE ERROR for ENAUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.785Z [ERROR] ❌ DEBUG: Signal enhancement failed for ENAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:45.786Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:45.792Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.793Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:45.794Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:45.799Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.805Z [ERROR] ❌ QUEUE ERROR for FUNUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.806Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:45.807Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:45.810Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.811Z [ERROR] ❌ DEBUG: Signal enhancement failed for CRVUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:45.812Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:45.815Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:45.817Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:46.186Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:46.187Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:46.188Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:46.267Z [ERROR] ❌ QUEUE ERROR for VIRTUALUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:46.269Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:46.269Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:46.282Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:46.284Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:46.284Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:46.324Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:46.325Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:46.325Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:47.419Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:47.419Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:10:47.850Z [ERROR] ❌ QUEUE ERROR for HBARUSDT: "Cannot read properties of undefined (reading 'isFallbackData')"
+2025-07-14T10:10:47.852Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:10:47.852Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:39.437Z [ERROR] ❌ QUEUE ERROR for AAVEUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:39.457Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:39.464Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:39.478Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:39.999Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.000Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.001Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.008Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.018Z [ERROR] ❌ QUEUE ERROR for ENAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.020Z [ERROR] ❌ DEBUG: Signal enhancement failed for ENAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.020Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.031Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.033Z [ERROR] ❌ DEBUG: Signal enhancement failed for CRVUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.033Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.038Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.117Z [ERROR] ❌ QUEUE ERROR for AAVEUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.118Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.118Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.123Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.300Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.301Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.302Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.306Z [ERROR] ❌ QUEUE ERROR for XRPUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.507Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.508Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.508Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.513Z [ERROR] ❌ QUEUE ERROR for VIRTUALUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.515Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.515Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.524Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.530Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.532Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.532Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.537Z [ERROR] ❌ QUEUE ERROR for XLMUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.615Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:40.616Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:40.617Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:40.621Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.005Z [ERROR] ❌ QUEUE ERROR for FUNUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.007Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.007Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:41.427Z [ERROR] ❌ QUEUE ERROR for XRPUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.429Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.429Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:41.454Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.455Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.456Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:41.483Z [ERROR] ❌ QUEUE ERROR for XLMUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.484Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.485Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:41.502Z [ERROR] ❌ QUEUE ERROR for HBARUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.504Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.505Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:41.515Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:41.519Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:41.519Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:55.291Z [ERROR] ❌ QUEUE ERROR for AAVEUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:55.333Z [ERROR] ❌ QUEUE ERROR for AAVEUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:55.334Z [ERROR] ❌ DEBUG: Signal enhancement failed for AAVEUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:55.334Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.284Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.291Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.319Z [ERROR] ❌ QUEUE ERROR for ADAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.321Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.321Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.325Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.779Z [ERROR] ❌ QUEUE ERROR for FUNUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.780Z [ERROR] ❌ DEBUG: Signal enhancement failed for FUNUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.780Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.787Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.793Z [ERROR] ❌ QUEUE ERROR for ENAUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.795Z [ERROR] ❌ DEBUG: Signal enhancement failed for ENAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.795Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.800Z [ERROR] ❌ QUEUE ERROR for VIRTUALUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.801Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.801Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.805Z [ERROR] ❌ QUEUE ERROR for CRVUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.806Z [ERROR] ❌ DEBUG: Signal enhancement failed for CRVUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.808Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.810Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.813Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.817Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.821Z [ERROR] ❌ QUEUE ERROR for ONDOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.822Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.823Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.830Z [ERROR] ❌ QUEUE ERROR for ETHUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.831Z [ERROR] ❌ DEBUG: Signal enhancement failed for ETHUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.831Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.835Z [ERROR] ❌ QUEUE ERROR for XRPUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.838Z [ERROR] ❌ QUEUE ERROR for XLMUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.860Z [ERROR] ❌ QUEUE ERROR for UNIUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.861Z [ERROR] ❌ DEBUG: Signal enhancement failed for UNIUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.861Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.866Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.889Z [ERROR] ❌ QUEUE ERROR for SOLUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.890Z [ERROR] ❌ DEBUG: Signal enhancement failed for SOLUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.891Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.920Z [ERROR] ❌ QUEUE ERROR for BTCUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.922Z [ERROR] ❌ DEBUG: Signal enhancement failed for BTCUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.922Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.952Z [ERROR] ❌ QUEUE ERROR for XRPUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.953Z [ERROR] ❌ DEBUG: Signal enhancement failed for XRPUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.953Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:56.978Z [ERROR] ❌ QUEUE ERROR for XLMUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:56.979Z [ERROR] ❌ DEBUG: Signal enhancement failed for XLMUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:56.979Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:57.342Z [ERROR] ❌ QUEUE ERROR for KAITOUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:57.343Z [ERROR] ❌ DEBUG: Signal enhancement failed for KAITOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:57.344Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:15:57.364Z [ERROR] ❌ QUEUE ERROR for HBARUSDT: "Cannot access 'requestPromise' before initialization"
+2025-07-14T10:15:57.365Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:15:57.366Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:13.678Z [ERROR] ❌ DEBUG: Signal enhancement failed for MKRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:13.678Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:29.385Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:29.385Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:43.212Z [ERROR] Taapi service error for ADAUSDT: "Request failed with status code 403"
+2025-07-14T10:22:46.106Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:46.106Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:47.113Z [ERROR] ❌ DEBUG: Signal enhancement failed for ONDOUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:47.113Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:47.143Z [ERROR] ❌ DEBUG: Signal enhancement failed for ADAUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:47.143Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:58.777Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:58.777Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:58.778Z [ERROR] ❌ DEBUG: Signal enhancement failed for HBARUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:58.778Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:22:59.272Z [ERROR] ❌ DEBUG: Signal enhancement failed for MKRUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:22:59.272Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:23:14.800Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:23:14.801Z [ERROR] Signal enhancement failed, falling back to base signal:
+2025-07-14T10:23:14.801Z [ERROR] ❌ DEBUG: Signal enhancement failed for VIRTUALUSDT: "TAAPI returned fallback data instead of real indicators"
+2025-07-14T10:23:14.802Z [ERROR] Signal enhancement failed, falling back to base signal:

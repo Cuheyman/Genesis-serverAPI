@@ -1,450 +1,437 @@
 // src/services/enhancedSignalGenerator.js
+const EnhancedTaapiService = require('./enhancedTaapiService');
 const logger = require('../utils/logger');
 
 class EnhancedSignalGenerator {
-  constructor(taapiService) {
-    this.taapiService = taapiService;
-    this.signalHistory = new Map(); // Track signal quality over time
+  constructor() {
+    this.taapiService = new EnhancedTaapiService();
+    this.signalCache = new Map();
+    this.cacheExpiry = 10 * 60 * 1000; // 10 minutes cache for signals
   }
 
-  // Hovedfunktion der forbedrer eksisterende signaler med Taapi data
   async enhanceSignalWithTaapi(baseSignal, marketData, symbol, timeframe = '1h', riskLevel = 'balanced') {
+    const startTime = Date.now(); // ✅ ADD: Missing startTime variable
+    
     try {
+      logger.info(`🔍 DEBUG: enhanceSignalWithTaapi called for ${symbol}`);
       logger.info(`Enhancing signal for ${symbol} with Taapi indicators`);
       
-      // Hent real-time indikatorer fra Taapi
+      // ✅ SINGLE CALL: Get TAAPI indicators once
       const taapiIndicators = await this.taapiService.getBulkIndicators(symbol, timeframe);
       
-      // Generer forbedret signal
-      const enhancedSignal = await this.generateEnhancedSignal(
-        baseSignal, 
-        marketData, 
-        taapiIndicators, 
-        riskLevel
-      );
+      logger.info(`🔍 DEBUG: taapiIndicators received for ${symbol}:`, JSON.stringify(taapiIndicators, null, 2));
       
-      // Valider signalet mod multiple confirmations
-      const validatedSignal = this.validateSignalWithMultipleConfirmations(
-        enhancedSignal, 
-        taapiIndicators, 
-        marketData.current_price
-      );
+      // ✅ Check if we got fallback data instead of real TAAPI data
+      if (taapiIndicators && taapiIndicators.isFallbackData) {
+        logger.warn(`TAAPI returned fallback data for ${symbol}, using base signal`);
+        throw new Error('TAAPI returned fallback data instead of real indicators');
+      }
       
-      // Track signal quality for learning
-      this.trackSignalQuality(symbol, validatedSignal);
+      logger.info(`✅ DEBUG: TAAPI data check passed for ${symbol} - using real TAAPI data`);
       
-      return validatedSignal;
+      // ✅ Check if we should use Taapi enhancement
+      if (!this.shouldUseTaapiEnhancement || !this.shouldUseTaapiEnhancement(symbol)) {
+        logger.info(`Skipping Taapi enhancement for ${symbol}`);
+        return this.createEnhancedSignal ? 
+          this.createEnhancedSignal(baseSignal, null, symbol, 'base_only') : 
+          { ...baseSignal, enhanced_by: 'base_only' };
+      }
+      
+      // ✅ Check signal cache first
+      const cacheKey = `signal_${symbol}_${Math.floor(Date.now() / 300000)}`; // 5-minute buckets
+      if (this.signalCache && this.signalCache.has && this.signalCache.has(cacheKey)) {
+        const cached = this.signalCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < (this.cacheExpiry || 300000)) {
+          logger.debug(`Using cached enhanced signal for ${symbol}`);
+          return cached.signal;
+        }
+      }
+      
+      logger.info(`🔄 DEBUG: Generating enhanced signal for ${symbol} with real TAAPI data`);
+      
+      // ✅ Generate enhanced signal with TAAPI data
+      let enhancedSignal;
+      if (this.generateEnhancedSignal) {
+        enhancedSignal = await this.generateEnhancedSignal(
+          baseSignal, 
+          marketData, 
+          taapiIndicators, 
+          riskLevel
+        );
+      } else {
+        // ✅ Fallback: Create basic enhanced signal if method doesn't exist
+        enhancedSignal = {
+          ...baseSignal,
+          taapi_data: taapiIndicators,
+          enhanced_by: 'taapi_integration',
+          enhancement_quality: 'partial' // Since only RSI is real
+        };
+      }
+      
+      logger.info(`✅ DEBUG: Enhanced signal generated successfully for ${symbol}`);
+      
+      // ✅ Cache the result if cache is available
+      if (this.signalCache && this.signalCache.set) {
+        this.signalCache.set(cacheKey, {
+          signal: enhancedSignal,
+          timestamp: Date.now()
+        });
+      }
+      
+      const processingTime = Date.now() - startTime;
+      logger.info(`Enhanced signal completed for ${symbol}`, {
+        signal: enhancedSignal.signal,
+        confidence: enhancedSignal.confidence,
+        processing_time: processingTime,
+        taapi_used: true,
+        taapi_available: true,
+        rsi_value: taapiIndicators.rsi // ✅ Log actual RSI value received
+      });
+      
+      return enhancedSignal;
       
     } catch (error) {
-      logger.error('Signal enhancement failed, falling back to base signal:', error);
-      // Fallback til base signal hvis Taapi fejler
-      return this.addFallbackWarning(baseSignal, error.message);
+      logger.error(`❌ DEBUG: Signal enhancement failed for ${symbol}:`, error.message);
+      logger.error(`Signal enhancement failed, falling back to base signal:`, error);
+      
+      // ✅ Create fallback signal
+      const fallbackSignal = this.createEnhancedSignal ? 
+        this.createEnhancedSignal(baseSignal, null, symbol, 'error_fallback') :
+        { ...baseSignal, enhanced_by: 'error_fallback', warnings: [error.message] };
+        
+      return fallbackSignal;
     }
   }
 
-  async generateEnhancedSignal(baseSignal, marketData, taapiIndicators, riskLevel) {
-    const currentPrice = marketData.current_price;
+  shouldUseTaapiEnhancement(symbol) {
+    // Check service status
+    const serviceStatus = this.taapiService.getServiceStatus();
+    if (!serviceStatus.available) {
+      logger.debug(`Taapi service unavailable for ${symbol}`);
+      return false;
+    }
+
+    // Skip enhancement for known problematic symbols
+    const problematicSymbols = [
+      'ENAUSDT', 'HYPERUSDT', 'VIRTUALUSDT', 'NEIROUSDT', 
+      'FUNUSDT', 'HBARUSDT', 'XTZUSDT'
+    ];
     
-    // Generer Taapi-baseret signal
-    const taapiSignal = this.taapiService.generateConfirmedSignal(
-      taapiIndicators, 
-      currentPrice, 
-      riskLevel
-    );
-    
-    // Kombiner base signal med Taapi signal
-    const combinedSignal = this.combineSignals(baseSignal, taapiSignal, taapiIndicators);
-    
-    // Beregn forbedrede entry/exit points
-    const enhancedLevels = this.calculateEnhancedLevels(
-      combinedSignal, 
-      taapiIndicators, 
-      currentPrice
-    );
-    
+    if (problematicSymbols.includes(symbol)) {
+      logger.debug(`Skipping Taapi for problematic symbol: ${symbol}`);
+      return false;
+    }
+
+    return true;
+  }
+
+  createEnhancedSignal(baseSignal, taapiData, symbol, enhancementType) {
+    let signal = baseSignal.signal || 'HOLD';
+    let confidence = baseSignal.confidence || 50;
+    let reasoning = baseSignal.reasoning || [];
+
+    if (taapiData && taapiData.source === 'taapi') {
+      // Apply Taapi-based enhancements
+      const taapiAnalysis = this.analyzeTaapiIndicators(taapiData);
+      
+      // Combine base signal with Taapi analysis
+      const combinedAnalysis = this.combineSignals(baseSignal, taapiAnalysis);
+      
+      signal = combinedAnalysis.signal;
+      confidence = combinedAnalysis.confidence;
+      reasoning = [...reasoning, ...combinedAnalysis.reasoning];
+    } else {
+      // Fallback logic - adjust confidence based on enhancement type
+      switch (enhancementType) {
+        case 'fallback':
+          confidence = Math.max(confidence - 20, 10);
+          reasoning.push('Taapi unavailable - using fallback analysis');
+          break;
+        case 'error_fallback':
+          confidence = Math.max(confidence - 30, 5);
+          reasoning.push('Taapi error - using base signal only');
+          break;
+        case 'base_only':
+          confidence = Math.max(confidence - 10, 15);
+          reasoning.push('Using base technical analysis only');
+          break;
+      }
+    }
+
     return {
-      ...combinedSignal,
-      ...enhancedLevels,
-      taapi_analysis: taapiSignal.analysis,
-      risk_factors: taapiSignal.risk_factors,
-      indicator_confirmation: this.getIndicatorConfirmationScore(taapiIndicators, combinedSignal.signal),
-      signal_quality: this.assessSignalQuality(taapiIndicators, combinedSignal),
-      enhanced_by: 'taapi_integration'
+      symbol,
+      signal,
+      confidence: Math.round(confidence),
+      reasoning,
+      timestamp: Date.now(),
+      enhancement_type: enhancementType,
+      taapi_data: taapiData ? {
+        source: taapiData.source,
+        confidence: taapiData.confidence
+      } : null,
+      base_signal: {
+        signal: baseSignal.signal,
+        confidence: baseSignal.confidence
+      }
     };
   }
 
-  combineSignals(baseSignal, taapiSignal, indicators) {
-    // Vægt base signal og Taapi signal
-    const baseWeight = 0.4;
-    const taapiWeight = 0.6;
-    
-    // Kombiner confidence scores
-    const combinedConfidence = (baseSignal.confidence * baseWeight) + (taapiSignal.confidence * taapiWeight);
-    
-    // Determine final signal
-    let finalSignal = 'HOLD';
+  analyzeTaapiIndicators(taapiData) {
+    const signals = [];
+    const weights = [];
+    let totalConfidence = 0;
     let reasoning = [];
-    
-    // Hvis begge signaler er enige
-    if (baseSignal.signal === taapiSignal.signal) {
-      finalSignal = baseSignal.signal;
-      reasoning.push(`Both base and Taapi signals agree: ${finalSignal}`);
-      reasoning.push(`Combined confidence: ${combinedConfidence.toFixed(1)}%`);
-    }
-    // Hvis Taapi signal er stærkere og confidence er høj
-    else if (taapiSignal.confidence > 70 && taapiSignal.confidence > baseSignal.confidence) {
-      finalSignal = taapiSignal.signal;
-      reasoning.push(`Taapi signal override due to higher confidence (${taapiSignal.confidence}% vs ${baseSignal.confidence}%)`);
-    }
-    // Hvis base signal er stærkere
-    else if (baseSignal.confidence > taapiSignal.confidence) {
-      finalSignal = baseSignal.signal;
-      reasoning.push(`Base signal maintained due to higher confidence (${baseSignal.confidence}% vs ${taapiSignal.confidence}%)`);
-    }
-    // Hvis signaler er konflikterende og confidence er ens, hold
-    else {
-      finalSignal = 'HOLD';
-      reasoning.push(`Conflicting signals with similar confidence - holding position`);
+
+    // RSI Analysis
+    if (taapiData.rsi && taapiData.rsi.value) {
+      const rsi = taapiData.rsi.value;
+      if (rsi > 70) {
+        signals.push('SELL');
+        weights.push(0.25);
+        reasoning.push(`RSI overbought (${rsi.toFixed(1)})`);
+        totalConfidence += 80;
+      } else if (rsi < 30) {
+        signals.push('BUY');
+        weights.push(0.25);
+        reasoning.push(`RSI oversold (${rsi.toFixed(1)})`);
+        totalConfidence += 80;
+      } else if (rsi > 60) {
+        signals.push('SELL');
+        weights.push(0.1);
+        reasoning.push(`RSI trending high (${rsi.toFixed(1)})`);
+        totalConfidence += 60;
+      } else if (rsi < 40) {
+        signals.push('BUY');
+        weights.push(0.1);
+        reasoning.push(`RSI trending low (${rsi.toFixed(1)})`);
+        totalConfidence += 60;
+      }
     }
 
-    // Reducer confidence hvis der er risiko faktorer
-    let adjustedConfidence = combinedConfidence;
-    if (indicators.rsi > 80 || indicators.rsi < 20) {
-      adjustedConfidence *= 0.85;
-      reasoning.push('Confidence reduced due to extreme RSI');
+    // MACD Analysis
+    if (taapiData.macd && taapiData.macd.valueMACD !== undefined) {
+      const macd = taapiData.macd.valueMACD;
+      const signal = taapiData.macd.valueMACDSignal;
+      const histogram = taapiData.macd.valueMACDHist;
+
+      if (macd > signal && histogram > 0) {
+        signals.push('BUY');
+        weights.push(0.2);
+        reasoning.push('MACD bullish crossover');
+        totalConfidence += 75;
+      } else if (macd < signal && histogram < 0) {
+        signals.push('SELL');
+        weights.push(0.2);
+        reasoning.push('MACD bearish crossover');
+        totalConfidence += 75;
+      }
     }
+
+    // Stochastic Analysis
+    if (taapiData.stoch && taapiData.stoch.valueK) {
+      const stochK = taapiData.stoch.valueK;
+      const stochD = taapiData.stoch.valueD;
+
+      if (stochK > 80 && stochD > 80) {
+        signals.push('SELL');
+        weights.push(0.15);
+        reasoning.push(`Stochastic overbought (K:${stochK.toFixed(1)})`);
+        totalConfidence += 70;
+      } else if (stochK < 20 && stochD < 20) {
+        signals.push('BUY');
+        weights.push(0.15);
+        reasoning.push(`Stochastic oversold (K:${stochK.toFixed(1)})`);
+        totalConfidence += 70;
+      }
+    }
+
+    // EMA Trend Analysis
+    if (taapiData.ema20 && taapiData.ema50 && taapiData.ema20.value && taapiData.ema50.value) {
+      const ema20 = taapiData.ema20.value;
+      const ema50 = taapiData.ema50.value;
+
+      if (ema20 > ema50) {
+        signals.push('BUY');
+        weights.push(0.15);
+        reasoning.push('Short-term EMA above long-term');
+        totalConfidence += 65;
+      } else {
+        signals.push('SELL');
+        weights.push(0.15);
+        reasoning.push('Short-term EMA below long-term');
+        totalConfidence += 65;
+      }
+    }
+
+    // ADX Trend Strength
+    if (taapiData.adx && taapiData.adx.value) {
+      const adx = taapiData.adx.value;
+      if (adx > 25) {
+        // Strong trend - increase confidence of other signals
+        totalConfidence += 10;
+        reasoning.push(`Strong trend detected (ADX: ${adx.toFixed(1)})`);
+      } else {
+        // Weak trend - decrease confidence
+        totalConfidence -= 10;
+        reasoning.push(`Weak trend (ADX: ${adx.toFixed(1)})`);
+      }
+    }
+
+    // Calculate weighted signal
+    const buySignals = signals.filter((s, i) => s === 'BUY').length;
+    const sellSignals = signals.filter((s, i) => s === 'SELL').length;
     
-    if (this.isHighVolatilityEnvironment(indicators)) {
-      adjustedConfidence *= 0.9;
-      reasoning.push('Confidence reduced due to high volatility');
+    let finalSignal = 'HOLD';
+    let confidence = Math.max(totalConfidence / Math.max(signals.length, 1), 20);
+
+    if (buySignals > sellSignals && buySignals >= 2) {
+      finalSignal = 'BUY';
+    } else if (sellSignals > buySignals && sellSignals >= 2) {
+      finalSignal = 'SELL';
+    } else {
+      confidence = Math.max(confidence - 20, 10);
+      reasoning.push('Mixed signals - holding position');
     }
 
     return {
       signal: finalSignal,
-      confidence: Math.round(adjustedConfidence),
-      reasoning: reasoning.join(' | '),
-      base_signal: {
-        action: baseSignal.signal,
-        confidence: baseSignal.confidence
-      },
-      taapi_signal: {
-        action: taapiSignal.signal, 
-        confidence: taapiSignal.confidence,
-        reasoning: taapiSignal.reasoning
-      }
+      confidence: Math.min(confidence, 95),
+      reasoning: reasoning
     };
   }
 
-  calculateEnhancedLevels(signal, indicators, currentPrice) {
-    const atr = indicators.atr || (currentPrice * 0.02); // Fallback til 2% hvis ATR ikke tilgængelig
+  combineSignals(baseSignal, taapiAnalysis) {
+    const baseWeight = 0.4;
+    const taapiWeight = 0.6;
+
+    // Convert signals to numeric values for calculation
+    const signalToValue = { 'BUY': 1, 'HOLD': 0, 'SELL': -1 };
+    const valueToSignal = { 1: 'BUY', 0: 'HOLD', '-1': 'SELL' };
+
+    const baseValue = signalToValue[baseSignal.signal] || 0;
+    const taapiValue = signalToValue[taapiAnalysis.signal] || 0;
+
+    // Calculate weighted average
+    const combinedValue = (baseValue * baseWeight) + (taapiValue * taapiWeight);
     
-    // Basis levels
-    let stopLoss, takeProfit1, takeProfit2, takeProfit3;
-    
-    if (signal.signal === 'BUY') {
-      // Support fra Bollinger Lower Band eller EMA20
-      const support = Math.min(
-        indicators.bollinger?.lower || currentPrice * 0.98,
-        indicators.ema20 * 0.995 || currentPrice * 0.98
-      );
-      
-      stopLoss = Math.max(support, currentPrice - (atr * 2));
-      
-      // Resistance levels baseret på Bollinger Bands og Fibonacci
-      const resistance1 = indicators.bollinger?.upper || currentPrice * 1.02;
-      takeProfit1 = currentPrice + (atr * 1.5);
-      takeProfit2 = currentPrice + (atr * 3);
-      takeProfit3 = Math.min(resistance1, currentPrice + (atr * 5));
-      
-    } else if (signal.signal === 'SELL') {
-      // Resistance fra Bollinger Upper Band eller EMA20
-      const resistance = Math.max(
-        indicators.bollinger?.upper || currentPrice * 1.02,
-        indicators.ema20 * 1.005 || currentPrice * 1.02
-      );
-      
-      stopLoss = Math.min(resistance, currentPrice + (atr * 2));
-      
-      // Support levels
-      const support1 = indicators.bollinger?.lower || currentPrice * 0.98;
-      takeProfit1 = currentPrice - (atr * 1.5);
-      takeProfit2 = currentPrice - (atr * 3);
-      takeProfit3 = Math.max(support1, currentPrice - (atr * 5));
+    // Determine final signal based on combined value
+    let finalSignal = 'HOLD';
+    if (combinedValue > 0.3) {
+      finalSignal = 'BUY';
+    } else if (combinedValue < -0.3) {
+      finalSignal = 'SELL';
+    }
+
+    // Calculate combined confidence
+    const baseConfidence = baseSignal.confidence || 50;
+    const taapiConfidence = taapiAnalysis.confidence || 50;
+    const combinedConfidence = (baseConfidence * baseWeight) + (taapiConfidence * taapiWeight);
+
+    // Boost confidence if signals agree
+    let confidenceBoost = 0;
+    if (baseSignal.signal === taapiAnalysis.signal && finalSignal !== 'HOLD') {
+      confidenceBoost = 15;
+    } else if (baseSignal.signal !== taapiAnalysis.signal) {
+      confidenceBoost = -10;
     }
 
     return {
-      entry_price: currentPrice,
-      stop_loss: stopLoss,
-      take_profit_1: takeProfit1,
-      take_profit_2: takeProfit2,
-      take_profit_3: takeProfit3,
-      atr_used: atr,
-      support_resistance: {
-        primary_support: indicators.bollinger?.lower,
-        primary_resistance: indicators.bollinger?.upper,
-        ema20_level: indicators.ema20,
-        ema50_level: indicators.ema50
-      }
+      signal: finalSignal,
+      confidence: Math.max(Math.min(combinedConfidence + confidenceBoost, 95), 5),
+      reasoning: [
+        `Base signal: ${baseSignal.signal} (${baseConfidence}%)`,
+        `Taapi signal: ${taapiAnalysis.signal} (${taapiConfidence}%)`,
+        ...taapiAnalysis.reasoning
+      ]
     };
   }
 
-  validateSignalWithMultipleConfirmations(signal, indicators, currentPrice) {
-    const confirmations = [];
-    const warnings = [];
-    
-    // 1. Trend Confirmation
-    if (signal.signal === 'BUY') {
-      if (currentPrice > indicators.ema20 && indicators.ema20 > indicators.ema50) {
-        confirmations.push('Trend alignment confirmed (Price > EMA20 > EMA50)');
-      } else {
-        warnings.push('Trend alignment missing - higher risk entry');
-      }
-    } else if (signal.signal === 'SELL') {
-      if (currentPrice < indicators.ema20 && indicators.ema20 < indicators.ema50) {
-        confirmations.push('Downtrend confirmed (Price < EMA20 < EMA50)');
-      } else {
-        warnings.push('Downtrend not confirmed - higher risk entry');
-      }
-    }
-    
-    // 2. Momentum Confirmation
-    if (indicators.rsi >= 30 && indicators.rsi <= 70) {
-      confirmations.push('RSI in healthy range');
-    } else {
-      warnings.push(`RSI extreme: ${indicators.rsi.toFixed(1)}`);
-    }
-    
-    // 3. Volume Confirmation
-    if (indicators.mfi > 20 && indicators.mfi < 80) {
-      confirmations.push('Money flow in normal range');
-    } else {
-      warnings.push(`Extreme money flow: ${indicators.mfi.toFixed(1)}`);
-    }
-    
-    // 4. Volatility Check
-    if (indicators.atr && !this.isHighVolatilityEnvironment(indicators)) {
-      confirmations.push('Volatility acceptable for entry');
-    } else {
-      warnings.push('High volatility environment - exercise caution');
-    }
-    
-    // 5. Candlestick Pattern Confirmation
-    if (signal.signal === 'BUY' && (indicators.hammer > 0 || indicators.engulfing > 0)) {
-      confirmations.push('Bullish candlestick pattern detected');
-    } else if (signal.signal === 'SELL' && indicators.shootingStar > 0) {
-      confirmations.push('Bearish candlestick pattern detected');
-    }
-    
-    // Beregn validation score
-    const validationScore = (confirmations.length / (confirmations.length + warnings.length)) * 100;
-    
-    // Adjust confidence baseret på validation
-    let adjustedConfidence = signal.confidence;
-    if (validationScore < 60) {
-      adjustedConfidence *= 0.8;
-    } else if (validationScore > 80) {
-      adjustedConfidence *= 1.1;
-    }
-    
-    return {
-      ...signal,
-      confidence: Math.min(95, Math.round(adjustedConfidence)),
-      validation: {
-        score: Math.round(validationScore),
-        confirmations,
-        warnings,
-        recommendation: validationScore > 70 ? 'PROCEED' : validationScore > 50 ? 'CAUTION' : 'AVOID'
-      }
-    };
-  }
-
-  getIndicatorConfirmationScore(indicators, signal) {
-    let score = 0;
-    let total = 0;
-    
-    // RSI confirmation
-    total++;
-    if (signal === 'BUY' && indicators.rsi < 60) score++;
-    else if (signal === 'SELL' && indicators.rsi > 40) score++;
-    else if (signal === 'HOLD') score++;
-    
-    // MACD confirmation
-    if (indicators.macd) {
-      total++;
-      if (signal === 'BUY' && indicators.macd.histogram > 0) score++;
-      else if (signal === 'SELL' && indicators.macd.histogram < 0) score++;
-      else if (signal === 'HOLD') score++;
-    }
-    
-    // Stochastic confirmation
-    if (indicators.stochastic) {
-      total++;
-      if (signal === 'BUY' && indicators.stochastic.k < 80) score++;
-      else if (signal === 'SELL' && indicators.stochastic.k > 20) score++;
-      else if (signal === 'HOLD') score++;
-    }
-    
-    // ADX strength confirmation
-    if (indicators.adx) {
-      total++;
-      if ((signal === 'BUY' || signal === 'SELL') && indicators.adx > 20) score++;
-      else if (signal === 'HOLD' && indicators.adx < 20) score++;
-    }
-    
-    return total > 0 ? Math.round((score / total) * 100) : 0;
-  }
-
-  assessSignalQuality(indicators, signal) {
-    const quality = {
-      data_completeness: this.getDataCompleteness(indicators),
-      indicator_alignment: this.getIndicatorAlignment(indicators, signal.signal),
-      risk_level: this.getRiskLevel(indicators),
-      confidence_grade: this.getConfidenceGrade(signal.confidence)
-    };
-    
-    // Beregn overall quality score
-    const scores = Object.values(quality).map(item => item.score || 0);
-    quality.overall_score = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-    quality.overall_grade = this.getGrade(quality.overall_score);
-    
-    return quality;
-  }
-
-  getDataCompleteness(indicators) {
-    const requiredIndicators = ['rsi', 'macd', 'ema20', 'ema50', 'atr', 'adx'];
-    const available = requiredIndicators.filter(ind => indicators[ind] !== undefined).length;
-    const score = Math.round((available / requiredIndicators.length) * 100);
-    
-    return {
-      score,
-      grade: this.getGrade(score),
-      available_indicators: available,
-      total_indicators: requiredIndicators.length
-    };
-  }
-
-  getIndicatorAlignment(indicators, signal) {
-    // Dette er forenklet - kan udvides med mere sofistikeret logik
-    const score = this.getIndicatorConfirmationScore(indicators, signal);
-    return {
-      score,
-      grade: this.getGrade(score)
-    };
-  }
-
-  getRiskLevel(indicators) {
-    let riskScore = 50; // Start med medium risk
-    
-    // Høj RSI øger risiko
-    if (indicators.rsi > 70 || indicators.rsi < 30) riskScore += 20;
-    
-    // Høj volatilitet øger risiko
-    if (this.isHighVolatilityEnvironment(indicators)) riskScore += 15;
-    
-    // Ekstrem MFI øger risiko
-    if (indicators.mfi > 80 || indicators.mfi < 20) riskScore += 10;
-    
-    const risk = riskScore > 70 ? 'HIGH' : riskScore > 40 ? 'MEDIUM' : 'LOW';
-    
-    return {
-      score: Math.min(100, riskScore),
-      level: risk,
-      grade: this.getGrade(100 - riskScore) // Invert for grade
-    };
-  }
-
-  getConfidenceGrade(confidence) {
-    return {
-      score: confidence,
-      grade: this.getGrade(confidence)
-    };
-  }
-
-  getGrade(score) {
-    if (score >= 90) return 'A+';
-    if (score >= 80) return 'A';
-    if (score >= 70) return 'B';
-    if (score >= 60) return 'C';
-    if (score >= 50) return 'D';
-    return 'F';
-  }
-
-  isHighVolatilityEnvironment(indicators) {
-    // Dette kan udvides med mere sofistikerede volatility checks
-    return indicators.atr > (indicators.atr * 1.5); // Simplified check
-  }
-
-  trackSignalQuality(symbol, signal) {
-    // Track signal for later performance analysis
-    const key = `${symbol}_${Date.now()}`;
-    this.signalHistory.set(key, {
-      symbol,
-      signal: signal.signal,
-      confidence: signal.confidence,
-      timestamp: Date.now(),
-      quality_score: signal.signal_quality?.overall_score
-    });
-    
-    // Keep only last 100 signals per symbol
-    if (this.signalHistory.size > 1000) {
-      const oldest = Array.from(this.signalHistory.keys())[0];
-      this.signalHistory.delete(oldest);
-    }
-  }
-
-  addFallbackWarning(baseSignal, errorMessage) {
-    return {
-      ...baseSignal,
-      confidence: Math.round(baseSignal.confidence * 0.8), // Reduce confidence
-      warnings: [`Taapi enhancement failed: ${errorMessage}`, 'Using base signal only'],
-      enhanced_by: 'fallback_mode'
-    };
-  }
-
-  // Ny metode til at undgå dårlige entries
-  async shouldAvoidEntry(symbol, timeframe = '1h') {
+  async shouldAvoidEntry(symbol, signalType, marketData) {
     try {
-      const indicators = await this.taapiService.getBulkIndicators(symbol, timeframe);
-      
-      const avoidanceFactors = [];
-      
-      // Ekstreme RSI værdier
-      if (indicators.rsi > 85 || indicators.rsi < 15) {
-        avoidanceFactors.push(`Extreme RSI: ${indicators.rsi.toFixed(1)}`);
+      // Quick validation without heavy Taapi calls
+      if (!this.shouldUseTaapiEnhancement(symbol)) {
+        return {
+          avoid: false,
+          reason: 'Taapi unavailable - proceeding with base analysis'
+        };
       }
-      
-      // Meget lav ADX (ingen trend)
-      if (indicators.adx < 15) {
-        avoidanceFactors.push(`No trend (ADX: ${indicators.adx.toFixed(1)})`);
+
+      // Use cached data if available
+      const cacheKey = `avoid_${symbol}_${Math.floor(Date.now() / 600000)}`; // 10-minute buckets
+      const cached = this.signalCache.get(cacheKey);
+      if (cached) {
+        return cached.avoidance;
       }
+
+      // Get minimal indicators for avoidance check
+      const taapiData = await this.taapiService.getBulkIndicators(symbol, '1h', 'binance');
       
-      // Bollinger Band squeeze
-      if (indicators.bollinger) {
-        const bbWidth = (indicators.bollinger.upper - indicators.bollinger.lower) / indicators.bollinger.middle;
-        if (bbWidth < 0.015) {
-          avoidanceFactors.push('Bollinger Band squeeze detected');
+      if (!taapiData || taapiData.source === 'fallback') {
+        return {
+          avoid: false,
+          reason: 'Taapi unavailable - no avoidance restrictions'
+        };
+      }
+
+      // Check for extreme conditions that suggest avoiding entry
+      const avoidanceChecks = [];
+
+      // Extreme RSI conditions
+      if (taapiData.rsi && taapiData.rsi.value) {
+        const rsi = taapiData.rsi.value;
+        if ((signalType === 'BUY' && rsi > 80) || (signalType === 'SELL' && rsi < 20)) {
+          avoidanceChecks.push(`Extreme RSI (${rsi.toFixed(1)})`);
         }
       }
-      
-      // Ekstrem Money Flow
-      if (indicators.mfi > 95 || indicators.mfi < 5) {
-        avoidanceFactors.push(`Extreme Money Flow: ${indicators.mfi.toFixed(1)}`);
+
+      // Strong opposing trend
+      if (taapiData.adx && taapiData.adx.value > 40) {
+        // Very strong trend - be cautious about counter-trend entries
+        if (taapiData.ema20 && taapiData.ema50) {
+          const trendUp = taapiData.ema20.value > taapiData.ema50.value;
+          if ((signalType === 'SELL' && trendUp) || (signalType === 'BUY' && !trendUp)) {
+            avoidanceChecks.push(`Strong opposing trend (ADX: ${taapiData.adx.value.toFixed(1)})`);
+          }
+        }
       }
-      
-      return {
-        should_avoid: avoidanceFactors.length > 0,
-        reasons: avoidanceFactors,
-        recommendation: avoidanceFactors.length > 0 ? 'WAIT_FOR_BETTER_SETUP' : 'PROCEED_WITH_CAUTION'
+
+      const shouldAvoid = avoidanceChecks.length >= 2;
+      const result = {
+        avoid: shouldAvoid,
+        reason: shouldAvoid ? avoidanceChecks.join(', ') : 'No avoidance conditions detected'
       };
-      
+
+      // Cache the result
+      this.signalCache.set(cacheKey, {
+        avoidance: result,
+        timestamp: Date.now()
+      });
+
+      return result;
+
     } catch (error) {
       logger.error('Entry avoidance check failed:', error);
       return {
-        should_avoid: false,
-        reasons: ['Unable to perform avoidance check'],
-        recommendation: 'PROCEED_WITH_EXTRA_CAUTION'
+        avoid: false,
+        reason: 'Avoidance check failed - proceeding with caution'
       };
     }
+  }
+
+  // Get service health status
+  getServiceHealth() {
+    return {
+      taapi: this.taapiService.getServiceStatus(),
+      cache_size: this.signalCache.size,
+      cache_entries: Array.from(this.signalCache.keys()).slice(0, 5) // Sample entries
+    };
+  }
+
+  // Clear caches and reset services
+  reset() {
+    this.signalCache.clear();
+    this.taapiService.reset();
+    logger.info('Enhanced signal generator reset');
   }
 }
 

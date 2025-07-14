@@ -3547,7 +3547,7 @@ function calculateDataCompleteness(onChainData, offChainData) {
 // Load enhanced services
 try {
   EnhancedSignalGenerator = require('./services/enhancedSignalGenerator');
-  TaapiServiceClass = require('./services/taapiService');
+  TaapiServiceClass = require('./services/enhancedTaapiService');
   // Debug log for TAAPI_SECRET
   const taapiSecret = process.env.TAAPI_SECRET;
   if (taapiSecret) {
@@ -3578,6 +3578,92 @@ if (EnhancedSignalGenerator && taapiService) {
     enhancedSignalGenerator = null;
   }
 }
+
+
+
+app.get('/api/health/taapi', async (req, res) => {
+  try {
+    const enhancedSignalGenerator = require('./services/enhancedSignalGenerator');
+    const signalGen = new enhancedSignalGenerator();
+    const health = signalGen.getServiceHealth();
+    
+    res.json({
+      status: health.taapi.available ? 'healthy' : 'degraded',
+      timestamp: new Date().toISOString(),
+      taapi_service: health.taapi,
+      cache_status: {
+        signal_cache_size: health.cache_size,
+        sample_entries: health.cache_entries
+      },
+      recommendations: getHealthRecommendations(health.taapi)
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+function getHealthRecommendations(taapiStatus) {
+  const recommendations = [];
+  
+  if (!taapiStatus.available) {
+    recommendations.push('Taapi service is unavailable - using fallback mode');
+  }
+  
+  if (taapiStatus.consecutiveErrors > 2) {
+    recommendations.push('High error rate detected - consider checking API credentials');
+  }
+  
+  if (taapiStatus.backoffMultiplier > 2) {
+    recommendations.push('Rate limiting active - requests are being throttled');
+  }
+  
+  if (taapiStatus.unsupportedSymbolsCount > 10) {
+    recommendations.push('Many unsupported symbols detected - consider symbol validation');
+  }
+  
+  if (recommendations.length === 0) {
+    recommendations.push('Service is operating normally');
+  }
+  
+  return recommendations;
+}
+
+// 4. ADD monitoring route for supported symbols
+app.get('/api/taapi/symbols', async (req, res) => {
+  try {
+    const EnhancedTaapiService = require('./services/enhancedTaapiService');
+    const taapiService = new EnhancedTaapiService();
+    
+    res.json({
+      supported_symbols: Array.from(taapiService.supportedSymbols),
+      unsupported_symbols: Array.from(taapiService.unsupportedSymbols),
+      total_supported: taapiService.supportedSymbols.size,
+      total_unsupported: taapiService.unsupportedSymbols.size
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 5. ADD reset endpoint for emergencies
+app.post('/api/taapi/reset', async (req, res) => {
+  try {
+    const enhancedSignalGenerator = require('./services/enhancedSignalGenerator');
+    const signalGen = new enhancedSignalGenerator();
+    signalGen.reset();
+    
+    res.json({
+      message: 'Taapi service reset successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // ===============================================
 // ENHANCED SIGNAL ENDPOINT
@@ -3616,8 +3702,10 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
     // Check if Taapi services are available
     if (use_taapi && (!enhancedSignalGenerator || !taapiService)) {
       logger.warn('Taapi services not available, falling back to base signal');
-      use_taapi = true; // Fix: Changed from const to let and properly reassign
+      use_taapi = false; // Fix: Changed from const to let and properly reassign
     }
+
+    
 
     // Check if we should avoid entry (only if Taapi is active)
     let entryAvoidanceCheck = null;
@@ -3662,33 +3750,37 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
       { symbol, timeframe, risk_level }
     );
 
-    let finalSignal = baseSignal;
+  let finalSignal = baseSignal;
+  let actuallyUsedTaapi = false; // ✅ NEW: Track actual usage
 
-    // If Taapi is enabled and available, enhance the signal
-    if (use_taapi && enhancedSignalGenerator) {
-      try {
-        finalSignal = await enhancedSignalGenerator.enhanceSignalWithTaapi(
-          baseSignal,
-          marketData,
-          symbol,
-          timeframe,
-          risk_level
-        );
-        logger.info(`Signal enhanced with Taapi for ${symbol}`);
-      } catch (error) {
-        logger.warn('Taapi enhancement failed, using base signal:', error.message);
-        finalSignal = baseSignal;
-        finalSignal.warnings = finalSignal.warnings || [];
-        finalSignal.warnings.push('Taapi enhancement unavailable - using base signal only');
-        finalSignal.enhanced_by = 'fallback_mode';
-      }
-    } else {
-      finalSignal.enhanced_by = 'base_system_only';
-      if (use_taapi) {
-        finalSignal.warnings = finalSignal.warnings || [];
-        finalSignal.warnings.push('Taapi services not available');
-      }
+  // If Taapi is enabled and available, enhance the signal
+  if (use_taapi && enhancedSignalGenerator) {
+    try {
+      finalSignal = await enhancedSignalGenerator.enhanceSignalWithTaapi(
+        baseSignal,
+        marketData,
+        symbol,
+        timeframe,
+        risk_level
+      );
+      actuallyUsedTaapi = true; // ✅ NEW: Mark as actually used
+      logger.info(`Signal enhanced with Taapi for ${symbol}`);
+    } catch (error) {
+      logger.warn('Taapi enhancement failed, using base signal:', error.message);
+      actuallyUsedTaapi = false; // ✅ NEW: Mark as not used
+      finalSignal = baseSignal;
+      finalSignal.warnings = finalSignal.warnings || [];
+      finalSignal.warnings.push('Taapi enhancement unavailable - using base signal only');
+      finalSignal.enhanced_by = 'fallback_mode';
     }
+  } else {
+    actuallyUsedTaapi = false; // ✅ NEW: Mark as not used
+    finalSignal.enhanced_by = 'base_system_only';
+    if (use_taapi) {
+      finalSignal.warnings = finalSignal.warnings || [];
+      finalSignal.warnings.push('Taapi services not available');
+    }
+  }
 
     // Get risk parameters
     const riskParams = riskParameterService.getRiskParameters(risk_level, technicalData.market_regime);
@@ -3792,11 +3884,11 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
         volume_ratio: technicalData.volume_ratio
       },
 
-      // Metadata
       metadata: {
         symbol,
         timeframe,
         taapi_enabled: use_taapi,
+        taapi_actually_used: actuallyUsedTaapi, // ✅ NEW: Add actual usage
         taapi_available: !!(enhancedSignalGenerator && taapiService),
         avoidance_check_enabled: avoid_bad_entries,
         processing_time_ms: Date.now() - startTime,
@@ -3806,16 +3898,15 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
       }
     };
 
-    // Log successful enhanced signal generation
-    logger.info(`Enhanced signal generated for ${symbol}`, {
+        // Log successful enhanced signal generation
+      logger.info(`Enhanced signal generated for ${symbol}`, {
       signal: finalSignal.signal,
       confidence: finalSignal.confidence,
-      taapi_used: use_taapi,
+      taapi_used: actuallyUsedTaapi, // ✅ CHANGED: Use actual usage
       taapi_available: !!(enhancedSignalGenerator && taapiService),
       quality_score: finalSignal.signal_quality?.overall_score,
       processing_time: Date.now() - startTime
     });
-
     res.json(response);
 
   } catch (error) {
@@ -3830,6 +3921,8 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
     });
   }
 });
+
+
 
 // ===============================================
 // TAAPI HEALTH CHECK ENDPOINT
@@ -3860,6 +3953,17 @@ app.get('/api/v1/taapi/health', authenticateAPI, async (req, res) => {
       timestamp: Date.now()
     });
   }
+});
+
+app.get('/api/v1/taapi/queue-status', authenticateAPI, (req, res) => {
+  const status = taapiService.getQueueStatus();
+  res.json({
+    queue_length: status.queueLength,
+    processing: status.processing,
+    current_request: status.currentRequest,
+    estimated_wait_minutes: Math.ceil(status.estimatedWaitTime / 60),
+    cache_size: status.cacheSize
+  });
 });
 
 // New endpoint for bot execution instructions
@@ -4015,6 +4119,35 @@ async function startServer() {
   try {
     // Run startup diagnostics
     await logStartupStatus();
+    async function validateTaapiSetup() {
+      const EnhancedTaapiService = require('./services/enhancedTaapiService');
+      const taapiService = new EnhancedTaapiService();
+      
+      console.log('Validating Taapi service...');
+      
+      try {
+        // Test with a known good symbol
+        const testResult = await taapiService.getBulkIndicators('BTCUSDT', '1h', 'binance');
+        
+        if (testResult && testResult.source === 'taapi') {
+          console.log('Taapi service validated successfully');
+          console.log(`Test indicators received for BTCUSDT`);
+        } else {
+          console.log('Taapi service running in fallback mode');
+        }
+        
+        const status = taapiService.getServiceStatus();
+        console.log(`Service status:`, {
+          available: status.available,
+          supported_symbols: status.supportedSymbolsCount,
+          cache_size: status.cacheSize
+        });
+        
+      } catch (error) {
+        console.error('Taapi service validation failed:', error.message);
+        console.log('Service will use fallback mode');
+      }
+    }
     
     // Start the server
 const server = app.listen(PORT, () => {
