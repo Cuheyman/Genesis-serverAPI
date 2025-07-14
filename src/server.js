@@ -3547,7 +3547,7 @@ function calculateDataCompleteness(onChainData, offChainData) {
 // Load enhanced services
 try {
   EnhancedSignalGenerator = require('./services/enhancedSignalGenerator');
-  TaapiServiceClass = require('./services/enhancedTaapiService');
+  TaapiServiceClass = require('./services/enhancedTaapiServiceV2');
   // Debug log for TAAPI_SECRET
   const taapiSecret = process.env.TAAPI_SECRET;
   if (taapiSecret) {
@@ -3578,8 +3578,102 @@ if (EnhancedSignalGenerator && taapiService) {
     enhancedSignalGenerator = null;
   }
 }
+app.get('/api/v1/taapi/queue-status', authenticateAPI, (req, res) => {
+  const status = taapiService.getQueueStatus();
+  res.json({
+    queue_length: status.queueLength,
+    processing: status.processing,
+    current_request: status.currentRequest,
+    estimated_wait_minutes: Math.ceil(status.estimatedWaitTime / 60),
+    cache_size: status.cacheSize
+  });
+});
 
+// TAAPI V2 Plan Information
+app.get('/api/v1/taapi/plan-info', authenticateAPI, async (req, res) => {
+  if (!taapiService?.symbolManager) {
+    return res.status(503).json({ error: 'TAAPI service not available' });
+  }
+  
+  try {
+    const stats = await taapiService.symbolManager.getSymbolStats();
+    const upgradeInfo = taapiService.symbolManager.getPlanUpgradeInfo();
+    
+    res.json({
+      ...stats,
+      upgrade_info: upgradeInfo,
+      dynamic_detection: true
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
+// Enhanced Health Check V2
+app.get('/api/v1/taapi/health-v2', authenticateAPI, async (req, res) => {
+  if (!taapiService) {
+    return res.status(503).json({ error: 'TAAPI service not available' });
+  }
+  
+  try {
+    const health = await taapiService.getServiceHealth();
+    res.json(health);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Symbol Validation
+app.post('/api/v1/taapi/validate-symbol', authenticateAPI, async (req, res) => {
+  if (!taapiService?.symbolManager) {
+    return res.status(503).json({ error: 'TAAPI service not available' });
+  }
+  
+  const { symbol } = req.body;
+  if (!symbol) {
+    return res.status(400).json({ error: 'Symbol parameter required' });
+  }
+  
+  try {
+    const routing = await taapiService.symbolManager.routeSymbolRequest(symbol);
+    res.json({ symbol, ...routing });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Refresh Symbols
+app.post('/api/v1/taapi/refresh-symbols', authenticateAPI, async (req, res) => {
+  if (!taapiService?.symbolManager) {
+    return res.status(503).json({ error: 'TAAPI service not available' });
+  }
+  
+  try {
+    const symbols = await taapiService.symbolManager.refreshSymbols();
+    res.json({
+      message: 'Symbols refreshed successfully',
+      symbol_count: symbols.length,
+      symbols: symbols.slice(0, 10)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Emergency Reset
+app.post('/api/v1/taapi/emergency-reset', authenticateAPI, async (req, res) => {
+  if (!taapiService) {
+    return res.status(503).json({ error: 'TAAPI service not available' });
+  }
+  
+  try {
+    taapiService.reset();
+    await taapiService.initializeService();
+    res.json({ message: 'TAAPI service reset successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get('/api/health/taapi', async (req, res) => {
   try {
@@ -3635,7 +3729,7 @@ function getHealthRecommendations(taapiStatus) {
 // 4. ADD monitoring route for supported symbols
 app.get('/api/taapi/symbols', async (req, res) => {
   try {
-    const EnhancedTaapiService = require('./services/enhancedTaapiService');
+    const EnhancedTaapiService = require('./services/enhancedTaapiServiceV2');
     const taapiService = new EnhancedTaapiService();
     
     res.json({
@@ -4120,7 +4214,7 @@ async function startServer() {
     // Run startup diagnostics
     await logStartupStatus();
     async function validateTaapiSetup() {
-      const EnhancedTaapiService = require('./services/enhancedTaapiService');
+      const EnhancedTaapiService = require('./services/enhancedTaapiServiceV2');
       const taapiService = new EnhancedTaapiService();
       
       console.log('Validating Taapi service...');
