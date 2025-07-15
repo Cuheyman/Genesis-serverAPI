@@ -90,6 +90,78 @@ class EnhancedSignalGenerator {
     }
   }
 
+
+  
+// 🔧 ENHANCED createEnhancedSignal method - Handle free plan limitations gracefully
+createEnhancedSignal(baseSignal, taapiData, symbol, enhancementType) {
+  let signal = baseSignal.signal || 'HOLD';
+  let confidence = baseSignal.confidence || 50;
+  
+  // Ensure reasoning is always an array
+  let reasoning = [];
+  if (baseSignal.reasoning) {
+    if (Array.isArray(baseSignal.reasoning)) {
+      reasoning = [...baseSignal.reasoning];
+    } else if (typeof baseSignal.reasoning === 'string') {
+      reasoning = [baseSignal.reasoning];
+    }
+  }
+
+  // Adjust confidence and reasoning based on enhancement type
+  switch (enhancementType) {
+    case 'taapi_enhanced':
+      confidence = Math.min(confidence + 15, 95);
+      reasoning.push('Enhanced with real TAAPI indicators');
+      break;
+      
+    case 'free_plan_limitation':
+      // 🎯 SPECIAL: Free plan limitation - still provide good analysis
+      confidence = Math.max(confidence - 5, 25); // Minimal penalty
+      reasoning.push(`Free plan: ${symbol} not in supported symbols (BTC, ETH, XRP, LTC, XMR)`);
+      reasoning.push('Using enhanced CoinGecko and market analysis');
+      break;
+      
+    case 'taapi_rate_limited':
+      confidence = Math.max(confidence - 8, 22);
+      reasoning.push('TAAPI rate limited - using enhanced fallback analysis');
+      break;
+      
+    case 'error_fallback':
+      confidence = Math.max(confidence - 25, 10);
+      reasoning.push('Technical error - using base signal analysis');
+      break;
+      
+    case 'base_only':
+      confidence = Math.max(confidence - 5, 25);
+      reasoning.push('Using base technical analysis with market data');
+      break;
+  }
+
+  return {
+    symbol,
+    signal,
+    confidence: Math.round(confidence),
+    reasoning,
+    timestamp: Date.now(),
+    enhancement_type: enhancementType,
+    taapi_data: taapiData ? {
+      source: taapiData.source,
+      isFallbackData: taapiData.isFallbackData || false,
+      realIndicators: taapiData.realIndicators || 0
+    } : null,
+    base_signal: {
+      signal: baseSignal.signal,
+      confidence: baseSignal.confidence
+    },
+    plan_info: {
+      plan_type: 'free',
+      symbol_supported: enhancementType === 'taapi_enhanced',
+      supported_symbols: ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'LTCUSDT', 'XMRUSDT']
+    }
+  };
+}
+
+
   async generateEnhancedSignal(baseSignal, marketData, taapiIndicators, riskLevel) {
     try {
       // Analyze TAAPI indicators if available
@@ -112,99 +184,59 @@ class EnhancedSignalGenerator {
     }
   }
 
-  shouldUseTaapiEnhancement(symbol) {
-    // This is now handled by the dynamic symbol manager
-    // The routing decision is made at the service level
-    return true; // Let the service decide
-  }
+  // 🚨 URGENT FIX: Replace the analyzeTaapiIndicators method in enhancedSignalGenerator.js
+// This fixes the "Cannot read properties of undefined (reading 'toFixed')" error
 
-  createEnhancedSignal(baseSignal, taapiData, symbol, enhancementType) {
-    let signal = baseSignal.signal || 'HOLD';
-    let confidence = baseSignal.confidence || 50;
-    let reasoning = baseSignal.reasoning || [];
+analyzeTaapiIndicators(taapiData) {
+  const signals = [];
+  const weights = [];
+  let totalConfidence = 0;
+  let reasoning = [];
 
-    // Adjust confidence based on enhancement type
-    switch (enhancementType) {
-      case 'taapi_enhanced':
-        // TAAPI data successfully used
-        confidence = Math.min(confidence + 15, 95);
-        reasoning.push('Enhanced with real TAAPI indicators');
-        break;
-      case 'taapi_fallback':
-        confidence = Math.max(confidence - 10, 20);
-        reasoning.push('TAAPI unavailable - using enhanced fallback');
-        break;
-      case 'symbol_unsupported':
-        confidence = Math.max(confidence - 15, 15);
-        reasoning.push('Symbol not supported by current TAAPI plan');
-        break;
-      case 'error_fallback':
-        confidence = Math.max(confidence - 25, 10);
-        reasoning.push('TAAPI error - using base signal only');
-        break;
-      case 'base_only':
-        confidence = Math.max(confidence - 5, 25);
-        reasoning.push('Using base technical analysis');
-        break;
-    }
-
+  // 🚨 SAFETY CHECK: Ensure taapiData exists
+  if (!taapiData || typeof taapiData !== 'object') {
     return {
-      symbol,
-      signal,
-      confidence: Math.round(confidence),
-      reasoning,
-      timestamp: Date.now(),
-      enhancement_type: enhancementType,
-      taapi_data: taapiData ? {
-        source: taapiData.source,
-        isFallbackData: taapiData.isFallbackData || false,
-        realIndicators: taapiData.realIndicators || 0
-      } : null,
-      base_signal: {
-        signal: baseSignal.signal,
-        confidence: baseSignal.confidence
-      }
+      signal: 'HOLD',
+      confidence: 20,
+      reasoning: ['Invalid TAAPI data received']
     };
   }
 
-  analyzeTaapiIndicators(taapiData) {
-    const signals = [];
-    const weights = [];
-    let totalConfidence = 0;
-    let reasoning = [];
-
-    // RSI Analysis
-    if (taapiData.rsi !== undefined && taapiData.rsi !== null) {
-      const rsi = taapiData.rsi;
-      if (rsi > 70) {
-        signals.push('SELL');
-        weights.push(0.25);
-        reasoning.push(`RSI overbought (${rsi.toFixed(1)})`);
-        totalConfidence += 80;
-      } else if (rsi < 30) {
-        signals.push('BUY');
-        weights.push(0.25);
-        reasoning.push(`RSI oversold (${rsi.toFixed(1)})`);
-        totalConfidence += 80;
-      } else if (rsi > 60) {
-        signals.push('SELL');
-        weights.push(0.1);
-        reasoning.push(`RSI trending high (${rsi.toFixed(1)})`);
-        totalConfidence += 60;
-      } else if (rsi < 40) {
-        signals.push('BUY');
-        weights.push(0.1);
-        reasoning.push(`RSI trending low (${rsi.toFixed(1)})`);
-        totalConfidence += 60;
-      }
+  // RSI Analysis with null safety
+  if (taapiData.rsi !== undefined && taapiData.rsi !== null && typeof taapiData.rsi === 'number') {
+    const rsi = taapiData.rsi;
+    if (rsi > 70) {
+      signals.push('SELL');
+      weights.push(0.25);
+      reasoning.push(`RSI overbought (${rsi.toFixed(1)})`);
+      totalConfidence += 80;
+    } else if (rsi < 30) {
+      signals.push('BUY');
+      weights.push(0.25);
+      reasoning.push(`RSI oversold (${rsi.toFixed(1)})`);
+      totalConfidence += 80;
+    } else if (rsi > 60) {
+      signals.push('SELL');
+      weights.push(0.1);
+      reasoning.push(`RSI trending high (${rsi.toFixed(1)})`);
+      totalConfidence += 60;
+    } else if (rsi < 40) {
+      signals.push('BUY');
+      weights.push(0.1);
+      reasoning.push(`RSI trending low (${rsi.toFixed(1)})`);
+      totalConfidence += 60;
     }
+  } else {
+    reasoning.push('RSI data unavailable');
+  }
 
-    // MACD Analysis
-    if (taapiData.macd && taapiData.macd.macd !== undefined) {
-      const macd = taapiData.macd.macd;
-      const signal = taapiData.macd.signal;
-      const histogram = taapiData.macd.histogram;
+  // MACD Analysis with null safety
+  if (taapiData.macd && typeof taapiData.macd === 'object') {
+    const macd = taapiData.macd.macd;
+    const signal = taapiData.macd.signal;
+    const histogram = taapiData.macd.histogram;
 
+    if (typeof macd === 'number' && typeof signal === 'number' && typeof histogram === 'number') {
       if (macd > signal && histogram > 0) {
         signals.push('BUY');
         weights.push(0.2);
@@ -216,13 +248,19 @@ class EnhancedSignalGenerator {
         reasoning.push('MACD bearish crossover');
         totalConfidence += 75;
       }
+    } else {
+      reasoning.push('MACD data incomplete');
     }
+  } else {
+    reasoning.push('MACD data unavailable');
+  }
 
-    // Stochastic Analysis
-    if (taapiData.stochastic && taapiData.stochastic.k !== undefined) {
-      const stochK = taapiData.stochastic.k;
-      const stochD = taapiData.stochastic.d;
+  // Stochastic Analysis with null safety
+  if (taapiData.stochastic && typeof taapiData.stochastic === 'object') {
+    const stochK = taapiData.stochastic.k;
+    const stochD = taapiData.stochastic.d;
 
+    if (typeof stochK === 'number' && typeof stochD === 'number') {
       if (stochK > 80 && stochD > 80) {
         signals.push('SELL');
         weights.push(0.15);
@@ -234,60 +272,204 @@ class EnhancedSignalGenerator {
         reasoning.push(`Stochastic oversold (K:${stochK.toFixed(1)})`);
         totalConfidence += 70;
       }
-    }
-
-    // EMA Trend Analysis
-    if (taapiData.ema20 !== undefined && taapiData.ema50 !== undefined) {
-      const ema20 = taapiData.ema20;
-      const ema50 = taapiData.ema50;
-
-      if (ema20 > ema50) {
-        signals.push('BUY');
-        weights.push(0.15);
-        reasoning.push('Short-term EMA above long-term');
-        totalConfidence += 65;
-      } else if (ema20 < ema50) {
-        signals.push('SELL');
-        weights.push(0.15);
-        reasoning.push('Short-term EMA below long-term');
-        totalConfidence += 65;
-      }
-    }
-
-    // ADX Trend Strength
-    if (taapiData.adx !== undefined) {
-      const adx = taapiData.adx;
-      if (adx > 25) {
-        totalConfidence += 10;
-        reasoning.push(`Strong trend detected (ADX: ${adx.toFixed(1)})`);
-      } else {
-        totalConfidence -= 10;
-        reasoning.push(`Weak trend (ADX: ${adx.toFixed(1)})`);
-      }
-    }
-
-    // Calculate weighted signal
-    const buySignals = signals.filter(s => s === 'BUY').length;
-    const sellSignals = signals.filter(s => s === 'SELL').length;
-    
-    let finalSignal = 'HOLD';
-    let confidence = Math.max(totalConfidence / Math.max(signals.length, 1), 20);
-
-    if (buySignals > sellSignals && buySignals >= 2) {
-      finalSignal = 'BUY';
-    } else if (sellSignals > buySignals && sellSignals >= 2) {
-      finalSignal = 'SELL';
     } else {
-      confidence = Math.max(confidence - 20, 10);
-      reasoning.push('Mixed signals - holding position');
+      reasoning.push('Stochastic data incomplete');
     }
-
-    return {
-      signal: finalSignal,
-      confidence: Math.min(confidence, 95),
-      reasoning: reasoning
-    };
+  } else {
+    reasoning.push('Stochastic data unavailable');
   }
+
+  // EMA Trend Analysis with null safety
+  if (typeof taapiData.ema20 === 'number' && typeof taapiData.ema50 === 'number') {
+    const ema20 = taapiData.ema20;
+    const ema50 = taapiData.ema50;
+
+    if (ema20 > ema50) {
+      signals.push('BUY');
+      weights.push(0.15);
+      reasoning.push('Short-term EMA above long-term');
+      totalConfidence += 65;
+    } else if (ema20 < ema50) {
+      signals.push('SELL');
+      weights.push(0.15);
+      reasoning.push('Short-term EMA below long-term');
+      totalConfidence += 65;
+    }
+  } else {
+    reasoning.push('EMA data unavailable');
+  }
+
+  // ADX Trend Strength with null safety
+  if (typeof taapiData.adx === 'number') {
+    const adx = taapiData.adx;
+    if (adx > 25) {
+      totalConfidence += 10;
+      reasoning.push(`Strong trend detected (ADX: ${adx.toFixed(1)})`);
+    } else {
+      totalConfidence -= 10;
+      reasoning.push(`Weak trend (ADX: ${adx.toFixed(1)})`);
+    }
+  } else {
+    reasoning.push('ADX data unavailable');
+  }
+
+  // Calculate weighted signal
+  const buySignals = signals.filter(s => s === 'BUY').length;
+  const sellSignals = signals.filter(s => s === 'SELL').length;
+  
+  let finalSignal = 'HOLD';
+  let confidence = Math.max(totalConfidence / Math.max(signals.length, 1), 20);
+
+  if (buySignals > sellSignals && buySignals >= 2) {
+    finalSignal = 'BUY';
+  } else if (sellSignals > buySignals && sellSignals >= 2) {
+    finalSignal = 'SELL';
+  } else {
+    confidence = Math.max(confidence - 20, 10);
+    reasoning.push('Mixed signals - holding position');
+  }
+
+  // 🚨 SAFETY: Ensure confidence is a valid number
+  if (isNaN(confidence) || !isFinite(confidence)) {
+    confidence = 20; // Default safe value
+  }
+
+  return {
+    signal: finalSignal,
+    confidence: Math.min(Math.max(confidence, 1), 95), // Clamp between 1-95
+    reasoning: reasoning.length > 0 ? reasoning : ['Analysis completed with limited data']
+  };
+}
+
+async enhanceSignalWithTaapi(baseSignal, marketData, symbol, timeframe = '1h', riskLevel = 'balanced') {
+  const startTime = Date.now();
+  
+  try {
+    logger.info(`🔍 DEBUG: enhanceSignalWithTaapi called for ${symbol}`);
+    
+    // Check symbol routing with hardcoded whitelist
+    const routing = await this.taapiService.symbolManager.routeSymbolRequest(symbol);
+    
+    if (routing.strategy === 'fallback_only') {
+      logger.info(`⏭️ ${symbol} not in free plan whitelist - ${routing.message}`);
+      logger.info(`📊 Delivering enhanced fallback analysis for ${symbol}`);
+      
+      // Create enhanced signal without TAAPI but with better confidence
+      return this.createEnhancedSignal(baseSignal, null, symbol, 'free_plan_limitation');
+    }
+    
+    logger.info(`✅ ${symbol} in free plan whitelist - enhancing with TAAPI indicators`);
+    
+    // Get TAAPI indicators for supported symbols
+    const taapiIndicators = await this.taapiService.getBulkIndicators(symbol, timeframe);
+    
+    logger.info(`🔍 DEBUG: taapiIndicators received for ${symbol}:`, JSON.stringify(taapiIndicators, null, 2));
+    
+    // Check if we got fallback data (rate limited, etc.)
+    if (taapiIndicators && taapiIndicators.isFallbackData) {
+      logger.warn(`TAAPI returned fallback data for ${symbol} (rate limited) - using enhanced base signal`);
+      return this.createEnhancedSignal(baseSignal, taapiIndicators, symbol, 'taapi_rate_limited');
+    }
+    
+    logger.info(`✅ Real TAAPI data received for ${symbol} - generating enhanced signal`);
+    
+    // Generate enhanced signal with real TAAPI data
+    const enhancedSignal = await this.generateEnhancedSignal(
+      baseSignal, 
+      marketData, 
+      taapiIndicators, 
+      riskLevel
+    );
+    
+    const processingTime = Date.now() - startTime;
+    logger.info(`Enhanced signal completed for ${symbol}`, {
+      signal: enhancedSignal.signal,
+      confidence: enhancedSignal.confidence,
+      processing_time: processingTime,
+      taapi_used: true,
+      taapi_available: true,
+      data_source: 'real_taapi'
+    });
+    
+    return enhancedSignal;
+    
+  } catch (error) {
+    logger.error(`❌ Signal enhancement failed for ${symbol}:`, error.message);
+    
+    // Always return a signal - never fail completely
+    const fallbackSignal = this.createEnhancedSignal(baseSignal, null, symbol, 'error_fallback');
+    return fallbackSignal;
+  }
+}
+
+// 🔧 ENHANCED createEnhancedSignal method - Handle free plan limitations gracefully
+createEnhancedSignal(baseSignal, taapiData, symbol, enhancementType) {
+  let signal = baseSignal.signal || 'HOLD';
+  let confidence = baseSignal.confidence || 50;
+  
+  // Ensure reasoning is always an array
+  let reasoning = [];
+  if (baseSignal.reasoning) {
+    if (Array.isArray(baseSignal.reasoning)) {
+      reasoning = [...baseSignal.reasoning];
+    } else if (typeof baseSignal.reasoning === 'string') {
+      reasoning = [baseSignal.reasoning];
+    }
+  }
+
+  // Adjust confidence and reasoning based on enhancement type
+  switch (enhancementType) {
+    case 'taapi_enhanced':
+      confidence = Math.min(confidence + 15, 95);
+      reasoning.push('Enhanced with real TAAPI indicators');
+      break;
+      
+    case 'free_plan_limitation':
+      // 🎯 SPECIAL: Free plan limitation - still provide good analysis
+      confidence = Math.max(confidence - 5, 25); // Minimal penalty
+      reasoning.push(`Free plan: ${symbol} not in supported symbols (BTC, ETH, XRP, LTC, XMR)`);
+      reasoning.push('Using enhanced CoinGecko and market analysis');
+      break;
+      
+    case 'taapi_rate_limited':
+      confidence = Math.max(confidence - 8, 22);
+      reasoning.push('TAAPI rate limited - using enhanced fallback analysis');
+      break;
+      
+    case 'error_fallback':
+      confidence = Math.max(confidence - 25, 10);
+      reasoning.push('Technical error - using base signal analysis');
+      break;
+      
+    case 'base_only':
+      confidence = Math.max(confidence - 5, 25);
+      reasoning.push('Using base technical analysis with market data');
+      break;
+  }
+
+  return {
+    symbol,
+    signal,
+    confidence: Math.round(confidence),
+    reasoning,
+    timestamp: Date.now(),
+    enhancement_type: enhancementType,
+    taapi_data: taapiData ? {
+      source: taapiData.source,
+      isFallbackData: taapiData.isFallbackData || false,
+      realIndicators: taapiData.realIndicators || 0
+    } : null,
+    base_signal: {
+      signal: baseSignal.signal,
+      confidence: baseSignal.confidence
+    },
+    plan_info: {
+      plan_type: 'free',
+      symbol_supported: enhancementType === 'taapi_enhanced',
+      supported_symbols: ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'LTCUSDT', 'XMRUSDT']
+    }
+  };
+}
 
   combineSignals(baseSignal, taapiAnalysis, taapiData) {
     const baseWeight = 0.4;
@@ -341,102 +523,49 @@ class EnhancedSignalGenerator {
     };
   }
 
-  async shouldAvoidEntry(symbol, signalType, marketData) {
-    try {
-      // Check symbol routing first
-      const routing = await this.taapiService.symbolManager.routeSymbolRequest(symbol);
-      if (routing.strategy === 'fallback_only') {
-        return {
-          avoid: false,
-          reason: 'Symbol not supported by TAAPI - no avoidance restrictions'
-        };
-      }
-
-      // Use cached data if available
-      const cacheKey = `avoid_${symbol}_${Math.floor(Date.now() / 600000)}`;
-      const cached = this.signalCache.get(cacheKey);
-      if (cached) {
-        return cached.avoidance;
-      }
-
-      // Get TAAPI indicators for avoidance check
-      const taapiData = await this.taapiService.getBulkIndicators(symbol, '1h');
-      
-      if (!taapiData || taapiData.isFallbackData) {
-        return {
-          avoid: false,
-          reason: 'TAAPI unavailable - no avoidance restrictions'
-        };
-      }
-
-      const avoidanceChecks = [];
-
-      // Extreme RSI conditions
-      if (taapiData.rsi !== undefined) {
-        const rsi = taapiData.rsi;
-        if ((signalType === 'BUY' && rsi > 80) || (signalType === 'SELL' && rsi < 20)) {
-          avoidanceChecks.push(`Extreme RSI (${rsi.toFixed(1)})`);
-        }
-      }
-
-      // Strong opposing trend
-      if (taapiData.adx !== undefined && taapiData.adx > 40) {
-        if (taapiData.ema20 !== undefined && taapiData.ema50 !== undefined) {
-          const trendUp = taapiData.ema20 > taapiData.ema50;
-          if ((signalType === 'SELL' && trendUp) || (signalType === 'BUY' && !trendUp)) {
-            avoidanceChecks.push(`Strong opposing trend (ADX: ${taapiData.adx.toFixed(1)})`);
-          }
-        }
-      }
-
-      const shouldAvoid = avoidanceChecks.length >= 2;
-      const result = {
-        avoid: shouldAvoid,
-        reason: shouldAvoid ? avoidanceChecks.join(', ') : 'No avoidance conditions detected'
-      };
-
-      // Cache the result
-      this.signalCache.set(cacheKey, {
-        avoidance: result,
-        timestamp: Date.now()
-      });
-
-      return result;
-
-    } catch (error) {
-      logger.error('Entry avoidance check failed:', error);
-      return {
-        avoid: false,
-        reason: 'Avoidance check failed - proceeding with caution'
-      };
-    }
+  shouldUseTaapiEnhancement(symbol) {
+    // This is now handled by the dynamic symbol manager
+    // The routing decision is made at the service level
+    return true; // Let the service decide
   }
 
-  // Get service health status
-  async getServiceHealth() {
+  getServiceHealth() {
     try {
-      const taapiHealth = await this.taapiService.getServiceHealth();
-      
+      const cacheEntries = Array.from(this.signalCache.entries()).slice(0, 3).map(([key, value]) => ({
+        key,
+        age_minutes: Math.floor((Date.now() - value.timestamp) / 60000),
+        signal: value.signal?.signal
+      }));
+
       return {
-        taapi: taapiHealth.taapi,
-        service_version: 'enhanced_signal_generator_v2',
+        signal_generator: 'healthy',
         cache_size: this.signalCache.size,
-        cache_entries: Array.from(this.signalCache.keys()).slice(0, 5)
+        cache_entries: cacheEntries,
+        taapi: this.taapiService ? {
+          available: true,
+          service_type: 'enhanced_v2'
+        } : {
+          available: false,
+          service_type: 'none'
+        }
       };
     } catch (error) {
       return {
-        taapi: { available: false, error: error.message },
-        service_version: 'enhanced_signal_generator_v2_error',
-        cache_size: this.signalCache.size
+        signal_generator: 'error',
+        error: error.message,
+        cache_size: 0
       };
     }
   }
 
-  // Clear caches and reset services
-  reset() {
-    this.signalCache.clear();
-    this.taapiService.reset();
-    logger.info('Enhanced signal generator V2 reset');
+  // Clear old cache entries periodically
+  cleanupCache() {
+    const now = Date.now();
+    for (const [key, value] of this.signalCache.entries()) {
+      if (now - value.timestamp > this.cacheExpiry) {
+        this.signalCache.delete(key);
+      }
+    }
   }
 }
 

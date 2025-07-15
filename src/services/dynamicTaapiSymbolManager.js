@@ -17,6 +17,24 @@ class DynamicTaapiSymbolManager {
     this.planType = 'unknown'; // 'free', 'demo', 'pro', etc.
     this.planLimitations = {};
     
+    // 🚨 HARDCODED FREE PLAN SUPPORTED SYMBOLS
+    this.FREE_PLAN_SUPPORTED = new Set([
+        'BTCUSDT',
+        'ETHUSDT', 
+        'XRPUSDT',
+        'LTCUSDT',
+        'XMRUSDT'
+      ]);
+      
+      // TAAPI format mapping
+      this.TAAPI_FORMAT_MAP = {
+        'BTCUSDT': 'BTC/USDT',
+        'ETHUSDT': 'ETH/USDT',
+        'XRPUSDT': 'XRP/USDT', 
+        'LTCUSDT': 'LTC/USDT',
+        'XMRUSDT': 'XMR/USDT'
+      }
+
     // Cache settings
     this.symbolCacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
     this.lastSymbolFetch = 0;
@@ -28,7 +46,7 @@ class DynamicTaapiSymbolManager {
     // Initialize with known fallbacks
     this.initializeFallbackSymbols();
     
-    logger.info('🔄 Dynamic TAAPI Symbol Manager initialized');
+    logger.info('🎯 Free Plan Symbol Manager initialized with 5 supported symbols');
   }
 
   initializeFallbackSymbols() {
@@ -234,43 +252,79 @@ class DynamicTaapiSymbolManager {
    * Smart symbol routing with comprehensive checking
    */
   async routeSymbolRequest(symbol) {
-    // First check static list
-    const normalizedSymbol = this.normalizeSymbol(symbol);
-    
-    if (this.supportedSymbols.has(normalizedSymbol)) {
-      return {
-        strategy: 'taapi_enhanced',
-        symbol: this.convertToTaapiFormat(normalizedSymbol),
-        confidence_bonus: 0.15,
-        processing_priority: 'high',
-        source: 'cached_supported'
-      };
-    }
-
-    // If not in cache, try live validation for unknown symbols
-    if (!this.blacklistedSymbols.has(normalizedSymbol)) {
-      const validation = await this.validateSymbolLive(normalizedSymbol);
-      
-      if (validation.supported) {
+    try {
+      // 🚨 STEP 1: Check if symbol is in free plan whitelist
+      if (this.FREE_PLAN_SUPPORTED.has(symbol)) {
+        logger.info(`✅ Symbol ${symbol} is FREE PLAN SUPPORTED - using TAAPI`);
+        
         return {
-          strategy: 'taapi_enhanced',
-          symbol: this.convertToTaapiFormat(normalizedSymbol),
-          confidence_bonus: 0.15,
-          processing_priority: 'high',
-          source: 'live_validated'
+          strategy: 'taapi_direct',
+          symbol: this.TAAPI_FORMAT_MAP[symbol],
+          source: 'free_plan_whitelist',
+          message: `${symbol} supported on free plan`,
+          supported: true
+        };
+      } else {
+        // 🎯 STEP 2: Symbol not supported - use fallback but still deliver analysis
+        logger.info(`⏭️ Symbol ${symbol} NOT in free plan (${Array.from(this.FREE_PLAN_SUPPORTED).join(', ')}) - using fallback analysis`);
+        
+        return {
+          strategy: 'fallback_only',
+          symbol: symbol,
+          source: 'free_plan_limitation',
+          message: `${symbol} not included in free plan - delivering enhanced fallback analysis`,
+          supported: false,
+          reason: 'Free plan only supports: BTC/USDT, ETH/USDT, XRP/USDT, LTC/USDT, XMR/USDT'
         };
       }
+      
+    } catch (error) {
+      logger.error(`Routing error for ${symbol}:`, error.message);
+      return {
+        strategy: 'fallback_only',
+        symbol: symbol,
+        source: 'routing_error',
+        message: 'Error during symbol routing - using fallback analysis',
+        supported: false
+      };
     }
+  }
 
-    // Fallback strategy
+  isSymbolSupported(symbol) {
+    return this.FREE_PLAN_SUPPORTED.has(symbol);
+  }
+
+  getSupportedSymbols() {
+    return Array.from(this.FREE_PLAN_SUPPORTED);
+  }
+
+  // Get symbol stats for the free plan
+  async getSymbolStats() {
+    const supported = Array.from(this.FREE_PLAN_SUPPORTED);
+    const blacklisted = Array.from(this.blacklistedSymbols);
+    
     return {
-      strategy: 'fallback_only',
-      symbol: normalizedSymbol,
-      confidence_penalty: 0.10,
-      processing_priority: 'low',
-      source: 'unsupported'
+      plan_type: 'free',
+      plan_limitations: {
+        symbols: '5 major pairs only',
+        requests_per_minute: 1,
+        requests_per_month: 'limited'
+      },
+      supported_symbols_count: supported.length,
+      supported_symbols: supported,
+      blacklisted_count: blacklisted.length,
+      blacklisted_symbols: blacklisted,
+      total_available_symbols: 5,
+      cache_entries: 0,
+      last_update: new Date().toISOString(),
+      recommendations: [
+        '💡 Free plan supports 5 symbols: BTC, ETH, XRP, LTC, XMR',
+        '🚀 Upgrade for access to 1400+ symbols',
+        '⭐ All other symbols receive enhanced fallback analysis'
+      ]
     };
   }
+
 
   /**
    * Get comprehensive symbol statistics

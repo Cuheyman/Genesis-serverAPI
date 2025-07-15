@@ -749,15 +749,52 @@ class SignalReasoningEngine {
     return tips;
   }
 
-  getMonitoringPoints(signal, technicalData) {
-    return [
-      `Price action around ${signal.entry_price.toFixed(4)} entry level`,
-      `Volume confirmation - watch for ${(technicalData.volume_ratio * 1.2).toFixed(1)}x increase`,
-      `RSI levels - current ${technicalData.rsi?.toFixed(1)} watching for divergence`,
-      `Stop loss level at ${signal.stop_loss.toFixed(4)}`,
-      `First take profit at ${signal.take_profit_1.toFixed(4)}`
-    ];
+  // 🚨 URGENT FIX: Replace the getMonitoringPoints method in signalReasoningEngine.js
+// This fixes the "Cannot read properties of undefined (reading 'toFixed')" error
+
+getMonitoringPoints(signal, technicalData) {
+  // 🚨 SAFETY: Add null checks for all properties that call .toFixed()
+  const entryPrice = signal?.entry_price || 0;
+  const stopLoss = signal?.stop_loss || 0;
+  const takeProfit1 = signal?.take_profit_1 || 0;
+  const volumeRatio = technicalData?.volume_ratio || 1;
+  const rsi = technicalData?.rsi || 50;
+
+  const monitoringPoints = [];
+
+  // Only add monitoring points if we have valid data
+  if (entryPrice > 0) {
+    monitoringPoints.push(`Price action around ${entryPrice.toFixed(4)} entry level`);
   }
+
+  if (volumeRatio > 0) {
+    monitoringPoints.push(`Volume confirmation - watch for ${(volumeRatio * 1.2).toFixed(1)}x increase`);
+  }
+
+  if (rsi > 0 && rsi <= 100) {
+    monitoringPoints.push(`RSI levels - current ${rsi.toFixed(1)} watching for divergence`);
+  }
+
+  if (stopLoss > 0) {
+    monitoringPoints.push(`Stop loss level at ${stopLoss.toFixed(4)}`);
+  }
+
+  if (takeProfit1 > 0) {
+    monitoringPoints.push(`First take profit at ${takeProfit1.toFixed(4)}`);
+  }
+
+  // Fallback monitoring points if data is missing
+  if (monitoringPoints.length === 0) {
+    monitoringPoints.push(
+      'Monitor price action and volume for entry confirmation',
+      'Watch for trend reversal signals',
+      'Set appropriate stop loss and take profit levels',
+      'Monitor overall market sentiment'
+    );
+  }
+
+  return monitoringPoints;
+}
 
   generateAlternativeScenarios(signal, technicalData, onChainData, offChainData) {
     return {
@@ -769,67 +806,170 @@ class SignalReasoningEngine {
   }
 
   generateBullishScenario(signal, technicalData, onChainData) {
+    // 🚨 SAFETY: Add null checks
+    const entryPrice = signal?.entry_price || 0;
+    const takeProfit1 = signal?.take_profit_1 || 0;
+    const takeProfit2 = signal?.take_profit_2 || 0;
+    const takeProfit3 = signal?.take_profit_3 || 0;
+  
     return {
       description: 'Price breaks above resistance with volume confirmation',
       triggers: [
-        `Price sustained above ${(signal.entry_price * 1.02).toFixed(4)}`,
+        entryPrice > 0 ? `Price sustained above ${(entryPrice * 1.02).toFixed(4)}` : 'Price breaks above resistance',
         'Volume ratio increases above 1.5x',
         'Whale accumulation continues',
         'RSI maintains above 50 without overbought conditions'
       ],
-      targets: [signal.take_profit_1, signal.take_profit_2, signal.take_profit_3],
+      targets: [takeProfit1, takeProfit2, takeProfit3].filter(target => target > 0),
       probability: this.calculateBullishProbability(signal, technicalData, onChainData)
     };
   }
 
   generateBearishScenario(signal, technicalData, onChainData) {
+    // 🚨 SAFETY: Add null checks
+    const entryPrice = signal?.entry_price || 0;
+  
     return {
       description: 'Price fails at resistance and breaks support levels',
       triggers: [
-        `Price breaks below ${(signal.entry_price * 0.98).toFixed(4)}`,
+        entryPrice > 0 ? `Price breaks below ${(entryPrice * 0.98).toFixed(4)}` : 'Price breaks below support',
         'Volume increases on selling pressure',
         'Whale distribution detected',
         'RSI breaks below 40 with momentum'
       ],
-      targets: [(signal.entry_price * 0.95), (signal.entry_price * 0.92), (signal.entry_price * 0.88)],
+      targets: entryPrice > 0 ? 
+        [(entryPrice * 0.95), (entryPrice * 0.92), (entryPrice * 0.88)] : 
+        ['Lower support levels', 'Key technical levels', 'Major support zones'],
       probability: this.calculateBearishProbability(signal, technicalData, onChainData)
     };
   }
 
   generateNeutralScenario(signal, technicalData, onChainData) {
+    // 🚨 SAFETY: Add null checks
+    const entryPrice = signal?.entry_price || 0;
+    
     return {
       description: 'Price consolidates in current range with low volatility',
       triggers: [
-        'Volume remains below average',
-        'Price stays within 2% of current level',
-        'No clear directional momentum',
-        'Technical indicators remain neutral'
+        entryPrice > 0 ? `Price stays between ${(entryPrice * 0.98).toFixed(4)} and ${(entryPrice * 1.02).toFixed(4)}` : 'Price consolidates in range',
+        'Low volume and volatility',
+        'Mixed whale activity signals',
+        'RSI stays in 40-60 range'
       ],
-      range: [signal.entry_price * 0.98, signal.entry_price * 1.02],
-      probability: 100 - this.calculateBullishProbability(signal, technicalData, onChainData) - this.calculateBearishProbability(signal, technicalData, onChainData)
+      expected_range: entryPrice > 0 ? 
+        [(entryPrice * 0.97), (entryPrice * 1.03)] : 
+        ['Current support', 'Current resistance'],
+      probability: this.calculateNeutralProbability(signal, technicalData, onChainData)
     };
   }
 
   calculateBullishProbability(signal, technicalData, onChainData) {
-    let probability = 30; // Base probability
+    // 🚨 SAFETY: Add comprehensive null checks
+    let probability = 50; // Base probability
     
-    if (signal.signal === 'BUY') probability += 20;
-    if (technicalData.rsi < 50) probability += 10;
-    if (technicalData.volume_ratio > 1.1) probability += 10;
-    if (onChainData?.whale_activity?.whale_accumulation === 'buying') probability += 15;
-    
-    return Math.max(10, Math.min(70, probability));
+    try {
+      // Technical factors
+      if (technicalData?.rsi && technicalData.rsi < 70 && technicalData.rsi > 30) {
+        probability += 10;
+      }
+      
+      if (technicalData?.volume_ratio && technicalData.volume_ratio > 1.2) {
+        probability += 15;
+      }
+      
+      // On-chain factors with null safety
+      if (onChainData?.whale_activity?.whale_accumulation === 'buying') {
+        probability += 20;
+      } else if (onChainData?.whale_activity?.whale_accumulation === 'accumulating') {
+        probability += 10;
+      }
+      
+      if (onChainData?.sentiment_indicators?.smart_money_flow === 'inflow') {
+        probability += 15;
+      }
+      
+      // Signal confidence
+      if (signal?.confidence && signal.confidence > 70) {
+        probability += 10;
+      }
+      
+      return Math.max(10, Math.min(90, probability));
+      
+    } catch (error) {
+      // Fallback if any calculation fails
+      return 50;
+    }
   }
 
   calculateBearishProbability(signal, technicalData, onChainData) {
-    let probability = 30; // Base probability
+    // 🚨 SAFETY: Add comprehensive null checks
+    let probability = 50; // Base probability
     
-    if (signal.signal === 'SELL') probability += 20;
-    if (technicalData.rsi > 50) probability += 10;
-    if (technicalData.volume_ratio > 1.1) probability += 10;
-    if (onChainData?.whale_activity?.whale_accumulation === 'selling') probability += 15;
+    try {
+      // Technical factors
+      if (technicalData?.rsi && technicalData.rsi > 70) {
+        probability += 15;
+      }
+      
+      if (technicalData?.volume_ratio && technicalData.volume_ratio < 0.8) {
+        probability += 10;
+      }
+      
+      // On-chain factors with null safety
+      if (onChainData?.whale_activity?.whale_accumulation === 'selling') {
+        probability += 20;
+      } else if (onChainData?.whale_activity?.whale_accumulation === 'distributing') {
+        probability += 10;
+      }
+      
+      if (onChainData?.sentiment_indicators?.smart_money_flow === 'outflow') {
+        probability += 15;
+      }
+      
+      // Signal confidence (inverted for bearish)
+      if (signal?.confidence && signal.confidence < 30) {
+        probability += 10;
+      }
+      
+      return Math.max(10, Math.min(90, probability));
+      
+    } catch (error) {
+      // Fallback if any calculation fails
+      return 50;
+    }
+  }
+
+  calculateNeutralProbability(signal, technicalData, onChainData) {
+    // 🚨 SAFETY: Add comprehensive null checks
+    let probability = 50; // Base probability
     
-    return Math.max(10, Math.min(70, probability));
+    try {
+      // Technical factors favoring consolidation
+      if (technicalData?.rsi && technicalData.rsi >= 40 && technicalData.rsi <= 60) {
+        probability += 15;
+      }
+      
+      if (technicalData?.volume_ratio && technicalData.volume_ratio >= 0.8 && technicalData.volume_ratio <= 1.2) {
+        probability += 10;
+      }
+      
+      // On-chain factors with null safety
+      if (onChainData?.whale_activity?.whale_accumulation === 'neutral' || 
+          onChainData?.whale_activity?.whale_accumulation === 'hodling') {
+        probability += 15;
+      }
+      
+      // Signal uncertainty
+      if (signal?.confidence && signal.confidence >= 40 && signal.confidence <= 60) {
+        probability += 10;
+      }
+      
+      return Math.max(10, Math.min(90, probability));
+      
+    } catch (error) {
+      // Fallback if any calculation fails
+      return 50;
+    }
   }
 
   assessScenarioProbabilities(signal, technicalData, onChainData, offChainData) {

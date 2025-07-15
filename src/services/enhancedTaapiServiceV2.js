@@ -54,6 +54,7 @@ class TaapiRequestQueue {
       interval,
       exchange,
       cacheKey,
+      taapiSymbol: routing.symbol, // Store the TAAPI-formatted symbol
       routing, // Include routing information
       resolve: resolveFunction,
       reject: rejectFunction,
@@ -90,6 +91,13 @@ class TaapiRequestQueue {
 
     try {
       while (this.queue.length > 0) {
+        // Check circuit breaker before processing each request
+        if (this.taapiService.isCircuitBreakerOpen()) {
+          logger.warn('🔴 Circuit breaker open - clearing remaining queue with fallback data');
+          this.clearQueueWithFallback();
+          break;
+        }
+
         const request = this.queue.shift();
         this.currentRequest = request;
         
@@ -99,7 +107,7 @@ class TaapiRequestQueue {
           
           // Use routing symbol (already in TAAPI format)
           const result = await this.taapiService.getDirectBulkIndicators(
-            request.routing.symbol, // Use the routed symbol 
+            request.taapiSymbol, // Use the routed symbol 
             request.interval, 
             request.exchange,
             request.symbol // Pass original symbol for fallback
@@ -149,6 +157,28 @@ class TaapiRequestQueue {
       this.processing = false;
       logger.info('🏁 TAAPI Queue V2 processing completed');
     }
+  }
+
+  // Clear queue with fallback data instead of rejecting
+  clearQueueWithFallback() {
+    const rejected = this.queue.length;
+    
+    this.queue.forEach(req => {
+      try {
+        const fallbackData = this.taapiService.getFallbackData(req.symbol, { 
+          source: 'circuit_breaker_open',
+          error: 'Service temporarily unavailable'
+        });
+        req.resolve(fallbackData);
+      } catch (error) {
+        req.reject(new Error('Queue cleared due to circuit breaker'));
+      }
+    });
+    
+    this.queue = [];
+    this.activePromises.clear();
+    
+    logger.warn(`🚨 Queue cleared with fallback - ${rejected} requests resolved`);
   }
 
   getCachedResult(cacheKey) {
@@ -272,6 +302,27 @@ class EnhancedTaapiServiceV2 {
     } catch (error) {
       logger.error(`Failed to initialize TAAPI service: ${error.message}`);
     }
+  }
+
+  // 🚨 EMERGENCY RESET METHOD - MISSING FROM YOUR CODE
+  emergencyReset() {
+    logger.warn('🚨 EMERGENCY RESET: Clearing all errors and opening circuit breaker');
+    
+    this.consecutiveErrors = 0;
+    this.backoffMultiplier = 1;
+    this.circuitBreakerOpen = false;
+    this.circuitBreakerResetTime = 0;
+    this.isRateLimited = false;
+    this.rateLimitUntil = 0;
+    this.cache.clear();
+    this.requestQueue.clearQueue();
+    
+    logger.info('✅ Emergency reset complete - service should recover');
+    return {
+      status: 'reset_complete',
+      timestamp: Date.now(),
+      message: 'All errors cleared, circuit breaker opened'
+    };
   }
 
   // Rate limiting methods
@@ -433,23 +484,97 @@ class EnhancedTaapiServiceV2 {
     }
   }
 
+  // Enhanced error handling with smart recovery
   handleError(error, symbol) {
     this.consecutiveErrors++;
     
+    logger.error(`🔥 Error for ${symbol}: ${error.message}`, {
+      status: error.response?.status,
+      consecutiveErrors: this.consecutiveErrors,
+      symbol
+    });
+    
     if (error.response?.status === 429) {
+      // Rate limited
       this.backoffMultiplier = Math.min(this.backoffMultiplier * 2, 8);
       this.handleRateLimit(error.response);
+      logger.warn(`⏰ Rate limited - backing off for ${this.backoffMultiplier} minutes`);
     } else if (error.response?.status === 403) {
       // Symbol not supported - blacklist it
       this.symbolManager.blacklistedSymbols.add(symbol);
-      logger.warn(`Symbol ${symbol} blacklisted due to 403 error`);
+      logger.warn(`🚫 Symbol ${symbol} blacklisted due to 403 error`);
+    } else if (error.response?.status === 401) {
+      // Authentication error
+      logger.error('🔑 Authentication error - check TAAPI_SECRET');
+      this.consecutiveErrors += 2; // Weight auth errors more heavily
     }
     
     // Open circuit breaker if too many consecutive errors
     if (this.consecutiveErrors >= this.maxConsecutiveErrors) {
+      const resetTime = 5 * 60 * 1000; // 5 minutes
       this.circuitBreakerOpen = true;
-      this.circuitBreakerResetTime = Date.now() + (5 * 60 * 1000); // 5 minutes
+      this.circuitBreakerResetTime = Date.now() + resetTime;
+      
       logger.error(`🔴 Circuit breaker OPENED after ${this.consecutiveErrors} consecutive errors`);
+      logger.info(`🕐 Will auto-reset in ${resetTime / 60000} minutes`);
+      
+      // Clear the queue with fallback data
+      if (this.requestQueue) {
+        this.requestQueue.clearQueueWithFallback();
+      }
+    }
+  }
+  async testSymbolSupport(symbol, interval = '1h', exchange = 'binance') {
+    try {
+      logger.info(`🧪 Testing symbol support: ${symbol}`);
+      
+      // Convert to TAAPI format
+      const taapiSymbol = symbol.replace('USDT', '/USDT').replace('BTC', '/BTC').replace('ETH', '/ETH');
+      
+      // Test with a simple RSI request (lowest cost)
+      const response = await axios.get(`${this.baseURL}/rsi`, {
+        params: {
+          secret: this.secret,
+          exchange,
+          symbol: taapiSymbol,
+          interval,
+          optInTimePeriod: 14
+        },
+        timeout: 10000,
+        headers: { 'User-Agent': 'TradingBot/2.0' }
+      });
+      
+      if (response.data && typeof response.data.value === 'number') {
+        logger.info(`✅ Symbol ${symbol} (${taapiSymbol}) is SUPPORTED`);
+        
+        // Add to supported symbols cache
+        this.symbolManager.supportedSymbols.add(symbol);
+        this.symbolManager.blacklistedSymbols.delete(symbol); // Remove from blacklist if there
+        
+        return {
+          supported: true,
+          taapiSymbol,
+          testValue: response.data.value,
+          message: `Symbol ${symbol} confirmed working`
+        };
+      } else {
+        throw new Error('Invalid response format');
+      }
+      
+    } catch (error) {
+      logger.warn(`❌ Symbol ${symbol} NOT supported: ${error.message}`);
+      
+      if (error.response?.status === 403) {
+        // Add to blacklist only after actual test
+        this.symbolManager.blacklistedSymbols.add(symbol);
+      }
+      
+      return {
+        supported: false,
+        error: error.message,
+        status: error.response?.status,
+        message: `Symbol ${symbol} not available on your plan`
+      };
     }
   }
 
@@ -516,6 +641,37 @@ class EnhancedTaapiServiceV2 {
     }
   }
 
+  // Enhanced system health monitoring
+  getSystemHealth() {
+    const now = Date.now();
+    const resetTimeRemaining = this.circuitBreakerOpen ? 
+      Math.max(0, this.circuitBreakerResetTime - now) : 0;
+    
+    return {
+      circuit_breaker: {
+        open: this.circuitBreakerOpen,
+        reset_in_seconds: Math.floor(resetTimeRemaining / 1000),
+        consecutive_errors: this.consecutiveErrors,
+        max_errors: this.maxConsecutiveErrors
+      },
+      rate_limiting: {
+        active: this.isRateLimited,
+        reset_in_seconds: this.isRateLimited ? Math.floor((this.rateLimitUntil - now) / 1000) : 0,
+        backoff_multiplier: this.backoffMultiplier
+      },
+      queue: this.requestQueue ? this.requestQueue.getQueueStatus() : null,
+      cache: {
+        size: this.cache.size,
+        max_age_minutes: this.cacheExpiry / 60000
+      },
+      symbols: {
+        blacklisted_count: this.symbolManager.blacklistedSymbols.size,
+        supported_count: this.symbolManager.supportedSymbols.size
+      },
+      recommendations: this.getHealthRecommendations()
+    };
+  }
+
   getRecommendations(symbolStats) {
     const recommendations = [];
     
@@ -529,6 +685,33 @@ class EnhancedTaapiServiceV2 {
     
     if (this.consecutiveErrors > 1) {
       recommendations.push('⚠️ Multiple errors detected - check API status');
+    }
+    
+    return recommendations;
+  }
+
+  getHealthRecommendations() {
+    const recommendations = [];
+    
+    if (this.circuitBreakerOpen) {
+      recommendations.push('🔴 Circuit breaker open - service will auto-recover in a few minutes');
+      recommendations.push('💡 You can force reset using the emergency reset endpoint');
+    }
+    
+    if (this.consecutiveErrors > 1) {
+      recommendations.push('⚠️ Multiple errors detected - check TAAPI_SECRET and plan limits');
+    }
+    
+    if (this.isRateLimited) {
+      recommendations.push('⏰ Rate limited - consider upgrading TAAPI plan for higher limits');
+    }
+    
+    if (this.symbolManager.blacklistedSymbols.size > 5) {
+      recommendations.push('🚫 Many symbols blacklisted - may need plan upgrade');
+    }
+    
+    if (recommendations.length === 0) {
+      recommendations.push('✅ System operating normally');
     }
     
     return recommendations;
