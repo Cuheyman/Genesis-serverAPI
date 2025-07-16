@@ -101,3 +101,1480 @@
 {"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:25:44.745Z"}
 {"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:25:44.771Z"}
 {"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:25:44.771Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T11:35:13.123Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T11:42:13.750Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T11:43:26.938Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:46:22.731Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:46:22.732Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:22.732Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:22.893Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:46:22.893Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:46:22.893Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:46:22.893Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:22.893Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:22.919Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:46:22.919Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:46:29.665Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:46:29.665Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:29.665Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:29.665Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:46:29.666Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:46:29.666Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:46:29.666Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:29.666Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:46:29.706Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:46:29.706Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T11:47:57.596Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:48:07.529Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:48:07.529Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:48:07.529Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:48:07.580Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:48:07.580Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:48:07.581Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:48:07.581Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:48:07.581Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:48:07.605Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:48:07.605Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T11:52:46.163Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:52:55.321Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:52:55.321Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:52:55.321Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:52:55.406Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:52:55.406Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:52:55.406Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:52:55.406Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:52:55.407Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:52:55.442Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:52:55.442Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:53:47.941Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:53:47.941Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:53:47.941Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:53:47.997Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:53:47.998Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:53:47.998Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:53:47.998Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:53:47.998Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:53:48.022Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:53:48.023Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:54:09.579Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:54:09.579Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:54:09.579Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:54:09.751Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:54:09.751Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:54:09.752Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:54:09.752Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:54:09.752Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:54:09.776Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:54:09.776Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:55:05.491Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:55:05.491Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:55:05.491Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:55:05.552Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:55:05.552Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T11:55:05.552Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T11:55:05.552Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:55:05.553Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T11:55:05.585Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T11:55:05.585Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T12:01:27.410Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T12:03:03.165Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T12:03:03.165Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:03:03.165Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:03:03.212Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T12:03:03.212Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T12:03:03.212Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T12:03:03.213Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:03:03.213Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:03:03.243Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T12:03:03.243Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T12:04:36.142Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T12:04:36.143Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:04:36.143Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:04:36.195Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T12:04:36.195Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T12:04:36.196Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T12:04:36.196Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:04:36.196Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T12:04:36.223Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T12:04:36.223Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T16:50:27.705Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T16:57:37.050Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T17:00:21.438Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T17:00:21.439Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T17:00:21.439Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T17:00:21.499Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T17:00:21.500Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T17:00:21.500Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T17:00:21.500Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T17:00:21.500Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T17:00:21.528Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T17:00:21.528Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T18:00:40.572Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:01:55.154Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:01:55.155Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:01:55.155Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:01:55.324Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:01:55.325Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:01:55.325Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:01:55.325Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:01:55.325Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:01:55.354Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:01:55.355Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T18:02:07.449Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T18:02:32.771Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T18:02:41.954Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-14T18:02:49.173Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:56.849Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:05:56.850Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:56.850Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:56.872Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:05:56.877Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:57.265Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:05:57.265Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:05:57.266Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T18:05:57.419Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T18:05:57.480Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:57.481Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T18:05:57.481Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T18:05:57.829Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:57.829Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T18:05:57.830Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T18:05:57.856Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:57.856Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:58.193Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:05:58.194Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:05:58.194Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:58.219Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:05:58.219Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:05:58.225Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:05:58.248Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:05:58.248Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:05:58.285Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.286Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.315Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:05:58.315Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:58.315Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:05:58.315Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.316Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.340Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:05:58.340Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:58.354Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:05:58.354Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.355Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.704Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:05:58.704Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:58.704Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:05:58.704Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.704Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:58.727Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:05:58.728Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:05:59.942Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:05:59.942Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:05:59.942Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:00.157Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:00.158Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:00.158Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:00.158Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:00.158Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:00.204Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:00.204Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:28.824Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:28.824Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:28.825Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:29.060Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:29.060Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:29.836Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:29.837Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:29.837Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:30.336Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:06:30.342Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:30.400Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:30.401Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:30.401Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:30.401Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:30.401Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:30.753Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:30.753Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:30.914Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:30.914Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:32.295Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:32.296Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.297Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:32.298Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:06:32.300Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:32.713Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:32.714Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:06:32.714Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.714Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:06:32.715Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:06:32.898Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:32.898Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:06:33.151Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:06:33.151Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:02.025Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:02.025Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:02.025Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:02.025Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:02.026Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:02.026Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:02.026Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:02.026Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:02.493Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:02.493Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:03.524Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:03.524Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.524Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.524Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:03.525Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:03.525Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:03.525Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.525Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:03.538Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:07:03.544Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:07:03.987Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:03.987Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:03.987Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.987Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.988Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:03.988Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:03.988Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:03.988Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:03.988Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:03.989Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:07:03.992Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T18:07:04.014Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T18:07:04.143Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:07:04.144Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:07:04.379Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:04.380Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:04.380Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:04.380Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:04.380Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:04.380Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:04.381Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:04.381Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:04.381Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:04.381Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:04.547Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:04.547Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:04.702Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:04.703Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:36.885Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:37.601Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:37.602Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:37.898Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:37.898Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:37.898Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:37.899Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:37.899Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:37.899Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:37.899Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:37.899Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:38.046Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:38.046Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:38.416Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:38.416Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:38.417Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:38.566Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:38.566Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:40.828Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:40.829Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:40.829Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:40.830Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:07:40.831Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:07:41.182Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:41.182Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:41.183Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:41.183Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:41.183Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:41.183Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:41.183Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:07:41.184Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:41.184Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:07:41.185Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:07:41.394Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:41.394Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:07:41.633Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:07:41.633Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:12.294Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:12.516Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:12.516Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:13.293Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:13.293Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.293Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.294Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:13.294Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:13.294Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:13.294Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.294Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:13.296Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:13.525Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:13.529Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:08:13.790Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:08:14.126Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:08:14.126Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:14.127Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:08:14.131Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:08:14.565Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:08:14.566Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:08:14.920Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:14.921Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:08:15.279Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:08:15.279Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:34.694Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:23:34.694Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:34.694Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:34.947Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:23:34.947Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:34.947Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:23:34.947Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:34.948Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:34.992Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:23:34.992Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:35.701Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:23:35.701Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:35.701Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:35.854Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:23:35.855Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:35.855Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:23:35.855Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:35.855Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:35.880Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:23:35.881Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:36.261Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:23:36.262Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:36.262Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:36.266Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:23:36.700Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:36.700Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:36.700Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:23:36.706Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:23:36.835Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:23:36.835Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:23:36.835Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:23:36.872Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:23:36.872Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:23:37.114Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:37.114Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:23:37.115Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:23:37.139Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:37.139Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:23:37.166Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:23:37.166Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:08.552Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:24:08.552Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:08.552Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:08.552Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:24:08.552Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:08.553Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:24:08.553Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:08.553Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:08.728Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:24:08.728Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.064Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:10.076Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:24:10.077Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T18:24:10.079Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T18:24:10.481Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:24:10.481Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:24:10.481Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:24:10.481Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:24:10.481Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.482Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T18:24:10.483Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T18:24:10.483Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T18:24:10.677Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:24:10.677Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T18:24:10.893Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:10.893Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T18:24:11.046Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T18:24:11.047Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:16.626Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:16.627Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:16.627Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:16.799Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:16.799Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:16.799Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:16.799Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:16.799Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:16.826Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:16.827Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:17.620Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:17.620Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:17.620Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:17.830Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:17.830Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:17.830Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:17.830Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:17.830Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:17.912Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:17.912Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.140Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:18.140Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.140Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.182Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.271Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.271Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.272Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.456Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.456Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.456Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.480Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.480Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.502Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:18.502Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.650Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:18.650Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.650Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.670Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.782Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.782Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.782Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.916Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.917Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:18.917Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:18.957Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.957Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:18.980Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:18.980Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:50.491Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:50.492Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:50.492Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:50.850Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:50.850Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:51.501Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:51.501Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.501Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.501Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:51.501Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:51.502Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:51.502Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.502Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:51.510Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:51.844Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:51.845Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:52.007Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:18:52.015Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:18:52.075Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:52.075Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:52.075Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.076Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:52.077Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:18:52.231Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.231Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.579Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:52.580Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:18:52.584Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.585Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:18:52.790Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:18:52.791Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:24.980Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:24.980Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:24.980Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:24.981Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:24.981Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:24.981Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:24.981Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:24.981Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:25.151Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:25.152Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:25.985Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:25.985Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:25.986Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:25.986Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:25.986Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:25.987Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:25.987Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:25.987Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:26.227Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:26.227Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:26.525Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:26.525Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:26.526Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:26.874Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:26.874Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.277Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:27.279Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:19:27.281Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:19:27.490Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:19:27.490Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:19:27.490Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.491Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:19:27.492Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:19:27.672Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.673Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:19:27.939Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:19:27.940Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:48.181Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:48.181Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:48.181Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:48.187Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:48.187Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:48.187Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:48.187Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:48.187Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:48.624Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:48.625Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:49.181Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:49.181Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.181Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.183Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:49.183Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:49.183Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:49.183Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.183Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:49.186Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:32:49.201Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:32:49.535Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:49.535Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:49.535Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.535Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.535Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:49.536Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:49.536Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:49.536Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.536Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:49.536Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:49.783Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:49.783Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:50.150Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:32:50.165Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:50.331Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:50.332Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:32:50.332Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:50.332Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:32:50.332Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:32:50.483Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:50.483Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:32:50.726Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:32:50.726Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:22.468Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:22.468Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:22.469Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:22.887Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:22.887Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:22.887Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:22.887Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:22.887Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:22.911Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:22.911Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:23.467Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:23.467Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:23.467Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:23.473Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:33:23.474Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:23.621Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:23.622Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:33:23.622Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T20:33:23.961Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T20:33:24.017Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.017Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T20:33:24.018Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T20:33:24.367Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.367Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-14T20:33:24.367Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-14T20:33:24.391Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.391Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.598Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:24.598Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:33:24.598Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.643Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:24.644Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:33:24.648Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:24.672Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:24.672Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:24.705Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:24.705Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:24.922Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:24.922Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:24.922Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:24.922Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:24.922Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:24.947Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:24.947Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:56.967Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:57.358Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:57.358Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:58.462Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:58.462Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.462Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.462Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:58.462Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:58.463Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:58.463Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.463Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:58.465Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:58.930Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:58.931Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.084Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:59.084Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:59.226Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.227Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:59.229Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:33:59.231Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:33:59.579Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:59.580Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:33:59.580Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.580Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:33:59.580Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:33:59.994Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:33:59.994Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:34:00.213Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:34:00.213Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:25.268Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:25.268Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:25.268Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:25.273Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:25.273Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:25.273Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:25.273Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:25.274Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:25.644Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:25.644Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:26.280Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:26.281Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:26.281Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:26.313Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:26.313Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:26.313Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:26.313Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:26.313Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:26.344Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:26.344Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:27.268Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:27.268Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.268Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.269Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:27.269Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:27.269Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:27.269Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.269Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:27.272Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:45:27.296Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:27.429Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:27.430Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:27.430Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.430Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:27.430Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:45:27.565Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.566Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:27.718Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:27.718Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:59.979Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:59.979Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:59.979Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:59.980Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:45:59.980Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:45:59.980Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:45:59.980Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:45:59.980Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:00.360Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:00.360Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:00.988Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:00.989Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:00.992Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:46:01.135Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.136Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.160Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:01.160Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:01.489Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:01.490Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.490Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:01.641Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:01.641Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:03.179Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:03.180Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:46:03.581Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:46:03.582Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:33.581Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:33.581Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:33.581Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:33.752Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:33.752Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:33.752Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:33.752Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:33.752Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:33.782Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:33.782Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:34.603Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:34.603Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:34.603Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:34.998Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:34.998Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:34.998Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:34.999Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:34.999Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:35.035Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:35.035Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:35.091Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:35.091Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:35.091Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:35.092Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:35.092Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:35.092Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:51:35.092Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:35.092Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:35.144Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:51:35.146Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:51:35.221Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:35.222Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:35.556Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:35.556Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:35.556Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:51:35.623Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:51:35.706Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:35.706Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:51:35.707Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:51:35.742Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:35.742Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:36.081Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:36.081Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:51:36.082Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:51:36.113Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:36.113Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:51:36.145Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:51:36.146Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:07.946Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:07.947Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:07.947Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:08.361Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:08.361Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:08.957Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:08.957Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:08.957Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:08.957Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:08.958Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:08.958Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:08.958Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:08.958Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:08.962Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:09.357Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.357Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.357Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:09.357Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:09.358Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:09.358Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.358Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:09.362Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:52:09.457Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:52:09.508Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:09.508Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.509Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:09.510Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:09.848Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:09.849Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:09.928Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:10.193Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:10.605Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:10.605Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:42.423Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:42.423Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:42.423Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:42.423Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:42.424Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:42.424Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:42.424Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:42.424Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:42.631Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:42.631Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:43.938Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:43.938Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:43.938Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:43.938Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:43.938Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:43.939Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:43.939Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:43.939Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:44.279Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:44.279Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:45.137Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:45.138Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:45.483Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:45.483Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:46.797Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:46.797Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:46.797Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:46.797Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:46.797Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:46.798Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:46.798Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:46.798Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:46.800Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T20:52:46.802Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:47.198Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:47.199Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T20:52:47.199Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:47.199Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T20:52:47.199Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T20:52:47.532Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:47.532Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T20:52:47.938Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T20:52:47.939Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:05.431Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:05.431Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:05.431Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:05.775Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:05.775Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:05.775Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:05.775Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:05.776Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:05.797Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:05.797Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:08.925Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:08.925Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:08.925Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.128Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:09.128Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:09.129Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:09.129Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.129Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.148Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:09.148Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:09.396Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:09.396Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.396Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.520Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:09.520Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:09.520Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:09.520Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.521Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:09.550Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:09.550Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:10.158Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:16:10.158Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:10.158Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:10.161Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:16:10.308Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:10.308Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:10.308Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:16:10.650Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:10.650Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:16:10.650Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:16:10.683Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:10.683Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:16:10.716Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:16:10.716Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:22:59.445Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:22:59.445Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:22:59.445Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:22:59.450Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:22:59.451Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:22:59.451Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:22:59.451Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:22:59.451Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:22:59.629Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:22:59.629Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:00.481Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:00.481Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.481Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.487Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:00.488Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:00.488Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:00.488Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.488Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.694Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:00.694Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:00.988Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:00.988Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.988Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.990Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:00.990Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:00.990Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:00.990Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:00.990Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:01.016Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:01.115Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.116Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.242Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:01.242Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:01.474Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:01.474Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.474Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.704Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:01.704Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:01.704Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:01.705Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.705Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:01.723Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:01.723Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:33.061Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:33.061Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:33.062Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:33.470Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:33.470Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.061Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:34.062Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.062Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.374Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:34.375Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.546Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:34.546Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.546Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.547Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:34.547Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.547Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:34.547Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.547Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.563Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:34.879Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:35.036Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:23:35.135Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:35.135Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:35.136Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:35.136Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:23:35.136Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:23:35.136Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:35.136Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:23:35.363Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:23:35.363Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:05.803Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:05.803Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:05.803Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:05.803Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:05.804Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:05.804Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:05.804Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:05.804Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:06.201Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:06.201Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:06.808Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:06.808Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:06.808Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.147Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.147Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.148Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.148Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.148Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.173Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.173Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.319Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.319Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.319Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.319Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.320Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.320Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.320Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.320Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.335Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:07.449Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.450Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.458Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:07.698Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.698Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.698Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.698Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.699Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.699Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.699Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.703Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:07.899Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.899Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.899Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:07.899Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:07.900Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:07.900Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:07.900Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:08.091Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:08.091Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:39.518Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:39.749Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:39.749Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:40.531Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:40.531Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.531Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.531Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:40.531Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:40.532Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:40.532Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.532Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:40.533Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:40.866Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.866Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.866Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:40.866Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:40.867Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:40.867Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:40.867Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:41.026Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:41.267Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.267Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.268Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:41.268Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:41.268Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:41.268Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.268Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:41.272Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-14T21:24:41.518Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-14T21:24:41.701Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:41.701Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.702Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-14T21:24:41.703Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-14T21:24:41.851Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:41.851Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-14T21:24:42.042Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-14T21:24:42.042Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-16T16:23:01.883Z"}
+{"level":"info","message":"CoinGecko service initialized with 2 API keys","timestamp":"2025-07-16T16:29:37.082Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:51.831Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:32:51.831Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:51.831Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:52.047Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:32:52.047Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:52.047Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:32:52.047Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:52.047Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:52.077Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:32:52.078Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:52.373Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:32:52.374Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:52.374Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:52.396Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:32:52.400Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:52.569Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:52.569Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:32:52.570Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-16T16:32:52.851Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-16T16:32:53.017Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.018Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-16T16:32:53.018Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-16T16:32:53.098Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.098Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-16T16:32:53.099Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-16T16:32:53.130Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.130Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.264Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.264Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:32:53.265Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.297Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.297Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:32:53.316Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.336Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.336Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:32:53.361Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:32:53.366Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.366Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.430Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:53.430Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:53.431Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:53.794Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:53.794Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:32:53.795Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:32:54.139Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:54.139Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:32:54.175Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:32:54.175Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:25.546Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:25.546Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.547Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:25.553Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:33:25.556Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:33:25.902Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:25.902Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:25.902Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.902Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.903Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:25.903Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:25.903Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:25.903Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:25.904Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:25.904Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:26.119Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:26.119Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:26.145Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:26.146Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:27.256Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:27.256Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.256Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.256Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:27.256Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:27.257Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:27.257Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.257Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:27.259Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:33:27.260Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-16T16:33:27.261Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-16T16:33:27.514Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:33:27.514Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:33:27.515Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:27.515Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:27.515Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.515Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.515Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:27.516Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:27.516Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:33:27.516Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.516Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:33:27.516Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:33:27.517Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:33:27.760Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:27.760Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:33:27.912Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:27.912Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:33:28.063Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:33:28.063Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.531Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:02.536Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:34:02.537Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:34:02.785Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:02.785Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:02.785Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.785Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.785Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:02.786Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:02.786Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:02.786Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:02.786Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:02.786Z"}
+{"level":"info","message":"Request queued. Queue length: 2","timestamp":"2025-07-16T16:34:03.014Z"}
+{"level":"info","message":"Request queued. Queue length: 3","timestamp":"2025-07-16T16:34:03.044Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 3","timestamp":"2025-07-16T16:34:03.133Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:34:03.133Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 2","timestamp":"2025-07-16T16:34:03.373Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:03.373Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:03.374Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:03.374Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:03.374Z"}
+{"error":"coin not found","level":"error","message":"CoinGecko coin data request failed:","timestamp":"2025-07-16T16:34:03.554Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:03.555Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:03.555Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:03.555Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:03.703Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:03.704Z"}
+{"error":"coin not found","level":"error","message":"CoinGecko market metrics request failed:","timestamp":"2025-07-16T16:34:03.874Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:03.874Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:03.874Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.356Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:04.359Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:04.502Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.502Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.502Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:04.502Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:04.503Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:04.503Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.503Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:04.643Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:04.643Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:06.479Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:06.479Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:06.479Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:06.479Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:06.480Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:06.480Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:06.480Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:06.480Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:06.637Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:06.637Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:38.604Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:38.604Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:38.604Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:38.604Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:38.604Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:38.605Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:38.605Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:38.605Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:38.981Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:38.981Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:39.620Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.621Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:39.623Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:39.780Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.780Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.780Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:39.781Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:39.781Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:39.781Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.781Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:39.919Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:39.920Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:41.449Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.450Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.858Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:41.858Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:41.862Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:41.862Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.862Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.863Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:41.863Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:41.863Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:41.863Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:41.864Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:41.914Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 1","timestamp":"2025-07-16T16:34:42.420Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:42.420Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:42.420Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:42.421Z"}
+{"level":"info","message":"Request queued. Queue length: 1","timestamp":"2025-07-16T16:34:42.421Z"}
+{"level":"info","message":"Processing queue. Items in queue: 1","timestamp":"2025-07-16T16:34:42.421Z"}
+{"level":"info","message":"Making CoinGecko request with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:42.421Z"}
+{"level":"info","message":"CoinGecko request successful with key 1. Queue remaining: 0","timestamp":"2025-07-16T16:34:42.771Z"}
+{"level":"info","message":"Queue processing complete","timestamp":"2025-07-16T16:34:42.771Z"}
