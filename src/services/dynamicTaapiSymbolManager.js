@@ -1,4 +1,4 @@
-// Dynamic TAAPI Symbol Manager with Live API Integration
+// Dynamic TAAPI Symbol Manager with Pro Plan Support
 // File: src/services/dynamicTaapiSymbolManager.js
 
 const axios = require('axios');
@@ -9,16 +9,21 @@ class DynamicTaapiSymbolManager {
     this.secret = taapiSecret;
     this.baseURL = 'https://api.taapi.io';
     
+    // 🔥 CRITICAL FIX: Read plan mode from environment
+    this.isFreePlanMode = process.env.TAAPI_FREE_PLAN_MODE === 'true';
+    this.enableBulkQuery = process.env.TAAPI_BULK_QUERY_ENABLED !== 'false';
+    
     // Dynamic symbol lists - fetched from TAAPI API
     this.supportedSymbols = new Set();
     this.allAvailableSymbols = new Set();
     
     // Plan detection
-    this.planType = 'unknown'; // 'free', 'demo', 'pro', etc.
+    this.planType = this.isFreePlanMode ? 'free' : 'pro';
     this.planLimitations = {};
     
-    // 🚨 HARDCODED FREE PLAN SUPPORTED SYMBOLS
-    this.FREE_PLAN_SUPPORTED = new Set([
+    // 🔥 CRITICAL FIX: Only use hardcoded list if explicitly in free plan mode
+    if (this.isFreePlanMode) {
+      this.FREE_PLAN_SUPPORTED = new Set([
         'BTCUSDT',
         'ETHUSDT', 
         'XRPUSDT',
@@ -26,35 +31,68 @@ class DynamicTaapiSymbolManager {
         'XMRUSDT'
       ]);
       
-      // TAAPI format mapping
       this.TAAPI_FORMAT_MAP = {
         'BTCUSDT': 'BTC/USDT',
         'ETHUSDT': 'ETH/USDT',
         'XRPUSDT': 'XRP/USDT', 
         'LTCUSDT': 'LTC/USDT',
         'XMRUSDT': 'XMR/USDT'
-      }
+      };
+      
+      logger.info('🚨 FREE PLAN MODE: Limited to 5 symbols');
+    } else {
+      // Pro plan mode - no hardcoded limitations
+      this.FREE_PLAN_SUPPORTED = new Set(); // Empty set for pro plan
+      this.TAAPI_FORMAT_MAP = {};
+      
+      logger.info('🚀 PRO PLAN MODE: All symbols supported');
+    }
 
     // Cache settings
-    this.symbolCacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+    this.symbolCacheExpiry = this.isFreePlanMode ? 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000; // 24h for free, 4h for pro
     this.lastSymbolFetch = 0;
     
     // Validation cache
     this.validationCache = new Map();
     this.blacklistedSymbols = new Set();
     
-    // Initialize with known fallbacks
-    this.initializeFallbackSymbols();
-    
-    logger.info('🎯 Free Plan Symbol Manager initialized with 5 supported symbols');
+    // Initialize
+    this.initialize();
+  }
+
+  async initialize() {
+    if (this.isFreePlanMode) {
+      this.initializeFallbackSymbols();
+      logger.info('📦 Free Plan: Initialized with 5 fallback symbols');
+    } else {
+      // Pro plan: Try to fetch all symbols immediately
+      logger.info('🔍 Pro Plan: Fetching all supported symbols...');
+      try {
+        await this.fetchSupportedSymbols(true);
+      } catch (error) {
+        logger.warn('⚠️ Could not fetch symbols on startup, will try later:', error.message);
+        // Set some common symbols as fallback for pro plan
+        this.initializeProPlanFallback();
+      }
+    }
   }
 
   initializeFallbackSymbols() {
     // Known free plan symbols as fallback
     const freePlanSymbols = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'LTCUSDT', 'XMRUSDT'];
     freePlanSymbols.forEach(symbol => this.supportedSymbols.add(symbol));
-    
-    logger.info(`📦 Initialized with ${freePlanSymbols.length} fallback symbols`);
+  }
+
+  initializeProPlanFallback() {
+    // Common symbols as fallback for pro plan
+    const commonSymbols = [
+      'BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'LTCUSDT', 'XMRUSDT',
+      'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'MATICUSDT', 'DOTUSDT',
+      'AVAXUSDT', 'LINKUSDT', 'UNIUSDT', 'ATOMUSDT', 'NEARUSDT',
+      'SOLUSDT', 'ORDIUSDT', 'SUIUSDT', 'AAVEUSDT', 'MKRUSDT'
+    ];
+    commonSymbols.forEach(symbol => this.supportedSymbols.add(symbol));
+    logger.info(`📦 Pro Plan Fallback: Initialized with ${commonSymbols.length} common symbols`);
   }
 
   /**
@@ -69,8 +107,14 @@ class DynamicTaapiSymbolManager {
       return Array.from(this.supportedSymbols);
     }
 
+    // Skip API fetch if in free plan mode (use hardcoded list)
+    if (this.isFreePlanMode) {
+      logger.debug('Free plan mode: Using hardcoded symbol list');
+      return Array.from(this.FREE_PLAN_SUPPORTED);
+    }
+
     try {
-      logger.info('🔍 Fetching supported symbols from TAAPI API...');
+      logger.info('🔍 Fetching supported symbols from TAAPI API (Pro Plan)...');
       
       const response = await axios.get(`${this.baseURL}/exchange-symbols`, {
         params: {
@@ -82,7 +126,7 @@ class DynamicTaapiSymbolManager {
 
       if (response.status === 200 && response.data) {
         const symbols = response.data;
-        logger.info(`📡 TAAPI API returned ${symbols.length} symbols`);
+        logger.info(`📡 TAAPI API returned ${symbols.length} symbols (Pro Plan)`);
         
         // Update our sets
         this.allAvailableSymbols.clear();
@@ -98,16 +142,17 @@ class DynamicTaapiSymbolManager {
         this.lastSymbolFetch = now;
         this.detectPlanType(symbols.length);
         
-        logger.info(`✅ Updated symbol list: ${this.supportedSymbols.size} symbols supported`);
+        logger.info(`✅ Pro Plan: Updated symbol list with ${this.supportedSymbols.size} symbols`);
         return Array.from(this.supportedSymbols);
       }
       
     } catch (error) {
       logger.error(`❌ Failed to fetch symbols from TAAPI: ${error.message}`);
       
-      // If it's a 403, we know it's likely a free plan
+      // If it's a 403, might be a plan limitation
       if (error.response?.status === 403) {
-        this.handleFreePlanDetection(error);
+        logger.warn('🚨 TAAPI returned 403 - check your plan status');
+        this.handleApiError(error);
       }
       
       // Return current symbols (fallback)
@@ -116,28 +161,17 @@ class DynamicTaapiSymbolManager {
   }
 
   /**
-   * Handle free plan detection from API response
+   * Handle API errors and plan detection
    */
-  handleFreePlanDetection(error) {
+  handleApiError(error) {
     const errorMessage = error.response?.data?.error || error.response?.data?.errors?.[0] || '';
     
     if (errorMessage.includes('Free plans only permits')) {
-      this.planType = 'free';
+      logger.warn('🚨 API indicates free plan limitations despite pro plan configuration');
+      logger.warn('Check your TAAPI plan status at taapi.io');
       
-      // Extract allowed symbols from error message
-      const symbolMatch = errorMessage.match(/\[(.*?)\]/);
-      if (symbolMatch) {
-        const allowedSymbols = symbolMatch[1].split(',').map(s => s.trim());
-        
-        this.supportedSymbols.clear();
-        allowedSymbols.forEach(symbol => {
-          const standardSymbol = symbol.replace('/', '');
-          this.supportedSymbols.add(standardSymbol);
-        });
-        
-        logger.warn(`🚫 Free plan detected - limited to ${this.supportedSymbols.size} symbols`);
-        logger.info(`✅ Free plan symbols: ${Array.from(this.supportedSymbols).join(', ')}`);
-      }
+      // Don't automatically switch to free plan mode - log warning instead
+      logger.warn('⚠️ Continuing with pro plan configuration as requested');
     }
   }
 
@@ -145,7 +179,7 @@ class DynamicTaapiSymbolManager {
    * Detect plan type based on symbol count
    */
   detectPlanType(symbolCount) {
-    if (symbolCount <= 5) {
+    if (this.isFreePlanMode) {
       this.planType = 'free';
       this.planLimitations = {
         symbols: 5,
@@ -155,14 +189,14 @@ class DynamicTaapiSymbolManager {
     } else if (symbolCount <= 100) {
       this.planType = 'starter';
       this.planLimitations = {
-        symbols: 100,
+        symbols: symbolCount,
         requests_per_minute: 30,
         requests_per_month: 10000
       };
     } else {
       this.planType = 'pro';
       this.planLimitations = {
-        symbols: 'unlimited',
+        symbols: symbolCount,
         requests_per_minute: 120,
         requests_per_month: 'unlimited'
       };
@@ -172,90 +206,46 @@ class DynamicTaapiSymbolManager {
   }
 
   /**
-   * Smart symbol validation with live testing
-   */
-  async validateSymbolLive(symbol) {
-    const cacheKey = `validate_${symbol}`;
-    const cached = this.validationCache.get(cacheKey);
-    
-    // Check cache first (valid for 1 hour)
-    if (cached && (Date.now() - cached.timestamp) < 3600000) {
-      return cached.result;
-    }
-
-    // Check blacklist
-    if (this.blacklistedSymbols.has(symbol)) {
-      return { supported: false, reason: 'blacklisted', source: 'cache' };
-    }
-
-    try {
-      const taapiSymbol = this.convertToTaapiFormat(symbol);
-      
-      // Try a simple RSI request to test symbol
-      const response = await axios.get(`${this.baseURL}/rsi`, {
-        params: {
-          secret: this.secret,
-          exchange: 'binance',
-          symbol: taapiSymbol,
-          interval: '1h'
-        },
-        timeout: 10000
-      });
-
-      if (response.status === 200) {
-        const result = { supported: true, reason: 'live_validated', source: 'api_test' };
-        this.supportedSymbols.add(symbol);
-        this.validationCache.set(cacheKey, { result, timestamp: Date.now() });
-        return result;
-      }
-      
-    } catch (error) {
-      let result;
-      
-      if (error.response?.status === 403) {
-        // Symbol not supported or plan limitation
-        result = { 
-          supported: false, 
-          reason: 'plan_limitation', 
-          source: 'api_error',
-          message: error.response?.data?.errors?.[0] || 'Access denied'
-        };
-        this.blacklistedSymbols.add(symbol);
-      } else if (error.response?.status === 400) {
-        // Bad symbol format
-        result = { 
-          supported: false, 
-          reason: 'invalid_symbol', 
-          source: 'api_error',
-          message: 'Symbol not available on exchange'
-        };
-        this.blacklistedSymbols.add(symbol);
-      } else {
-        // Other error - don't cache, might be temporary
-        result = { 
-          supported: false, 
-          reason: 'api_error', 
-          source: 'temporary_error',
-          message: error.message
-        };
-      }
-      
-      if (result.reason !== 'api_error') {
-        this.validationCache.set(cacheKey, { result, timestamp: Date.now() });
-      }
-      
-      return result;
-    }
-  }
-
-  /**
-   * Smart symbol routing with comprehensive checking
+   * Smart symbol routing with pro plan support
    */
   async routeSymbolRequest(symbol) {
     try {
-      // 🚨 STEP 1: Check if symbol is in free plan whitelist
+      // 🔥 CRITICAL FIX: Handle pro plan mode
+      if (!this.isFreePlanMode) {
+        // Pro plan mode - check if symbol is in our supported list
+        if (this.supportedSymbols.size === 0) {
+          // Try to fetch symbols if we don't have any
+          await this.fetchSupportedSymbols();
+        }
+        
+        // For pro plan, assume symbol is supported unless proven otherwise
+        if (this.supportedSymbols.has(symbol) || this.supportedSymbols.size === 0) {
+          logger.info(`✅ PRO PLAN: Symbol ${symbol} supported - using TAAPI`);
+          
+          return {
+            strategy: 'taapi_direct',
+            symbol: this.convertToTaapiFormat(symbol),
+            source: 'pro_plan',
+            message: `${symbol} supported on pro plan`,
+            supported: true
+          };
+        } else {
+          // Symbol not in list but pro plan - might be new symbol
+          logger.info(`⚠️ PRO PLAN: Symbol ${symbol} not in cached list - attempting TAAPI anyway`);
+          
+          return {
+            strategy: 'taapi_direct',
+            symbol: this.convertToTaapiFormat(symbol),
+            source: 'pro_plan_uncached',
+            message: `${symbol} attempting on pro plan`,
+            supported: true
+          };
+        }
+      }
+      
+      // Free plan mode - use original logic
       if (this.FREE_PLAN_SUPPORTED.has(symbol)) {
-        logger.info(`✅ Symbol ${symbol} is FREE PLAN SUPPORTED - using TAAPI`);
+        logger.info(`✅ FREE PLAN: Symbol ${symbol} supported - using TAAPI`);
         
         return {
           strategy: 'taapi_direct',
@@ -265,8 +255,7 @@ class DynamicTaapiSymbolManager {
           supported: true
         };
       } else {
-        // 🎯 STEP 2: Symbol not supported - use fallback but still deliver analysis
-        logger.info(`⏭️ Symbol ${symbol} NOT in free plan (${Array.from(this.FREE_PLAN_SUPPORTED).join(', ')}) - using fallback analysis`);
+        logger.info(`⏭️ FREE PLAN: Symbol ${symbol} NOT in free plan (${Array.from(this.FREE_PLAN_SUPPORTED).join(', ')}) - using fallback analysis`);
         
         return {
           strategy: 'fallback_only',
@@ -291,54 +280,37 @@ class DynamicTaapiSymbolManager {
   }
 
   isSymbolSupported(symbol) {
+    if (!this.isFreePlanMode) {
+      // Pro plan - check against fetched symbols or assume supported
+      return this.supportedSymbols.has(symbol) || this.supportedSymbols.size === 0;
+    }
     return this.FREE_PLAN_SUPPORTED.has(symbol);
   }
 
   getSupportedSymbols() {
+    if (!this.isFreePlanMode) {
+      return Array.from(this.supportedSymbols);
+    }
     return Array.from(this.FREE_PLAN_SUPPORTED);
   }
 
-  // Get symbol stats for the free plan
   async getSymbolStats() {
-    const supported = Array.from(this.FREE_PLAN_SUPPORTED);
+    if (!this.isFreePlanMode) {
+      // Refresh symbols if needed for pro plan
+      await this.fetchSupportedSymbols();
+    }
+    
+    const supported = this.getSupportedSymbols();
     const blacklisted = Array.from(this.blacklistedSymbols);
     
     return {
-      plan_type: 'free',
-      plan_limitations: {
-        symbols: '5 major pairs only',
-        requests_per_minute: 1,
-        requests_per_month: 'limited'
-      },
+      plan_type: this.planType,
+      plan_mode: this.isFreePlanMode ? 'free' : 'pro',
+      plan_limitations: this.planLimitations,
       supported_symbols_count: supported.length,
-      supported_symbols: supported,
+      supported_symbols: supported.slice(0, 20), // First 20 for display
       blacklisted_count: blacklisted.length,
       blacklisted_symbols: blacklisted,
-      total_available_symbols: 5,
-      cache_entries: 0,
-      last_update: new Date().toISOString(),
-      recommendations: [
-        '💡 Free plan supports 5 symbols: BTC, ETH, XRP, LTC, XMR',
-        '🚀 Upgrade for access to 1400+ symbols',
-        '⭐ All other symbols receive enhanced fallback analysis'
-      ]
-    };
-  }
-
-
-  /**
-   * Get comprehensive symbol statistics
-   */
-  async getSymbolStats() {
-    // Refresh symbols if needed
-    await this.fetchSupportedSymbols();
-    
-    return {
-      plan_type: this.planType,
-      plan_limitations: this.planLimitations,
-      supported_symbols_count: this.supportedSymbols.size,
-      supported_symbols: Array.from(this.supportedSymbols).slice(0, 20), // First 20
-      blacklisted_count: this.blacklistedSymbols.size,
       cache_entries: this.validationCache.size,
       last_update: new Date(this.lastSymbolFetch).toISOString(),
       recommendations: this.getRecommendations()
@@ -348,17 +320,16 @@ class DynamicTaapiSymbolManager {
   getRecommendations() {
     const recommendations = [];
     
-    if (this.planType === 'free') {
-      recommendations.push('💡 Free plan detected - consider upgrading for more symbols');
-      recommendations.push(`🎯 Focus trading on: ${Array.from(this.supportedSymbols).join(', ')}`);
+    if (this.isFreePlanMode) {
+      recommendations.push('💡 Free plan mode active - only 5 symbols supported');
+      recommendations.push('🚀 Set TAAPI_FREE_PLAN_MODE=false for pro plan features');
+    } else {
+      recommendations.push('🚀 Pro plan mode active - all symbols supported');
+      recommendations.push(`🎯 ${this.supportedSymbols.size} symbols available`);
     }
     
     if (this.blacklistedSymbols.size > 10) {
-      recommendations.push('⚠️ Many symbols unsupported - optimize symbol selection');
-    }
-    
-    if (this.supportedSymbols.size < 10) {
-      recommendations.push('🔄 Limited symbol coverage - refresh symbol list or upgrade plan');
+      recommendations.push('⚠️ Many symbols unsupported - check symbol names');
     }
     
     return recommendations;
@@ -373,6 +344,13 @@ class DynamicTaapiSymbolManager {
 
   convertToTaapiFormat(symbol) {
     const normalized = this.normalizeSymbol(symbol);
+    
+    // Check if we have a specific mapping (free plan)
+    if (this.TAAPI_FORMAT_MAP[normalized]) {
+      return this.TAAPI_FORMAT_MAP[normalized];
+    }
+    
+    // Default conversion for pro plan
     if (normalized.endsWith('USDT')) {
       const base = normalized.replace('USDT', '');
       return `${base}/USDT`;
@@ -391,27 +369,19 @@ class DynamicTaapiSymbolManager {
   }
 
   /**
-   * Get plan upgrade suggestions
+   * Get plan configuration info
    */
-  getPlanUpgradeInfo() {
+  getPlanInfo() {
     return {
       current_plan: this.planType,
+      plan_mode: this.isFreePlanMode ? 'free' : 'pro',
+      environment_setting: process.env.TAAPI_FREE_PLAN_MODE,
       current_symbols: this.supportedSymbols.size,
-      upgrade_benefits: {
-        starter: {
-          symbols: '100+',
-          requests: '30/min',
-          cost: 'Check TAAPI pricing'
-        },
-        pro: {
-          symbols: 'All 1460+',
-          requests: '120/min', 
-          cost: 'Check TAAPI pricing'
-        }
-      },
-      recommendation: this.planType === 'free' 
-        ? 'Consider upgrading for better symbol coverage'
-        : 'Current plan provides good symbol coverage'
+      hardcoded_limitations: this.isFreePlanMode,
+      bulk_query_enabled: this.enableBulkQuery,
+      configuration_status: this.isFreePlanMode 
+        ? '🚨 FREE PLAN MODE - Limited functionality'
+        : '🚀 PRO PLAN MODE - Full functionality'
     };
   }
 }

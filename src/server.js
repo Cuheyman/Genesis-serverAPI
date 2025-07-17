@@ -1366,6 +1366,54 @@ class EnhancedAISignalGenerator {
     logger.info('🇩🇰 Enhanced AI Signal Generator initialized with Danish Bull Strategy');
   }
 
+  async enhanceSignalWithTaapi(baseSignal, marketData, symbol, timeframe = '1h', riskLevel = 'balanced') {
+    const startTime = Date.now();
+    
+    try {
+      logger.info(`🔍 DEBUG: enhanceSignalWithTaapi called for ${symbol}`);
+      
+      // Check symbol routing
+      const routing = await this.taapiService.symbolManager.routeSymbolRequest(symbol);
+      
+      if (routing.strategy === 'fallback_only') {
+        logger.info(`⏭️ ${symbol} not supported - ${routing.message}`);
+        return this.createEnhancedSignal(baseSignal, null, symbol, 'unsupported_symbol');
+      }
+      
+      logger.info(`✅ ${symbol} supported - enhancing with TAAPI indicators`);
+      
+      // Get TAAPI indicators
+      const taapiIndicators = await this.taapiService.getBulkIndicators(symbol, timeframe);
+      
+      if (!taapiIndicators || taapiIndicators.isFallbackData) {
+        logger.warn(`⚠️ ${symbol} using fallback data`);
+        return this.createEnhancedSignal(baseSignal, taapiIndicators, symbol, 'fallback_data');
+      }
+      
+      logger.info(`✅ Real TAAPI data received for ${symbol} - generating enhanced signal`);
+      
+      // Generate enhanced signal
+      const enhancedSignal = this.generateEnhancedSignal(baseSignal, taapiIndicators, symbol);
+      
+      // 🇩🇰 CRITICAL: Apply Danish Strategy Filter BEFORE returning
+      const technicalData = {
+        rsi: taapiIndicators.rsi,
+        adx: taapiIndicators.adx,
+        volume_ratio: taapiIndicators.volume_ratio || 1.0
+      };
+      
+      const danishFilteredSignal = this.applyDanishStrategyFilter(enhancedSignal, technicalData, marketData);
+      
+      logger.info(`🇩🇰 Danish Strategy Applied: ${danishFilteredSignal.signal} (${danishFilteredSignal.confidence.toFixed(1)}%)`);
+      
+      return danishFilteredSignal;
+      
+    } catch (error) {
+      logger.error(`enhanceSignalWithTaapi error for ${symbol}:`, error);
+      return this.createEnhancedSignal(baseSignal, null, symbol, 'error');
+    }
+  }
+
   async generateAdvancedSignal(marketData, technicalData, onChainData, requestParams) {
     try {
       // 🇩🇰 DANISH MOMENTUM STRATEGY - PRIMARY SIGNAL GENERATION
@@ -1447,97 +1495,159 @@ class EnhancedAISignalGenerator {
   // DANISH MOMENTUM STRATEGY METHODS
   // ===============================================
 
-  applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
-    try {
-      // Start with the momentum signal
-      let filteredSignal = { ...momentumSignal };
-      
-      // 🇩🇰 RULE 1: IGNORE_BEARISH_SIGNALS - Only allow BUY signals
-      if (this.danishConfig.IGNORE_BEARISH_SIGNALS && momentumSignal.action === 'SELL') {
-        return {
-          ...momentumSignal,
-          signal: 'HOLD',
-          action: 'HOLD',
-          confidence: 0,
-          reasoning: 'Danish strategy: Bearish signals ignored - only bullish entries allowed',
-          danish_filter_applied: 'BEARISH_SIGNAL_FILTERED'
-        };
-      }
-      
-      // 🇩🇰 RULE 2: REQUIRE_VOLUME_CONFIRMATION
-      if (this.danishConfig.REQUIRE_VOLUME_CONFIRMATION) {
-        const hasVolumeConfirmation = momentumSignal.momentum_data?.volume_analysis?.has_volume_confirmation;
-        if (!hasVolumeConfirmation) {
-          return {
-            ...momentumSignal,
-            signal: 'HOLD',
-            action: 'HOLD', 
-            confidence: Math.max(0, momentumSignal.confidence - 30),
-            reasoning: 'Danish strategy: Volume confirmation required but not met',
-            danish_filter_applied: 'VOLUME_CONFIRMATION_REQUIRED'
-          };
-        }
-      }
-      
-      // 🇩🇰 RULE 3: REQUIRE_BREAKOUT_CONFIRMATION
-      if (this.danishConfig.REQUIRE_BREAKOUT_CONFIRMATION) {
-        const hasBreakoutConfirmation = momentumSignal.momentum_data?.breakout_analysis?.has_breakout_confirmation;
-        if (!hasBreakoutConfirmation) {
-          return {
-            ...momentumSignal,
-            signal: 'HOLD',
-            action: 'HOLD',
-            confidence: Math.max(0, momentumSignal.confidence - 25),
-            reasoning: 'Danish strategy: Breakout confirmation required but not met',
-            danish_filter_applied: 'BREAKOUT_CONFIRMATION_REQUIRED'
-          };
-        }
-      }
-      
-      // 🇩🇰 RULE 4: MIN_CONFIDENCE_SCORE
-      if (momentumSignal.confidence < this.danishConfig.MIN_CONFIDENCE_SCORE) {
-        return {
-          ...momentumSignal,
-          signal: 'HOLD',
-          action: 'HOLD',
-          confidence: momentumSignal.confidence,
-          reasoning: `Danish strategy: Confidence ${momentumSignal.confidence}% below minimum ${this.danishConfig.MIN_CONFIDENCE_SCORE}%`,
-          danish_filter_applied: 'MIN_CONFIDENCE_NOT_MET'
-        };
-      }
-      
-      // 🇩🇰 RULE 5: RSI Overbought Avoidance
-      const rsi = technicalData.rsi;
-      if (rsi > this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid) {
-        return {
-          ...momentumSignal,
-          signal: 'HOLD',
-          action: 'HOLD',
-          confidence: Math.max(0, momentumSignal.confidence - 20),
-          reasoning: `Danish strategy: RSI overbought (${rsi.toFixed(1)}) - avoiding late entry`,
-          danish_filter_applied: 'RSI_OVERBOUGHT_AVOIDED'
-        };
-      }
-      
-      // Signal passed all Danish filters - enhance it
-      filteredSignal.danish_strategy_validated = true;
-      filteredSignal.danish_compliance_score = this.calculateDanishComplianceScore(momentumSignal, technicalData);
-      filteredSignal.strategy_type = 'DANISH_MOMENTUM_BULL_STRATEGY';
-      
-      // Boost confidence for excellent signals
-      if (momentumSignal.confluence_score >= this.danishConfig.EXCELLENT_ENTRY_THRESHOLD) {
-        filteredSignal.confidence = Math.min(95, filteredSignal.confidence + 10);
-        filteredSignal.entry_quality = 'EXCELLENT_DANISH_SETUP';
-      }
-      
-      logger.info(`✅ Signal passed all Danish strategy filters (compliance: ${filteredSignal.danish_compliance_score}%)`);
-      return filteredSignal;
-      
-    } catch (error) {
-      logger.error('Danish strategy filter error:', error);
-      return momentumSignal; // Return original signal if filter fails
+  // Fixed Danish Strategy Filter - Insert this into your server.js
+// Replace the existing applyDanishStrategyFilter method
+
+applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
+  try {
+    logger.info(`🇩🇰 APPLYING Danish Strategy Filter for ${marketData.symbol}`);
+    logger.info(`🔍 Initial Signal: ${momentumSignal.signal}, Confidence: ${momentumSignal.confidence}%`);
+    
+    // Extract technical data with null safety
+    const rsi = technicalData?.rsi || momentumSignal?.technical_data?.rsi || 50;
+    const adx = technicalData?.adx || momentumSignal?.technical_data?.adx || 20;
+    const volumeRatio = technicalData?.volume_ratio || momentumSignal?.volume_analysis?.volume_ratio || 1.0;
+    
+    logger.info(`📊 Technical Data: RSI=${rsi}, ADX=${adx}, Volume Ratio=${volumeRatio}`);
+    
+    // 🇩🇰 RULE 1: MINIMUM CONFIDENCE REQUIREMENT (CRITICAL)
+    if (momentumSignal.confidence < this.danishConfig.MIN_CONFIDENCE_SCORE) {
+      logger.info(`❌ DANISH FILTER: Confidence ${momentumSignal.confidence}% < ${this.danishConfig.MIN_CONFIDENCE_SCORE}% minimum`);
+      return {
+        ...momentumSignal,
+        signal: 'HOLD',
+        action: 'HOLD',
+        confidence: momentumSignal.confidence,
+        reasoning: `Danish Strategy: Confidence ${momentumSignal.confidence.toFixed(1)}% below minimum ${this.danishConfig.MIN_CONFIDENCE_SCORE}% - waiting for better setup`,
+        danish_filter_applied: 'MIN_CONFIDENCE_NOT_MET',
+        strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+        entry_quality: 'REJECTED_LOW_CONFIDENCE'
+      };
     }
+
+    // 🇩🇰 RULE 2: RSI OVERBOUGHT AVOIDANCE (CRITICAL)
+    if (rsi > this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid) {
+      logger.info(`❌ DANISH FILTER: RSI ${rsi.toFixed(1)} > ${this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid} (overbought) - avoiding late entry`);
+      return {
+        ...momentumSignal,
+        signal: 'HOLD',
+        action: 'HOLD',
+        confidence: Math.max(25, momentumSignal.confidence - 30),
+        reasoning: `Danish Strategy: RSI overbought (${rsi.toFixed(1)}) - avoiding late entry, waiting for pullback`,
+        danish_filter_applied: 'RSI_OVERBOUGHT_AVOIDED',
+        strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+        entry_quality: 'REJECTED_OVERBOUGHT'
+      };
+    }
+
+    // 🇩🇰 RULE 3: IGNORE ALL BEARISH SIGNALS
+    if (this.danishConfig.IGNORE_BEARISH_SIGNALS && momentumSignal.signal === 'SELL') {
+      logger.info(`❌ DANISH FILTER: SELL signal rejected - only bullish entries allowed`);
+      return {
+        ...momentumSignal,
+        signal: 'HOLD',
+        action: 'HOLD',
+        confidence: 0,
+        reasoning: 'Danish Strategy: Bearish signals ignored - only bullish entries allowed',
+        danish_filter_applied: 'BEARISH_SIGNAL_FILTERED',
+        strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+        entry_quality: 'REJECTED_BEARISH'
+      };
+    }
+
+    // 🇩🇰 RULE 4: VOLUME CONFIRMATION REQUIRED
+    if (this.danishConfig.REQUIRE_VOLUME_CONFIRMATION) {
+      if (volumeRatio < this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min) {
+        logger.info(`❌ DANISH FILTER: Volume ratio ${volumeRatio.toFixed(2)} < ${this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min} required`);
+        return {
+          ...momentumSignal,
+          signal: 'HOLD',
+          action: 'HOLD',
+          confidence: Math.max(20, momentumSignal.confidence - 25),
+          reasoning: `Danish Strategy: Volume confirmation required (${volumeRatio.toFixed(2)}x vs ${this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min}x minimum)`,
+          danish_filter_applied: 'VOLUME_CONFIRMATION_REQUIRED',
+          strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+          entry_quality: 'REJECTED_LOW_VOLUME'
+        };
+      }
+    }
+
+    // 🇩🇰 RULE 5: TREND STRENGTH REQUIREMENT (ADX)
+    const adxMinimum = 25; // Strong trend requirement
+    if (adx < adxMinimum) {
+      logger.info(`❌ DANISH FILTER: ADX ${adx} < ${adxMinimum} (weak trend) - waiting for stronger momentum`);
+      return {
+        ...momentumSignal,
+        signal: 'HOLD',
+        action: 'HOLD',
+        confidence: Math.max(30, momentumSignal.confidence - 20),
+        reasoning: `Danish Strategy: Weak trend strength (ADX: ${adx}) - waiting for stronger momentum (>25)`,
+        danish_filter_applied: 'WEAK_TREND_AVOIDED',
+        strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+        entry_quality: 'REJECTED_WEAK_TREND'
+      };
+    }
+
+    // 🇩🇰 RULE 6: RSI SWEET SPOT CHECK
+    const [rsiMin, rsiMax] = this.danishConfig.MOMENTUM_THRESHOLDS.rsi_momentum_sweet_spot;
+    if (rsi < rsiMin || rsi > rsiMax) {
+      logger.info(`❌ DANISH FILTER: RSI ${rsi.toFixed(1)} outside sweet spot [${rsiMin}-${rsiMax}]`);
+      return {
+        ...momentumSignal,
+        signal: 'HOLD',
+        action: 'HOLD',
+        confidence: Math.max(25, momentumSignal.confidence - 15),
+        reasoning: `Danish Strategy: RSI ${rsi.toFixed(1)} outside optimal range [${rsiMin}-${rsiMax}] - waiting for better entry`,
+        danish_filter_applied: 'RSI_OUTSIDE_SWEETSPOT',
+        strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+        entry_quality: 'REJECTED_RSI_TIMING'
+      };
+    }
+
+    // ✅ SIGNAL PASSED ALL DANISH FILTERS
+    logger.info(`✅ DANISH FILTER: Signal PASSED all filters - generating enhanced signal`);
+    
+    // Calculate Danish compliance score
+    const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
+      rsi, adx, volumeRatio
+    });
+
+    // Enhance the signal with Danish strategy validation
+    const enhancedSignal = {
+      ...momentumSignal,
+      strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+      danish_strategy_validated: true,
+      danish_compliance_score: danishComplianceScore,
+      danish_filter_applied: 'ALL_FILTERS_PASSED',
+      entry_quality: momentumSignal.confidence >= this.danishConfig.EXCELLENT_ENTRY_THRESHOLD ? 
+        'EXCELLENT_DANISH_SETUP' : 'GOOD_DANISH_SETUP',
+      reasoning: `Danish Strategy: High-quality ${momentumSignal.signal} signal (${momentumSignal.confidence.toFixed(1)}% confidence) with volume and momentum confirmation`
+    };
+
+    // Boost confidence for excellent setups
+    if (momentumSignal.confidence >= this.danishConfig.EXCELLENT_ENTRY_THRESHOLD) {
+      enhancedSignal.confidence = Math.min(95, enhancedSignal.confidence + 5);
+      logger.info(`🚀 DANISH BOOST: Excellent setup detected, confidence boosted to ${enhancedSignal.confidence}%`);
+    }
+
+    logger.info(`✅ DANISH RESULT: ${enhancedSignal.signal} signal with ${enhancedSignal.confidence.toFixed(1)}% confidence (Compliance: ${danishComplianceScore}%)`);
+    return enhancedSignal;
+
+  } catch (error) {
+    logger.error('❌ Danish strategy filter error:', error);
+    // Return HOLD signal on filter error to be safe
+    return {
+      signal: 'HOLD',
+      action: 'HOLD',
+      confidence: 20,
+      reasoning: 'Danish strategy filter error - defaulting to HOLD for safety',
+      danish_filter_applied: 'ERROR_HOLD',
+      strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
+      entry_quality: 'ERROR'
+    };
   }
+}
+
 
   async generateDanishAdaptiveSignal(marketData, technicalData, onChainData, offChainData, requestParams) {
     const marketRegime = technicalData.market_regime;
@@ -1696,13 +1806,38 @@ class EnhancedAISignalGenerator {
 
   calculateDanishComplianceScore(signal, technicalData) {
     let score = 0;
+    const { rsi, adx, volumeRatio } = technicalData;
     
-    // Check compliance with each Danish rule
-    if (signal.signal !== 'SELL') score += 20; // Only bullish entries
-    if (signal.confidence >= this.danishConfig.MIN_CONFIDENCE_SCORE) score += 20; // Min confidence
-    if (technicalData.volume_ratio >= this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min) score += 20; // Volume
-    if (technicalData.rsi < this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid) score += 20; // Not overbought
-    if (signal.confluence_score >= this.danishConfig.MIN_CONFLUENCE_SCORE) score += 20; // Confluence
+    // Confidence requirement (25 points)
+    if (signal.confidence >= this.danishConfig.MIN_CONFIDENCE_SCORE) {
+      score += 25;
+    }
+    
+    // RSI not overbought (20 points)
+    if (rsi <= this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid) {
+      score += 20;
+    }
+    
+    // RSI in sweet spot (15 points)
+    const [rsiMin, rsiMax] = this.danishConfig.MOMENTUM_THRESHOLDS.rsi_momentum_sweet_spot;
+    if (rsi >= rsiMin && rsi <= rsiMax) {
+      score += 15;
+    }
+    
+    // Volume confirmation (20 points)
+    if (volumeRatio >= this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min) {
+      score += 20;
+    }
+    
+    // Trend strength (15 points)
+    if (adx >= 25) {
+      score += 15;
+    }
+    
+    // Only bullish signals (5 points)
+    if (signal.signal !== 'SELL') {
+      score += 5;
+    }
     
     return Math.min(100, score);
   }
@@ -2780,6 +2915,7 @@ try {
   taapiService = null;
   enhancedSignalGenerator = null;
 }
+
 
 // ===============================================
 // ENHANCED SIGNAL ENDPOINT (FIXED)
