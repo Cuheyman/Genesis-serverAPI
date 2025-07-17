@@ -1,14 +1,20 @@
 // src/services/enhancedSignalGenerator.js
-const EnhancedTaapiServiceV2 = require('./enhancedTaapiServiceV2');
+const OptimizedTaapiService = require('./optimizedTaapiService');
 const logger = require('../utils/logger');
 
 class EnhancedSignalGenerator {
   constructor(taapiService = null) {
-    // Use provided service or create new V2 service
-    this.taapiService = taapiService || new EnhancedTaapiServiceV2();
+    // 🚀 CRITICAL FIX: Use OptimizedTaapiService for Pro Plan bulk queries
+    this.taapiService = taapiService || new OptimizedTaapiService();
     this.signalCache = new Map();
     this.cacheExpiry = 10 * 60 * 1000; // 10 minutes cache for signals
     
+    // 🔄 Batch processing for Pro Plan optimization
+    this.batchQueue = new Map(); // Queue symbols for batch processing
+    this.batchTimeout = null;
+    this.batchDelay = 100; // 100ms delay to collect symbols for batching
+    this.maxBatchSize = 20; // Pro plan can handle 20 symbols per request
+  
     // 🇩🇰 DANISH STRATEGY CONFIG
     this.danishConfig = {
       IGNORE_BEARISH_SIGNALS: true,
@@ -27,81 +33,27 @@ class EnhancedSignalGenerator {
         breakout_confirmation: 0.5
       }
     };
-    
-    logger.info('🚀 Enhanced Signal Generator V2 initialized with Danish Strategy');
+    logger.info('🔍 DEBUG: Service type:', this.taapiService.constructor.name);
+    logger.info('🔍 DEBUG: isProPlan:', this.taapiService.isProPlan);
+    logger.info('🔍 DEBUG: bulkEnabled:', this.taapiService.bulkEnabled);
+    logger.info('🔍 DEBUG: TAAPI_FREE_PLAN_MODE env:', process.env.TAAPI_FREE_PLAN_MODE);
+    logger.info('🚀 Enhanced Signal Generator V3 initialized with Pro Plan Optimization & Danish Strategy');
   }
 
-  // 🔧 MAIN METHOD: Enhanced Signal Generation with Danish Filter
+  // 🔧 MAIN METHOD: Enhanced Signal Generation with Pro Plan Bulk Query Optimization
   async enhanceSignalWithTaapi(baseSignal, marketData, symbol, timeframe = '1h', riskLevel = 'balanced') {
     const startTime = Date.now();
     
     try {
       logger.info(`🔍 DEBUG: enhanceSignalWithTaapi called for ${symbol}`);
       
-      // Check if symbol should use TAAPI (dynamic routing)
-      const routing = await this.taapiService.symbolManager.routeSymbolRequest(symbol);
-      
-      if (routing.strategy === 'fallback_only') {
-        logger.info(`⏭️ Skipping TAAPI for ${symbol} - ${routing.source}`);
-        return this.createEnhancedSignal(baseSignal, null, symbol, 'symbol_unsupported');
+      // 🚀 OPTIMIZATION: Use batch processing for Pro Plan
+      if (this.taapiService.isProPlan && this.taapiService.bulkEnabled) {
+        return await this.enhanceSignalWithBatchOptimization(baseSignal, marketData, symbol, timeframe, riskLevel, startTime);
       }
       
-      logger.info(`✅ ${symbol} supported - enhancing with TAAPI indicators`);
-      
-      // Get TAAPI indicators using the queue system
-      const taapiIndicators = await this.taapiService.getBulkIndicators(symbol, timeframe);
-      
-      logger.info(`🔍 DEBUG: taapiIndicators received for ${symbol}:`, JSON.stringify(taapiIndicators, null, 2));
-      
-      // Check if we got fallback data
-      if (taapiIndicators && taapiIndicators.isFallbackData) {
-        logger.warn(`TAAPI returned fallback data for ${symbol}, using base signal`);
-        return this.createEnhancedSignal(baseSignal, taapiIndicators, symbol, 'taapi_fallback');
-      }
-      
-      logger.info(`✅ Real TAAPI data received for ${symbol} - generating enhanced signal`);
-      
-      // Generate the initial enhanced signal
-      const enhancedSignal = await this.generateEnhancedSignal(
-        baseSignal, 
-        marketData, 
-        taapiIndicators, 
-        riskLevel
-      );
-      
-      // 🇩🇰 CRITICAL: Apply Danish Strategy Filter BEFORE returning
-      logger.info(`🇩🇰 BEFORE Danish Filter: ${symbol} - ${enhancedSignal.signal} at ${enhancedSignal.confidence}%`);
-      
-      const technicalData = {
-        rsi: taapiIndicators.rsi,
-        adx: taapiIndicators.adx,
-        volume_ratio: taapiIndicators.volume_ratio || 1.0
-      };
-      
-      const danishFilteredSignal = this.applyDanishStrategyFilter(enhancedSignal, technicalData, marketData);
-      
-      logger.info(`🇩🇰 AFTER Danish Filter: ${symbol} - ${danishFilteredSignal.signal} at ${danishFilteredSignal.confidence}%`);
-      logger.info(`🔍 Filter Applied: ${danishFilteredSignal.danish_filter_applied || 'NONE'}`);
-      
-      // Cache the result
-      const cacheKey = `signal_${symbol}_${Math.floor(Date.now() / 300000)}`;
-      this.signalCache.set(cacheKey, {
-        signal: danishFilteredSignal,
-        timestamp: Date.now()
-      });
-      
-      const processingTime = Date.now() - startTime;
-      logger.info(`Enhanced signal completed for ${symbol}`, {
-        signal: danishFilteredSignal.signal,
-        confidence: danishFilteredSignal.confidence,
-        processing_time: processingTime,
-        taapi_used: true,
-        taapi_available: true,
-        data_source: "real_taapi",
-        danish_filter_applied: danishFilteredSignal.danish_filter_applied
-      });
-      
-      return danishFilteredSignal;
+      // 🔄 FALLBACK: Individual processing for free plan or when batch is disabled
+      return await this.enhanceSignalIndividual(baseSignal, marketData, symbol, timeframe, riskLevel, startTime);
       
     } catch (error) {
       logger.error(`❌ DEBUG: Signal enhancement failed for ${symbol}:`, error.message);
@@ -110,6 +62,190 @@ class EnhancedSignalGenerator {
       const fallbackSignal = this.createEnhancedSignal(baseSignal, null, symbol, 'error_fallback');
       return fallbackSignal;
     }
+  }
+
+  // 🚀 PRO PLAN: Batch-optimized signal enhancement
+  async enhanceSignalWithBatchOptimization(baseSignal, marketData, symbol, timeframe, riskLevel, startTime) {
+    // Create a promise for this symbol that will be resolved when batch processes
+    return new Promise((resolve, reject) => {
+      // Add to batch queue
+      this.batchQueue.set(symbol, {
+        baseSignal,
+        marketData,
+        timeframe,
+        riskLevel,
+        startTime,
+        resolve,
+        reject
+      });
+
+      logger.info(`📦 Added ${symbol} to batch queue (${this.batchQueue.size} symbols queued)`);
+
+      // Set up batch processing timer
+      if (this.batchTimeout) {
+        clearTimeout(this.batchTimeout);
+      }
+
+      this.batchTimeout = setTimeout(() => {
+        this.processBatch();
+      }, this.batchDelay);
+
+      // If batch is full, process immediately
+      if (this.batchQueue.size >= this.maxBatchSize) {
+        clearTimeout(this.batchTimeout);
+        this.processBatch();
+      }
+    });
+  }
+
+  // 🔄 BATCH PROCESSOR: Process multiple symbols in single TAAPI request
+  async processBatch() {
+    if (this.batchQueue.size === 0) return;
+
+    const batch = new Map(this.batchQueue);
+    this.batchQueue.clear();
+    this.batchTimeout = null;
+
+    const symbols = Array.from(batch.keys());
+    logger.info(`🚀 Processing batch of ${symbols.length} symbols: ${symbols.join(', ')}`);
+
+    try {
+      // 🔥 CORE: Get indicators for all symbols in single bulk request
+      const bulkResults = await this.taapiService.getBulkIndicatorsOptimized(symbols, '1h', 'binance');
+      
+      // Process each symbol's result
+      for (const [symbol, request] of batch) {
+        try {
+          const taapiIndicators = bulkResults[symbol];
+          
+          if (!taapiIndicators || taapiIndicators.isFallbackData) {
+            logger.warn(`⚠️ Fallback data for ${symbol} in batch`);
+            const fallbackSignal = this.createEnhancedSignal(request.baseSignal, taapiIndicators, symbol, 'taapi_fallback');
+            request.resolve(fallbackSignal);
+            continue;
+          }
+
+          logger.info(`✅ Pro Plan data received for ${symbol} - ${taapiIndicators.realIndicators} indicators`);
+          
+          // Generate enhanced signal
+          const enhancedSignal = await this.generateEnhancedSignal(
+            request.baseSignal, 
+            request.marketData, 
+            taapiIndicators, 
+            request.riskLevel
+          );
+          
+          // 🇩🇰 Apply Danish Strategy Filter
+          const technicalData = {
+            rsi: taapiIndicators.rsi,
+            adx: taapiIndicators.adx,
+            volume_ratio: taapiIndicators.volume_ratio || 1.0
+          };
+          
+          const danishFilteredSignal = this.applyDanishStrategyFilter(enhancedSignal, technicalData, request.marketData);
+          
+          // Log results
+          const processingTime = Date.now() - request.startTime;
+          logger.info(`Enhanced signal completed for ${symbol}`, {
+            signal: danishFilteredSignal.signal,
+            confidence: danishFilteredSignal.confidence,
+            processing_time: processingTime,
+            taapi_used: true,
+            taapi_available: true,
+            data_source: "real_taapi_bulk",
+            danish_filter_applied: danishFilteredSignal.danish_filter_applied
+          });
+          
+          request.resolve(danishFilteredSignal);
+          
+        } catch (symbolError) {
+          logger.error(`❌ Error processing ${symbol} in batch:`, symbolError.message);
+          const errorSignal = this.createEnhancedSignal(request.baseSignal, null, symbol, 'batch_error');
+          request.resolve(errorSignal);
+        }
+      }
+      
+    } catch (batchError) {
+      logger.error(`❌ Batch processing failed:`, batchError.message);
+      
+      // Resolve all requests with fallback signals
+      for (const [symbol, request] of batch) {
+        const fallbackSignal = this.createEnhancedSignal(request.baseSignal, null, symbol, 'batch_failed');
+        request.resolve(fallbackSignal);
+      }
+    }
+  }
+
+  // 🔄 INDIVIDUAL: Fallback to individual processing (Free Plan or batch disabled)
+  async enhanceSignalIndividual(baseSignal, marketData, symbol, timeframe, riskLevel, startTime) {
+    logger.info(`🔄 Processing ${symbol} individually (Free Plan or batch disabled)`);
+    
+    // Check if symbol should use TAAPI (dynamic routing)
+    const routing = await this.taapiService.symbolManager?.routeSymbolRequest?.(symbol) || { strategy: 'taapi_direct' };
+    
+    if (routing.strategy === 'fallback_only') {
+      logger.info(`⏭️ Skipping TAAPI for ${symbol} - ${routing.source}`);
+      return this.createEnhancedSignal(baseSignal, null, symbol, 'symbol_unsupported');
+    }
+    
+    logger.info(`✅ ${symbol} supported - enhancing with TAAPI indicators`);
+    
+    // Get TAAPI indicators (legacy method for individual requests)
+    const taapiIndicators = await this.taapiService.getBulkIndicatorsLegacy?.(symbol, timeframe) || 
+                            await this.taapiService.getSingleSymbolIndicators?.(symbol, timeframe, 'binance') ||
+                            this.taapiService.getFallbackData(symbol);
+    
+    logger.info(`🔍 DEBUG: taapiIndicators received for ${symbol}:`, JSON.stringify(taapiIndicators, null, 2));
+    
+    // Check if we got fallback data
+    if (taapiIndicators && taapiIndicators.isFallbackData) {
+      logger.warn(`TAAPI returned fallback data for ${symbol}, using base signal`);
+      return this.createEnhancedSignal(baseSignal, taapiIndicators, symbol, 'taapi_fallback');
+    }
+    
+    logger.info(`✅ Real TAAPI data received for ${symbol} - generating enhanced signal`);
+    
+    // Generate the initial enhanced signal
+    const enhancedSignal = await this.generateEnhancedSignal(
+      baseSignal, 
+      marketData, 
+      taapiIndicators, 
+      riskLevel
+    );
+    
+    // 🇩🇰 CRITICAL: Apply Danish Strategy Filter BEFORE returning
+    logger.info(`🇩🇰 BEFORE Danish Filter: ${symbol} - ${enhancedSignal.signal} at ${enhancedSignal.confidence}%`);
+    
+    const technicalData = {
+      rsi: taapiIndicators.rsi,
+      adx: taapiIndicators.adx,
+      volume_ratio: taapiIndicators.volume_ratio || 1.0
+    };
+    
+    const danishFilteredSignal = this.applyDanishStrategyFilter(enhancedSignal, technicalData, marketData);
+    
+    logger.info(`🇩🇰 AFTER Danish Filter: ${symbol} - ${danishFilteredSignal.signal} at ${danishFilteredSignal.confidence}%`);
+    logger.info(`🔍 Filter Applied: ${danishFilteredSignal.danish_filter_applied || 'NONE'}`);
+    
+    // Cache the result
+    const cacheKey = `signal_${symbol}_${Math.floor(Date.now() / 300000)}`;
+    this.signalCache.set(cacheKey, {
+      signal: danishFilteredSignal,
+      timestamp: Date.now()
+    });
+    
+    const processingTime = Date.now() - startTime;
+    logger.info(`Enhanced signal completed for ${symbol}`, {
+      signal: danishFilteredSignal.signal,
+      confidence: danishFilteredSignal.confidence,
+      processing_time: processingTime,
+      taapi_used: true,
+      taapi_available: true,
+      data_source: "real_taapi_individual",
+      danish_filter_applied: danishFilteredSignal.danish_filter_applied
+    });
+    
+    return danishFilteredSignal;
   }
 
   // 🇩🇰 DANISH STRATEGY FILTER
@@ -541,6 +677,16 @@ class EnhancedSignalGenerator {
         confidence = Math.max(confidence - 25, 10);
         reasoning.push('Technical error - using base signal analysis');
         break;
+
+      case 'batch_error':
+        confidence = Math.max(confidence - 15, 15);
+        reasoning.push('Batch processing error - using base signal analysis');
+        break;
+
+      case 'batch_failed':
+        confidence = Math.max(confidence - 20, 10);
+        reasoning.push('Bulk query failed - using base signal analysis');
+        break;
         
       case 'base_only':
         confidence = Math.max(confidence - 5, 25);
@@ -567,7 +713,7 @@ class EnhancedSignalGenerator {
     };
   }
 
-  // SERVICE HEALTH CHECK
+  // 🔧 SERVICE HEALTH CHECK
   getServiceHealth() {
     try {
       const cacheEntries = Array.from(this.signalCache.entries()).slice(0, 3).map(([key, value]) => ({
@@ -578,14 +724,20 @@ class EnhancedSignalGenerator {
 
       return {
         signal_generator: 'healthy',
+        version: 'v3_pro_optimized',
         cache_size: this.signalCache.size,
         cache_entries: cacheEntries,
+        batch_queue_size: this.batchQueue.size,
+        pro_plan_optimization: this.taapiService?.isProPlan || false,
+        bulk_enabled: this.taapiService?.bulkEnabled || false,
+        max_batch_size: this.maxBatchSize,
         danish_strategy: 'enabled',
         confidence_threshold: this.danishConfig.MIN_CONFIDENCE_SCORE,
         rsi_threshold: this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid,
         taapi: this.taapiService ? {
           available: true,
-          service_type: 'enhanced_v2'
+          service_type: 'optimized_pro_plan',
+          stats: this.taapiService.getServiceStats?.() || {}
         } : {
           available: false,
           service_type: 'none'
@@ -595,12 +747,13 @@ class EnhancedSignalGenerator {
       return {
         signal_generator: 'error',
         error: error.message,
-        cache_size: 0
+        cache_size: 0,
+        batch_queue_size: this.batchQueue.size
       };
     }
   }
 
-  // CACHE CLEANUP
+  // 🧹 CACHE CLEANUP
   cleanupCache() {
     const now = Date.now();
     for (const [key, value] of this.signalCache.entries()) {
@@ -608,6 +761,14 @@ class EnhancedSignalGenerator {
         this.signalCache.delete(key);
       }
     }
+  }
+
+  // 🚨 FORCE BATCH PROCESSING (for testing/debugging)
+  forceBatchProcess() {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+    }
+    return this.processBatch();
   }
 }
 
