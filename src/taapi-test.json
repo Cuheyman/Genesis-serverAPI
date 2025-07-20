@@ -1,0 +1,12 @@
+{
+    "secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjg1NDFjNDI4MDZmZjE2NTFlNTY4ZGNhIiwiaWF0IjoxNzUyNzM4NDU3LCJleHAiOjMzMjU3MjAyNDU3fQ.Ejxe9tzURSF84McZTtRATb57DQ1FZAKeN43_amre6IY",
+    "construct": {
+      "exchange": "binance",
+      "symbol": "BTC/USDT",
+      "interval": "1h",
+      "indicators": [
+        { "indicator": "rsi", "period": 14 },
+        { "indicator": "macd", "fastPeriod": 12, "slowPeriod": 26, "signalPeriod": 9 }
+      ]
+    }
+  }

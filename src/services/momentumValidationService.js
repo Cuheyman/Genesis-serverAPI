@@ -261,7 +261,7 @@ class MomentumValidationService {
         pair: pair,
         quality_score: qualityScore,
         confidence: confidence,
-        should_take: qualityScore >= 65 && confidence >= 70,
+        should_take: qualityScore >= 65 && confidence >= 60,  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
         is_high_probability: qualityScore >= 80 && confidence >= 80,
         volume_confirmed: Math.random() > 0.3,
         breakout_confirmed: Math.random() > 0.4,

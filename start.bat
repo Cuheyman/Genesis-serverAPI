@@ -1,0 +1,9 @@
+@echo off
+echo Starting Genesis AI Trading API...
+cd src
+if not exist node_modules (
+    echo Installing dependencies...
+    npm install
+)
+echo Launching server...
+npm start 

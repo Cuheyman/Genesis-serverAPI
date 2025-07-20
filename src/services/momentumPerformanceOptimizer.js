@@ -2,7 +2,7 @@ class MomentumPerformanceOptimizer {
   constructor() {
     this.tradeHistory = [];
     this.adaptiveThresholds = {
-      confidence_threshold: 70,
+      confidence_threshold: 60,  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
       confluence_threshold: 65,
       volume_threshold: 1.8
     };
@@ -82,4 +82,4 @@ class MomentumPerformanceOptimizer {
   }
 }
 
-module.exports = { MomentumStrategyService, MomentumPerformanceOptimizer };
+module.exports = { MomentumPerformanceOptimizer };

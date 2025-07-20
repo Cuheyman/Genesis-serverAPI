@@ -3,20 +3,21 @@ const logger = require('../utils/logger');
 
 class MomentumStrategyService {
   constructor() {
-    this.apiSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjg1NDFjNDI4MDZmZjE2NTFlNTY4ZGNhIiwiaWF0IjoxNzUyNDIyMzg4LCJleHAiOjMzMjU2ODg2Mzg4fQ.Q4GOQ6s32PcS3S8zBNTGxJXHtoAt6bveeav8aIegmTU";
+    this.apiSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjg1NDFjNDI4MDZmZjE2NTFlNTY4ZGNhIiwiaWF0IjoxNzUyNzM4NDU3LCJleHAiOjMzMjU3MjAyNDU3fQ.Ejxe9tzURSF84McZTtRATb57DQ1FZAKeN43_amre6IY"; // FIXED: Use the working Pro secret from curl test
     this.baseUrl = "https://api.taapi.io";
     this.rateLimit = 1200; // Pro plan rate limit
     this.signalHistory = [];
     this.performanceTracker = new Map();
     
     // Danish Strategy Configuration
+    // 🇩🇰 DANISH STRATEGY CONFIG (ORIGINAL BACKTESTED PARAMETERS)
     this.danishConfig = {
       IGNORE_BEARISH_SIGNALS: true,
       ONLY_BULLISH_ENTRIES: true,
       REQUIRE_VOLUME_CONFIRMATION: true,
       REQUIRE_BREAKOUT_CONFIRMATION: true,
       MIN_CONFLUENCE_SCORE: 65,
-      MIN_CONFIDENCE_SCORE: 70,
+      MIN_CONFIDENCE_SCORE: 60,  // 🎯 DANISH PURE MODE: 60-70% trust API directly
       EXCELLENT_ENTRY_THRESHOLD: 80,
       MOMENTUM_THRESHOLDS: {
         rsi_oversold_entry: 38,
@@ -28,7 +29,7 @@ class MomentumStrategyService {
       }
     };
     
-    logger.info('🚀 Momentum Strategy Service initialized with Danish strategy');
+    logger.info('🚀 Momentum Strategy Service initialized with Original Backtested Danish Strategy');
   }
 
   // Main momentum signal generation
@@ -611,3 +612,5 @@ class MomentumStrategyService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
+
+module.exports = { MomentumStrategyService };

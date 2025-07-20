@@ -127,8 +127,8 @@
       // Signal strength requirement
       if (!['STRONG', 'EXCELLENT'].includes(entryMetrics.signal_strength)) return false;
       
-      // Confidence threshold
-      if (momentumSignal.confidence < 70) return false;
+      // Confidence threshold - 🎯 DANISH PURE MODE: Lowered from 70 to 60
+      if (momentumSignal.confidence < 60) return false;
       
       // Volume confirmation requirement
       if (!entryMetrics.has_volume_confirmation) return false;

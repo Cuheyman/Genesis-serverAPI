@@ -16,7 +16,7 @@ class EnhancedSignalGenerator {
       REQUIRE_VOLUME_CONFIRMATION: true,
       REQUIRE_BREAKOUT_CONFIRMATION: true,
       MIN_CONFLUENCE_SCORE: 65,
-      MIN_CONFIDENCE_SCORE: 70,  // CRITICAL: 70% minimum
+      MIN_CONFIDENCE_SCORE: 60,  // 🎯 DANISH PURE MODE: 60-70% trust API directly, 70%+ immediate execution
       EXCELLENT_ENTRY_THRESHOLD: 80,
       MOMENTUM_THRESHOLDS: {
         rsi_oversold_entry: 38,
