@@ -1394,16 +1394,16 @@ class EnhancedAISignalGenerator {
       REQUIRE_VOLUME_CONFIRMATION: true, // Reagerer først når der er bekræftet volumen + prisbevægelse
       REQUIRE_BREAKOUT_CONFIRMATION: true, // Vælger udelukkende at handle på udvælgte, stærke bullish setups
       MIN_CONFLUENCE_SCORE: 65,        // Minimum confluence percentage for entry
-      MIN_CONFIDENCE_SCORE: 60,        // 🎯 DANISH PURE MODE: 60-70% trust API directly, 70%+ immediate execution
+      MIN_CONFIDENCE_SCORE: 55,        // 🎯 DANISH PURE MODE: Lowered from 60 to 55 - 55-70% trust API directly, 70%+ immediate execution
       EXCELLENT_ENTRY_THRESHOLD: 80,   // Threshold for "excellent" quality entries
       
       // Danish Strategy Momentum Thresholds
       MOMENTUM_THRESHOLDS: {
         rsi_oversold_entry: 38,         // More conservative than standard 30
-        rsi_momentum_sweet_spot: [40, 65], // Ideal RSI range for momentum entries
+        rsi_momentum_sweet_spot: [35, 70], // Lowered RSI range for more opportunities
         rsi_overbought_avoid: 72,       // Avoid late entries
         macd_histogram_min: 0.001,      // Must be positive for bullish momentum
-        volume_spike_min: 1.8,          // Minimum volume spike for confirmation
+        volume_spike_min: 1.2,          // Lowered volume spike for confirmation (was 1.8)
         breakout_confirmation: 0.5      // Minimum breakout strength
       }
     };
@@ -1978,12 +1978,12 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
     
     // 🥈 TIER 2: MODERATE (10% positions) 
     if (confidence >= 65) {
-      return 10; // Good setups = 10% position (Tier 2)
+      return 15; // Good setups = 15% position (Tier 2)
     }
     
     // 🥉 TIER 3: CONSERVATIVE (5% positions)
     if (confidence >= 55) {
-      return 5; // Fair setups = 5% position (Tier 3)
+      return 10; // Fair setups = 10% position (Tier 3)
     }
     
     // ❌ BELOW THRESHOLD: No trade

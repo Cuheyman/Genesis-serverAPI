@@ -17,13 +17,13 @@ class MomentumStrategyService {
       REQUIRE_VOLUME_CONFIRMATION: true,
       REQUIRE_BREAKOUT_CONFIRMATION: true,
       MIN_CONFLUENCE_SCORE: 65,
-      MIN_CONFIDENCE_SCORE: 60,  // 🎯 DANISH PURE MODE: 60-70% trust API directly
+      MIN_CONFIDENCE_SCORE: 55,  // 🎯 DANISH PURE MODE: Lowered from 60 to 55
       EXCELLENT_ENTRY_THRESHOLD: 80,
       MOMENTUM_THRESHOLDS: {
         rsi_oversold_entry: 38,
         rsi_overbought_avoid: 72,
         macd_histogram_min: 0.001,
-        volume_spike_min: 1.8,
+        volume_spike_min: 1.2, // Lowered from 1.8
         confluence_min: 4,
         breakout_confirmation: 0.5
       }

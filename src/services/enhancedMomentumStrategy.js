@@ -1536,9 +1536,9 @@ class EnhancedMomentumStrategy {
       // Step 5: Determine action based on Danish strategy rules
       let action = "HOLD"; // Default to HOLD
       
-      if (entryMetrics.signalStrength === EntrySignalStrength.EXCELLENT && confidence >= 60) {  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
+      if (entryMetrics.signalStrength === EntrySignalStrength.EXCELLENT && confidence >= 55) {  // 🎯 DANISH PURE MODE: Lowered from 60 to 55
         action = "BUY";
-      } else if (entryMetrics.signalStrength === EntrySignalStrength.STRONG && confidence >= 60) {
+      } else if (entryMetrics.signalStrength === EntrySignalStrength.STRONG && confidence >= 55) {
         action = "BUY";
       }
       

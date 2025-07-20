@@ -24,7 +24,7 @@ class EnhancedSignalGenerator {
       
       // 🎯 TIER 1: ULTRA-SELECTIVE (Original Backtested - 2-3 signals/month)
       MIN_CONFLUENCE_SCORE: 65, // Minimum confluence percentage for entry
-      MIN_CONFIDENCE_SCORE: 60,  // 🎯 DANISH PURE MODE: 60-70% trust API directly, 70%+ immediate execution
+      MIN_CONFIDENCE_SCORE: 55,  // 🎯 DANISH PURE MODE: Lowered from 60 to 55 - 55-70% trust API directly, 70%+ immediate execution
       EXCELLENT_ENTRY_THRESHOLD: 80, // Threshold for "excellent" quality entries
       
       // 🎯 TIER 2: MODERATE SELECTIVE (For more monthly opportunities)
@@ -39,16 +39,16 @@ class EnhancedSignalGenerator {
       
       MOMENTUM_THRESHOLDS: {
         rsi_oversold_entry: 38, // More conservative than standard 30
-        rsi_momentum_sweet_spot: [40, 65], // Ideal RSI range for momentum entries
+        rsi_momentum_sweet_spot: [35, 70], // Lowered RSI range for more opportunities
         rsi_overbought_avoid: 72,  // CRITICAL: No entries above 72
         macd_histogram_min: 0.001, // Must be positive for bullish momentum
-        volume_spike_min: 1.8, // Minimum volume spike for confirmation
+        volume_spike_min: 1.2, // Lowered volume spike for confirmation (was 1.8)
         breakout_confirmation: 0.5, // Minimum breakout strength
         
         // 🎯 MODERATE TIER THRESHOLDS (More Relaxed)
-        moderate_volume_spike_min: 1.4, // 40% volume increase for moderate signals
-        moderate_rsi_range: [35, 70], // Slightly wider RSI range
-        moderate_adx_min: 20 // Lower ADX requirement for moderate signals
+        moderate_volume_spike_min: 1.1, // Lowered volume increase for moderate signals (was 1.4)
+        moderate_rsi_range: [30, 75], // Wider RSI range for more opportunities
+        moderate_adx_min: 18 // Lower ADX requirement for moderate signals (was 20)
       }
     };
     logger.info('🔍 DEBUG: Service type:', this.taapiService.constructor.name);
@@ -295,7 +295,7 @@ class EnhancedSignalGenerator {
       // Check Tier 1 (Ultra-Selective) criteria
       if (momentumSignal.confidence >= this.danishConfig.MIN_CONFIDENCE_SCORE && 
           volumeRatio >= this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min && 
-          adx >= 25 && rsi >= 40 && rsi <= 65) {
+          adx >= 25 && rsi >= 35 && rsi <= 70) {
         signalTier = 'TIER_1_ULTRA';
         positionSize = this.danishConfig.PRIMARY_POSITION_SIZE;
         logger.info(`🎯 QUALIFIED FOR TIER 1: Ultra-selective signal (${positionSize}% position)`);
@@ -304,7 +304,7 @@ class EnhancedSignalGenerator {
       else if (momentumSignal.confidence >= this.danishConfig.MODERATE_CONFIDENCE_SCORE &&
                volumeRatio >= this.danishConfig.MOMENTUM_THRESHOLDS.moderate_volume_spike_min &&
                adx >= this.danishConfig.MOMENTUM_THRESHOLDS.moderate_adx_min &&
-               rsi >= 35 && rsi <= 70) {
+               rsi >= 30 && rsi <= 75) {
         signalTier = 'TIER_2_MODERATE';
         positionSize = this.danishConfig.MODERATE_POSITION_SIZE;
         logger.info(`🎯 QUALIFIED FOR TIER 2: Moderate signal (${positionSize}% position)`);
@@ -788,6 +788,139 @@ class EnhancedSignalGenerator {
       clearTimeout(this.batchTimeout);
     }
     return this.processBatch();
+  }
+
+  // 🎯 NEW: TIER-BASED SIGNAL GENERATION WITH LOWERED THRESHOLDS
+  generateSignalBasedOnConfidence(confidence, pair) {
+    // TIER 3: Generate BUY signals for 55%+ confidence (was 70%+)
+    if (confidence >= 55) {
+      return {
+        signal: 'BUY',
+        confidence: confidence,
+        reasoning: `Strong momentum detected for ${pair} - confidence ${confidence.toFixed(1)}%`,
+        tier_eligible: true
+      };
+    }
+    
+    // TIER 2: Generate BUY signals for 65%+ confidence 
+    if (confidence >= 65) {
+      return {
+        signal: 'BUY', 
+        confidence: confidence,
+        reasoning: `High momentum detected for ${pair} - confidence ${confidence.toFixed(1)}%`,
+        tier_eligible: true,
+        tier_boost: true
+      };
+    }
+    
+    // TIER 1: Generate BUY signals for 80%+ confidence
+    if (confidence >= 80) {
+      return {
+        signal: 'BUY',
+        confidence: confidence,
+        reasoning: `Excellent momentum detected for ${pair} - confidence ${confidence.toFixed(1)}%`,
+        tier_eligible: true,
+        tier_premium: true
+      };
+    }
+    
+    // Below 55% = HOLD signal
+    return {
+      signal: 'HOLD',
+      confidence: confidence,
+      reasoning: `Insufficient momentum for ${pair} - confidence ${confidence.toFixed(1)}%`,
+      tier_eligible: false
+    };
+  }
+
+  // 🎯 UPDATED: DANISH ADAPTIVE SIGNAL GENERATOR WITH LOWERED THRESHOLDS
+  generateDanishAdaptiveSignal(marketData, technicalData, onChainData, offChainData, requestParams) {
+    try {
+      const symbol = marketData.symbol || 'UNKNOWN';
+      const price = marketData.current_price;
+      const rsi = technicalData.rsi || 50;
+      const volumeRatio = technicalData.volume_ratio || 1.0;
+      const adx = technicalData.adx || 20;
+      
+      // Calculate base confidence from technical analysis
+      let confidence = this._calculateBaseConfidence(technicalData);
+      
+      // LOWERED DANISH BUY SIGNAL REQUIREMENTS:
+      const danishBuyRequirements = {
+        // TIER 3: Conservative BUY signals (was 70%, now 55%)
+        tier3_confidence: 55,
+        tier3_rsi_min: 35,          // Lower RSI requirement (was 40)
+        tier3_volume_min: 1.2,      // Lower volume requirement (was 1.5)
+        
+        // TIER 2: Moderate BUY signals (was 75%, now 65%) 
+        tier2_confidence: 65,
+        tier2_rsi_min: 40,
+        tier2_volume_min: 1.3,
+        
+        // TIER 1: Premium BUY signals (was 85%, now 80%)
+        tier1_confidence: 80,
+        tier1_rsi_min: 45,
+        tier1_volume_min: 1.5
+      };
+      
+      // Generate BUY signal if meets any tier requirements
+      if (confidence >= danishBuyRequirements.tier3_confidence &&
+          rsi >= danishBuyRequirements.tier3_rsi_min &&
+          volumeRatio >= danishBuyRequirements.tier3_volume_min) {
+          
+          let tier = 3;
+          if (confidence >= danishBuyRequirements.tier1_confidence) tier = 1;
+          else if (confidence >= danishBuyRequirements.tier2_confidence) tier = 2;
+          
+          return {
+              signal: 'BUY',  // Direct BUY signal, no HOLD conversion needed
+              confidence: confidence,
+              tier: tier,
+              reasoning: `Danish Tier ${tier} BUY signal - confidence ${confidence.toFixed(1)}%`,
+              strategy_type: `Danish Tier ${tier} Entry`,
+              danish_requirements_met: true
+          };
+      }
+      
+      // Default to HOLD if requirements not met
+      return {
+          signal: 'HOLD',
+          confidence: confidence,
+          reasoning: `Danish requirements not met - confidence ${confidence.toFixed(1)}%`,
+          danish_requirements_met: false
+      };
+      
+    } catch (error) {
+      logger.error('Error in generateDanishAdaptiveSignal:', error);
+      return {
+        signal: 'HOLD',
+        confidence: 20,
+        reasoning: `Error in Danish signal generation: ${error.message}`,
+        danish_requirements_met: false
+      };
+    }
+  }
+
+  // 🎯 HELPER: Calculate base confidence from technical data
+  _calculateBaseConfidence(technicalData) {
+    let confidence = 50; // Base confidence
+    
+    // RSI contribution
+    const rsi = technicalData.rsi || 50;
+    if (rsi >= 35 && rsi <= 70) confidence += 15;
+    else if (rsi < 30 || rsi > 75) confidence -= 10;
+    
+    // Volume contribution
+    const volumeRatio = technicalData.volume_ratio || 1.0;
+    if (volumeRatio >= 1.2) confidence += 10;
+    else if (volumeRatio < 0.8) confidence -= 10;
+    
+    // ADX contribution
+    const adx = technicalData.adx || 20;
+    if (adx >= 25) confidence += 10;
+    else if (adx < 15) confidence -= 5;
+    
+    return Math.max(0, Math.min(100, confidence));
   }
 }
 

@@ -85,14 +85,14 @@ class HighWinRateEntryFilter {
       ONLY_BULLISH_ENTRIES: true,
       REQUIRE_VOLUME_CONFIRMATION: true,
       REQUIRE_BREAKOUT_CONFIRMATION: true,
-      MIN_CONFIDENCE_THRESHOLD: 60,  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
+      MIN_CONFIDENCE_THRESHOLD: 55,  // 🎯 DANISH PURE MODE: Lowered from 60 to 55
       HIGH_PROBABILITY_THRESHOLD: 75,
       EXCELLENT_ENTRY_THRESHOLD: 85,
       
       // 🔄 ADAPTIVE MARKET REGIME THRESHOLDS
       MARKET_REGIME_ADAPTATION: true,
       TRENDING_MARKET_THRESHOLDS: {
-        MIN_CONFIDENCE: 60,  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
+        MIN_CONFIDENCE: 55,  // 🎯 DANISH PURE MODE: Lowered from 60 to 55
         HIGH_PROBABILITY: 75,
         EXCELLENT_ENTRY: 85
       },
@@ -1142,8 +1142,8 @@ class HighWinRateEntryFilter {
    * Determine if entry meets high probability criteria (75-90% win rate target)
    */
   _isHighProbabilityEntry(overallScore, signalStrength, confirmations, riskFactors) {
-    // Minimum score threshold - 🎯 DANISH PURE MODE: Lowered from 70 to 60
-    if (overallScore < 60) {
+    // Minimum score threshold - 🎯 DANISH PURE MODE: Lowered from 60 to 55
+    if (overallScore < 55) {
       return false;
     }
     

@@ -2,9 +2,9 @@ class MomentumPerformanceOptimizer {
   constructor() {
     this.tradeHistory = [];
     this.adaptiveThresholds = {
-      confidence_threshold: 60,  // 🎯 DANISH PURE MODE: Lowered from 70 to 60
+      confidence_threshold: 55,  // 🎯 DANISH PURE MODE: Lowered from 60 to 55
       confluence_threshold: 65,
-      volume_threshold: 1.8
+      volume_threshold: 1.2 // Lowered from 1.8
     };
     this.optimizationTargets = {
       target_win_rate: 0.8,
