@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 const fetch = require('node-fetch');
+const path = require('path');
 require('dotenv').config();
 
 // Import standard services
@@ -199,24 +200,16 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // ===============================================
-// LOGGING SETUP
+// COMPREHENSIVE LOGGING SETUP
 // ===============================================
 
-const winston = require('winston');
+// Import our enhanced logger (automatically initializes session logging)
+const logger = require('./utils/logger');
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' })
-  ]
-});
+// Log API startup
+logger.info('🚀 Genesis AI Trading API initializing...');
+logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+logger.info(`🚪 Port: ${process.env.PORT || 3000}`);
 
 // ===============================================
 // DYNAMIC SYMBOL VALIDATION SYSTEM
@@ -2653,6 +2646,7 @@ const validateSignalRequest = async (req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const sessionInfo = logger.getSessionInfo();
   res.json({
     success: true,
     status: 'healthy',
@@ -2660,6 +2654,13 @@ app.get('/api/health', (req, res) => {
     version: '2.0.0-spot-trading',
     strategy: 'DANISH_MOMENTUM_SPOT_STRATEGY',
     trading_type: 'BINANCE_SPOT',
+    session: {
+      start_time: sessionInfo.sessionStart,
+      uptime_ms: sessionInfo.uptime,
+      uptime_formatted: formatUptime(sessionInfo.uptime),
+      log_file: path.basename(sessionInfo.sessionFile),
+      log_size: sessionInfo.logSize
+    },
     ai_services: {
       claude: process.env.CLAUDE_API_KEY ? 'configured' : 'missing',
       taapi: process.env.TAAPI_SECRET ? 'configured' : 'missing',
@@ -2691,6 +2692,66 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime()
   });
 });
+
+// Session logging endpoint
+app.get('/api/v1/session', authenticateAPI, (req, res) => {
+  try {
+    const sessionInfo = logger.getSessionInfo();
+    const uptimeMs = sessionInfo.uptime;
+    const memoryUsage = process.memoryUsage();
+    
+    res.json({
+      success: true,
+      data: {
+        session: {
+          start_time: sessionInfo.sessionStart,
+          current_time: new Date(),
+          uptime_ms: uptimeMs,
+          uptime_formatted: formatUptime(uptimeMs),
+          log_file: path.basename(sessionInfo.sessionFile),
+          full_log_path: sessionInfo.sessionFile,
+          log_size: sessionInfo.logSize
+        },
+        system: {
+          platform: process.platform,
+          node_version: process.version,
+          pid: process.pid,
+          memory: {
+            used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+            total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+            external: Math.round(memoryUsage.external / 1024 / 1024),
+            rss: Math.round(memoryUsage.rss / 1024 / 1024)
+          }
+        },
+        logging: {
+          comprehensive_logging: true,
+          console_capture: true,
+          graceful_shutdown: true,
+          files: {
+            session_log: path.basename(sessionInfo.sessionFile),
+            combined_log: 'combined.log',
+            error_log: 'error.log'
+          }
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get session information',
+      message: error.message
+    });
+  }
+});
+
+// Helper function to format uptime
+function formatUptime(uptimeMs) {
+  const seconds = Math.floor(uptimeMs / 1000);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hours}h ${minutes}m ${secs}s`;
+}
 
 // Symbol list endpoint
 app.get('/api/v1/symbols', authenticateAPI, async (req, res) => {
@@ -3908,7 +3969,14 @@ async function startServer() {
     
     // Start the server
     const server = app.listen(PORT, () => {
-      logger.info(`🚀 Enhanced Crypto Signal API server running on port ${PORT}`);
+      // Register server with logger for graceful shutdown
+      logger.setServer(server);
+      
+      // Server startup success messages
+      logger.info('===============================================');
+      logger.info('🎉 GENESIS AI TRADING API - SERVER READY');
+      logger.info('===============================================');
+      logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`🇩🇰 DEFAULT STRATEGY: Danish Momentum Bull Strategy (75-90% win rate target)`);
       logger.info(`🤖 AI Models: Claude 4 Sonnet + LunarCrush API`);
       logger.info(`⚡ Momentum Services: ${MomentumStrategyService ? 'LOADED & DEFAULT' : 'NOT AVAILABLE'}`);
@@ -3917,10 +3985,20 @@ async function startServer() {
       logger.info(`🌐 Blockchain Coverage: 2,500+ EVM Networks`);
       logger.info(`📈 Symbol Validation: Dynamic (Binance API)`);
       logger.info(`🏗️ Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info('===============================================');
+      logger.info('📊 AVAILABLE ENDPOINTS:');
       logger.info(`💚 Health check: http://localhost:${PORT}/api/health`);
-      logger.info(`🇩🇰 Danish Strategy: /api/v1/signal (DEFAULT) | /api/v1/enhanced-signal (DEFAULT)`);
+      logger.info(`📋 Session info: http://localhost:${PORT}/api/v1/session`);
+      logger.info(`📊 Symbol list: http://localhost:${PORT}/api/v1/symbols`);
+      logger.info(`🎯 Signal generation: http://localhost:${PORT}/api/v1/signal`);
+      logger.info(`🇩🇰 Enhanced signals: http://localhost:${PORT}/api/v1/enhanced-signal`);
+      logger.info('===============================================');
+      logger.info(`📁 Session log: ${path.basename(logger.getSessionInfo().sessionFile)}`);
+      logger.info('🛑 Press Ctrl+C for graceful shutdown');
+      logger.info('===============================================');
       
       // Initialize symbols after server starts
+      logger.info('🔄 Initializing symbol validation...');
       initializeSymbols();
       
       // Set up periodic symbol updates
@@ -3932,24 +4010,11 @@ async function startServer() {
           logger.error('Periodic symbol update failed:', error);
         }
       }, 3600000); // Update every hour
+      
+      logger.info('✅ Server initialization complete - ready for requests');
     });
 
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      logger.info('SIGTERM received, shutting down gracefully...');
-      server.close(() => {
-        logger.info('Server closed');
-        process.exit(0);
-      });
-    });
-
-    process.on('SIGINT', () => {
-      logger.info('SIGINT received, shutting down gracefully...');
-      server.close(() => {
-        logger.info('Server closed');
-        process.exit(0);
-      });
-    });
+    // Note: Graceful shutdown is handled by the comprehensive logger
     
   } catch (error) {
     logger.error('Failed to start server:', error);
