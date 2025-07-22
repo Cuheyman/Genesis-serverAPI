@@ -3531,10 +3531,56 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
         volume_confirmed: enhancedSignal.volume_confirmation,
         breakout_confirmed: enhancedSignal.breakout_confirmation,
         high_probability: enhancedSignal.high_probability_entry,
-        strategy_type: enhancedSignal.api_data?.strategy_type
+        strategy_type: enhancedSignal.api_data?.strategy_type,
+        
       });
       console.log(`=====================================\n`);
       
+      // 🎯 FIXED: Enhanced response logging with precision timing
+      console.log(`✅ ===== ENHANCED STRATEGY WITH PRECISION TIMING =====`);
+      console.log(`📊 Symbol: ${symbol}`);
+
+      // 🔧 ADD NULL SAFETY CHECK
+      if (!enhancedSignal) {
+        console.log(`❌ ERROR: Enhanced signal is null for ${symbol}`);
+        throw new Error(`Enhanced signal generation returned null for ${symbol}`);
+      }
+
+      console.log(`📈 Signal: ${enhancedSignal.signal || 'UNKNOWN'}`);
+      console.log(`🎯 Confidence: ${enhancedSignal.confidence || 0}%`);
+
+      // 🚀 NEW: Add precision timing status with null safety
+      if (enhancedSignal.precision_timing) {
+        if (enhancedSignal.precision_perfect) {
+          console.log(`⚡ Precision Timing: PERFECT (${enhancedSignal.precision_score || 0}/100) - ENTRY NOW!`);
+          if (enhancedSignal.micro_signals) {
+            console.log(`🎯 Micro-Signals: Momentum=${enhancedSignal.micro_signals.micro_momentum_signal || 'N/A'}, VWAP=${enhancedSignal.micro_signals.vwap_entry_signal || 'N/A'}, Flow=${enhancedSignal.micro_signals.order_flow_entry_signal || 'N/A'}`);
+          }
+        } else {
+          console.log(`⏰ Precision Timing: NOT READY (${enhancedSignal.precision_score || 0}/100) - WAIT`);
+          if (enhancedSignal.precision_waiting_for && Array.isArray(enhancedSignal.precision_waiting_for)) {
+            console.log(`⏱️ Waiting For: ${enhancedSignal.precision_waiting_for.join(', ')}`);
+          }
+        }
+      } else {
+        console.log(`⚠️ Precision Timing: NOT ANALYZED`);
+      }
+
+      console.log(`🏆 Entry Quality: ${enhancedSignal.entry_quality || 'unknown'}`);
+      console.log(`💰 Position Size: ${enhancedSignal.position_size_percent || 0}%`);
+
+      // 🎯 Show precision-based decision
+      if (enhancedSignal.signal === 'BUY' && enhancedSignal.precision_perfect) {
+        console.log(`🚀 DECISION: BUY SIGNAL APPROVED - Perfect precision timing detected!`);
+      } else if (enhancedSignal.signal === 'HOLD' && enhancedSignal.precision_timing && !enhancedSignal.precision_perfect) {
+        console.log(`❌ DECISION: ENTRY BLOCKED - Precision timing not optimal`);
+      } else {
+        console.log(`📊 DECISION: ${enhancedSignal.signal || 'UNKNOWN'} - Standard analysis`);
+      }
+
+
+
+     console.log(`===========================================`);
       // Convert to finalSignal format with proper pricing
       const mockPrice = 45000 + Math.random() * 1000;
       finalSignal = {
@@ -3738,6 +3784,12 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
     console.log(`🇩🇰 Enhanced By: ${finalSignal.enhanced_by}`);
     console.log(`⏰ Sent At: ${new Date().toISOString()}`);
     console.log(`===========================================\n`);
+
+        // In your API response generation, add this:
+    console.log(`🔍 [DEBUG] Enhanced signal keys:`, Object.keys(enhancedSignal));
+    console.log(`🔍 [DEBUG] Has precision_timing:`, !!enhancedSignal.precision_timing);
+    console.log(`🔍 [DEBUG] Danish filter applied:`, enhancedSignal.danish_filter_applied);
+    console.log(`🔍 [DEBUG] Strategy type:`, enhancedSignal.strategy_type);
 
     res.json({
       success: true,

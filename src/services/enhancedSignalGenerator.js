@@ -2,6 +2,9 @@
 const OptimizedTaapiService = require('./optimizedTaapiService');
 const logger = require('../utils/logger');
 
+const { AdvancedScalpingSystem } = require('./advancedScalpingSystem'); 
+
+
 class EnhancedSignalGenerator {
   constructor(taapiService = null) {
     // 🚀 CRITICAL FIX: Use OptimizedTaapiService for Pro Plan bulk queries
@@ -9,6 +12,14 @@ class EnhancedSignalGenerator {
     this.signalCache = new Map();
     this.cacheExpiry = 10 * 60 * 1000; // 10 minutes cache for signals
     
+    
+
+
+    this.scalpingSystem= new AdvancedScalpingSystem(this.taapiService);
+
+    this.binanceClient = null;
+    this.offChainService = null;
+
     // 🔄 Batch processing for Pro Plan optimization
     this.batchQueue = new Map(); // Queue symbols for batch processing
     this.batchTimeout = null;
@@ -75,27 +86,33 @@ class EnhancedSignalGenerator {
     // 🚀 ANNUAL POTENTIAL: 7,000%+ if sustained and compounded
   }
 
-  // 🔧 MAIN METHOD: Enhanced Signal Generation with Pro Plan Bulk Query Optimization
-  async enhanceSignalWithTaapi(baseSignal, marketData, symbol, timeframe = '1h', riskLevel = 'balanced') {
-    const startTime = Date.now();
-    
+  // 🎯 FIXED: Initialize precision timing properly
+  async initializePrecisionTiming(binanceClient = null, offChainService = null) {
     try {
-      logger.info(`🔍 DEBUG: enhanceSignalWithTaapi called for ${symbol}`);
+      logger.info('🎯 Initializing precision timing system...');
       
-      // 🚀 OPTIMIZATION: Use batch processing for Pro Plan
-      if (this.taapiService.isProPlan && this.taapiService.bulkEnabled) {
-        return await this.enhanceSignalWithBatchOptimization(baseSignal, marketData, symbol, timeframe, riskLevel, startTime);
+      // Set the dependencies
+      this.binanceClient = binanceClient;
+      this.offChainService = offChainService;
+      
+      // Reinitialize scalping system with precision timing
+      if (this.binanceClient && this.offChainService) {
+        this.scalpingSystem = new AdvancedScalpingSystem(
+          this.taapiService,
+          this.binanceClient,
+          this.offChainService
+        );
+        logger.info('✅ Precision timing system initialized with full dependencies');
+        return true;
+      } else {
+        logger.warn('⚠️ Precision timing initialized with limited dependencies - some features may not work');
+        // Keep existing scalping system (basic mode)
+        logger.info('📊 Scalping system running in basic mode without precision timing');
+        return false;
       }
-      
-      // 🔄 FALLBACK: Individual processing for free plan or when batch is disabled
-      return await this.enhanceSignalIndividual(baseSignal, marketData, symbol, timeframe, riskLevel, startTime);
-      
     } catch (error) {
-      logger.error(`❌ DEBUG: Signal enhancement failed for ${symbol}:`, error.message);
-      logger.error(`Signal enhancement failed, falling back to base signal:`, error);
-      
-      const fallbackSignal = this.createEnhancedSignal(baseSignal, null, symbol, 'error_fallback');
-      return fallbackSignal;
+      logger.error(`❌ Error initializing precision timing: ${error.message}`);
+      return false;
     }
   }
 
@@ -286,11 +303,14 @@ class EnhancedSignalGenerator {
   // ===============================================
 // UPDATE YOUR applyDanishStrategyFilter METHOD
 // ===============================================
-applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
+async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
   try {
 
-    this.debugDowntrendFilter(marketData.symbol || 'UNKNOWN', momentumSignal, technicalData, marketData.current_price);
-    logger.info(`🇩🇰 APPLYING Danish Dual-Tier Strategy Filter for ${marketData.symbol || 'UNKNOWN'} (ROI Target: 18-25%)`);
+    logger.info(`🔥 [DEBUG] applyDanishStrategyFilter CALLED for ${marketData.symbol} with confidence ${momentumSignal.confidence}%`);
+    logger.info(`🔍 [DEBUG] ScalpingSystem exists: ${!!this.scalpingSystem}`);
+    logger.info(`🔍 [DEBUG] PrecisionTimer exists: ${!!this.scalpingSystem?.precisionTimer}`);
+    
+    logger.info(`🇩🇰 APPLYING Danish Dual-Tier Strategy Filter with PRECISION TIMING for ${marketData.symbol || 'UNKNOWN'} (ROI Target: 18-25%)`);
     logger.info(`🔍 Initial Signal: ${momentumSignal.signal}, Confidence: ${momentumSignal.confidence}%`);
     
     // Extract technical data with null safety
@@ -299,6 +319,37 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
     const volumeRatio = technicalData?.volume_ratio || momentumSignal?.volume_analysis?.volume_ratio || 1.0;
     
     logger.info(`📊 Technical Data: RSI=${rsi}, ADX=${adx}, Volume Ratio=${volumeRatio}`);
+    
+    // 🚀 NEW: ALWAYS analyze precision timing FIRST (even for low confidence signals)
+    logger.info(`🎯 ANALYZING PRECISION TIMING for ${marketData.symbol} (confidence: ${momentumSignal.confidence}%)`);
+    
+    let precisionTiming = null;
+    try {
+      if (this.scalpingSystem && this.scalpingSystem.precisionTimer) {
+        precisionTiming = await this.scalpingSystem.precisionTimer.detectPerfectEntry(
+          marketData.symbol || 'UNKNOWN',
+          momentumSignal,
+          marketData
+        );
+        
+        // 🎯 LOG PRECISION TIMING ANALYSIS FOR ALL SIGNALS
+        if (precisionTiming.perfect_timing) {
+          logger.info(`🚀 [PRECISION-TIMING] ${marketData.symbol} - PERFECT TIMING DETECTED! Score: ${precisionTiming.precision_score}/100`);
+          logger.info(`⚡ [PRECISION-SIGNALS] Micro-momentum: ${precisionTiming.micro_signals?.micro_momentum_signal || 'N/A'}, VWAP: ${precisionTiming.micro_signals?.vwap_entry_signal || 'N/A'}, Order Flow: ${precisionTiming.micro_signals?.order_flow_entry_signal || 'N/A'}`);
+        } else {
+          logger.info(`⏰ [PRECISION-TIMING] ${marketData.symbol} - TIMING NOT OPTIMAL (${precisionTiming.precision_score || 0}/100) - ${precisionTiming.reason}`);
+          if (precisionTiming.micro_status) {
+            logger.info(`⏱️ [PRECISION-STATUS] Micro-momentum: ${precisionTiming.micro_status.micro_momentum}, VWAP: ${precisionTiming.micro_status.vwap_entry}, Order Flow: ${precisionTiming.micro_status.order_flow_entry}`);
+          }
+        }
+      } else {
+        logger.warn(`⚠️ [PRECISION-TIMING] Precision timer not initialized for ${marketData.symbol}`);
+        precisionTiming = { perfect_timing: false, reason: 'Precision timer not available', precision_score: 0 };
+      }
+    } catch (error) {
+      logger.error(`❌ [PRECISION-TIMING] Error analyzing ${marketData.symbol}: ${error.message}`);
+      precisionTiming = { perfect_timing: false, reason: 'Precision analysis error', precision_score: 0 };
+    }
     
     // 🇩🇰 DUAL-TIER EVALUATION: Check which tier this signal qualifies for
     let signalTier = null;
@@ -334,38 +385,99 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       logger.info(`🎯 QUALIFIED FOR TIER 3: Conservative signal (${positionSize}% position)`);
     }
     
-    // 🚨 CRITICAL: Apply downtrend filter BEFORE converting HOLD to BUY
+    // 🚀 Apply SCALPING ENHANCEMENT for tier-qualified signals
     if (wouldBeBuySignal) {
-      logger.info(`🔍 [TIER-${signalTier}] Signal would become BUY - applying downtrend filter`);
+      logger.info(`🎯 [TIER-${signalTier}] Signal qualified for BUY - applying SCALPING ENHANCEMENT`);
       
-      const downtrendResult = this.checkDowntrendFilter(
+      // Apply scalping enhancement
+      const scalpingEnhanced = await this.scalpingSystem.enhanceExistingSignal(
         marketData.symbol || 'UNKNOWN',
         momentumSignal,
-        technicalData,
-        marketData.current_price
+        marketData
       );
       
-      if (!downtrendResult.allowed) {
-        logger.info(`❌ DOWNTREND FILTER BLOCKED ${marketData.symbol} ${signalTier}: ${downtrendResult.reason}`);
+      // 🚀 DECISION LOGIC: Only proceed if BOTH precision timing AND scalping are good
+      if (precisionTiming.perfect_timing && scalpingEnhanced.scalping_mode) {
+        logger.info(`🎯 [PERFECT-ENTRY] ${marketData.symbol} - BOTH PRECISION TIMING AND SCALPING OPTIMAL!`);
+        
+        // Calculate Danish compliance score
+        const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
+          rsi, adx, volumeRatio
+        });
+
+        return {
+          ...scalpingEnhanced,
+          signal: 'BUY',
+          action: 'BUY',
+          signal_tier: signalTier,
+          position_size_percent: positionSize,
+          monthly_roi_contribution: signalTier === 'TIER_1_ULTRA' ? 'HIGH' : 
+                                   signalTier === 'TIER_2_MODERATE' ? 'MODERATE' : 'CONSERVATIVE',
+          danish_strategy_validated: true,
+          danish_compliance_score: danishComplianceScore,
+          danish_filter_applied: `${signalTier}_PRECISION_SCALPING_PERFECT`,
+          strategy_type: 'PRECISION_SCALPING_STRATEGY',
+          downtrend_filter_passed: true,
+          converted_hold_to_buy: true,
+          // 🎯 PRECISION DATA
+          precision_timing: precisionTiming,
+          precision_perfect: true,
+          precision_score: precisionTiming.precision_score,
+          micro_signals: precisionTiming.micro_signals,
+          entry_quality: 'PERFECT_PRECISION_SCALPING_SETUP',
+          reasoning: `Danish ${signalTier} + PRECISION + SCALPING: PERFECT TIMING (P:${precisionTiming.precision_score}/100, S:${scalpingEnhanced.entry_score}/100) - ENTRY NOW!`
+        };
+      }
+      // 🔄 PRECISION TIMING NOT READY - Block the trade but show analysis
+      else if (!precisionTiming.perfect_timing) {
+        logger.info(`❌ [PRECISION-BLOCKED] ${marketData.symbol} ${signalTier}: Precision timing not ready - ${precisionTiming.reason}`);
+        
         return {
           ...momentumSignal,
           signal: 'HOLD',
           action: 'HOLD',
-          confidence: Math.max(momentumSignal.confidence - 20, 10),
-          reasoning: `${signalTier} BLOCKED BY DOWNTREND FILTER: ${downtrendResult.reason}`,
-          danish_filter_applied: 'DOWNTREND_FILTER_BLOCKED',
-          downtrend_rejection_reason: downtrendResult.reason,
+          confidence: Math.max(momentumSignal.confidence - 15, 10),
+          signal_tier: signalTier,
+          position_size_percent: 0,
+          // 🎯 PRECISION DATA
+          precision_timing: precisionTiming,
+          precision_perfect: false,
+          precision_score: precisionTiming.precision_score || 0,
+          precision_waiting_for: precisionTiming.waiting_for || ['Unknown factors'],
+          micro_status: precisionTiming.micro_status,
+          reasoning: `${signalTier} BLOCKED: Precision timing not ready - ${precisionTiming.reason}`,
+          danish_filter_applied: 'PRECISION_TIMING_BLOCKED',
           strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-          entry_quality: 'REJECTED_DOWNTREND',
+          entry_quality: 'PRECISION_BLOCKED',
           tier_qualified: signalTier,
-          tier_blocked_by_downtrend: true
+          tier_blocked_by_precision: true
         };
-      } else {
-        logger.info(`✅ DOWNTREND FILTER PASSED ${marketData.symbol} ${signalTier}: ${downtrendResult.reason}`);
+      }
+      // 🔄 SCALPING NOT READY
+      else {
+        logger.info(`❌ [SCALPING-BLOCKED] ${marketData.symbol} ${signalTier}: Scalping not optimal but precision timing good`);
+        
+        return {
+          ...momentumSignal,
+          signal: 'HOLD',
+          action: 'HOLD',
+          signal_tier: signalTier,
+          position_size_percent: 0,
+          // 🎯 PRECISION DATA
+          precision_timing: precisionTiming,
+          precision_perfect: true,
+          precision_score: precisionTiming.precision_score,
+          micro_signals: precisionTiming.micro_signals,
+          reasoning: `${signalTier} BLOCKED: Precision timing perfect but scalping not optimal`,
+          danish_filter_applied: 'SCALPING_BLOCKED_PRECISION_GOOD',
+          entry_quality: 'PRECISION_GOOD_SCALPING_BLOCKED',
+          tier_qualified: signalTier,
+          tier_blocked_by_scalping: true
+        };
       }
     }
     
-    // If doesn't qualify for any tier, apply standard rejection logic
+    // If doesn't qualify for any tier, return with precision analysis
     if (!signalTier && momentumSignal.confidence < this.danishConfig.MODERATE_CONFIDENCE_SCORE) {
       logger.info(`❌ DANISH FILTER: Confidence ${momentumSignal.confidence}% < ${this.danishConfig.MIN_CONFIDENCE_SCORE}% minimum`);
       return {
@@ -373,6 +485,13 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
         signal: 'HOLD',
         action: 'HOLD',
         confidence: momentumSignal.confidence,
+        position_size_percent: 0,
+        // 🎯 ADD PRECISION DATA FOR LOW CONFIDENCE SIGNALS
+        precision_timing: precisionTiming,
+        precision_perfect: precisionTiming.perfect_timing,
+        precision_score: precisionTiming.precision_score || 0,
+        precision_waiting_for: precisionTiming.waiting_for || ['Low base confidence'],
+        micro_status: precisionTiming.micro_status,
         reasoning: `Danish Strategy: Confidence ${momentumSignal.confidence.toFixed(1)}% below minimum ${this.danishConfig.MIN_CONFIDENCE_SCORE}% - waiting for better setup`,
         danish_filter_applied: 'MIN_CONFIDENCE_NOT_MET',
         strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
@@ -380,7 +499,7 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       };
     }
     
-    // 🇩🇰 RULE: IGNORE ALL BEARISH SIGNALS (applies to all tiers)
+    // 🇩🇰 RULE: IGNORE ALL BEARISH SIGNALS
     if (this.danishConfig.IGNORE_BEARISH_SIGNALS && momentumSignal.signal === 'SELL') {
       logger.info(`❌ DANISH FILTER: SELL signal rejected - only bullish entries allowed`);
       return {
@@ -388,6 +507,11 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
         signal: 'HOLD',
         action: 'HOLD',
         confidence: 0,
+        position_size_percent: 0,
+        // 🎯 ADD PRECISION DATA FOR BEARISH SIGNALS
+        precision_timing: precisionTiming,
+        precision_perfect: precisionTiming.perfect_timing,
+        precision_score: precisionTiming.precision_score || 0,
         reasoning: 'Danish Strategy: Bearish signals ignored - only bullish entries allowed',
         danish_filter_applied: 'BEARISH_SIGNAL_FILTERED',
         strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
@@ -395,10 +519,9 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       };
     }
 
-    // ✅ HANDLE TIER-QUALIFIED SIGNALS (convert HOLD to BUY after downtrend filter passes)
+    // ✅ HANDLE TIER-QUALIFIED SIGNALS (fallback if precision/scalping didn't run)
     if (signalTier && wouldBeBuySignal) {
-      logger.info(`✅ DANISH FILTER: Signal QUALIFIED for ${signalTier} - converting HOLD to BUY`);
-      logger.info(`🎯 ${signalTier} PASS: Converting to BUY signal (${momentumSignal.confidence}%, ${positionSize}% position) - DOWNTREND CLEARED`);
+      logger.info(`⚠️ FALLBACK: Signal QUALIFIED for ${signalTier} but precision/scalping analysis didn't run - using STANDARD MODE`);
       
       // Calculate Danish compliance score
       const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
@@ -408,23 +531,30 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       // Convert HOLD to BUY and enhance the signal
       const enhancedSignal = {
         ...momentumSignal,
-        signal: 'BUY', // 🚨 CONVERT HOLD → BUY
-        action: 'BUY',  // 🚨 CONVERT HOLD → BUY
+        signal: 'BUY',
+        action: 'BUY',
         strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
         signal_tier: signalTier,
         position_size_percent: positionSize,
         monthly_roi_contribution: signalTier === 'TIER_1_ULTRA' ? 'HIGH' : signalTier === 'TIER_2_MODERATE' ? 'MODERATE' : 'CONSERVATIVE',
         danish_strategy_validated: true,
         danish_compliance_score: danishComplianceScore,
-        danish_filter_applied: `${signalTier}_QUALIFIED`,
+        danish_filter_applied: `${signalTier}_QUALIFIED_STANDARD`,
         downtrend_filter_passed: true,
-        converted_hold_to_buy: true, // 🚨 FLAG: Signal was converted
+        converted_hold_to_buy: true,
+        scalping_analyzed: false,
+        scalping_mode: false,
+        // 🎯 ADD PRECISION DATA FOR FALLBACK
+        precision_timing: precisionTiming,
+        precision_perfect: precisionTiming.perfect_timing,
+        precision_score: precisionTiming.precision_score || 0,
+        precision_note: 'Precision analysis performed but using fallback standard mode',
         entry_quality: signalTier === 'TIER_1_ULTRA' ? 'EXCELLENT_ULTRA_SETUP' : 
                       signalTier === 'TIER_2_MODERATE' ? 'GOOD_MODERATE_SETUP' : 'FAIR_CONSERVATIVE_SETUP',
-        reasoning: `Danish ${signalTier}: HOLD→BUY conversion (${momentumSignal.confidence.toFixed(1)}% confidence, ${positionSize}% position) - DOWNTREND CLEARED & TIER QUALIFIED`
+        reasoning: `Danish ${signalTier}: HOLD→BUY conversion (${momentumSignal.confidence.toFixed(1)}% confidence, ${positionSize}% position) - TIER QUALIFIED (Fallback Standard Mode)`
       };
 
-      logger.info(`✅ DANISH RESULT: HOLD→BUY conversion with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier})`);
+      logger.info(`✅ DANISH RESULT: HOLD→BUY conversion with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier}) - FALLBACK STANDARD MODE`);
       return enhancedSignal;
     }
     
@@ -435,6 +565,12 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       signal: 'HOLD',
       action: 'HOLD',
       confidence: Math.max(25, momentumSignal.confidence - 15),
+      position_size_percent: 0,
+      // 🎯 ADD PRECISION DATA FOR FAILED QUALIFICATION
+      precision_timing: precisionTiming,
+      precision_perfect: precisionTiming.perfect_timing,
+      precision_score: precisionTiming.precision_score || 0,
+      precision_waiting_for: precisionTiming.waiting_for || ['Failed tier qualification'],
       reasoning: `Danish Strategy: Signal ${momentumSignal.confidence.toFixed(1)}% confidence but failed tier qualification`,
       danish_filter_applied: 'TIER_QUALIFICATION_FAILED',
       strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
@@ -447,6 +583,10 @@ applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       signal: 'HOLD',
       action: 'HOLD',
       confidence: 20,
+      position_size_percent: 0,
+      precision_timing: null,
+      precision_perfect: false,
+      precision_score: 0,
       reasoning: 'Danish strategy filter error - defaulting to HOLD for safety',
       danish_filter_applied: 'ERROR_HOLD',
       strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
@@ -1000,18 +1140,15 @@ debugDowntrendFilter(symbol, signal, technicalData, currentPrice) {
   
       return {
         signal_generator: 'healthy',
-        version: 'v3_pro_optimized_with_downtrend_filter', // Updated version
+        version: 'v4_precision_scalping_enhanced', // Updated version
         cache_size: this.signalCache.size,
-        cache_entries: cacheEntries,
-        batch_queue_size: this.batchQueue.size,
-        pro_plan_optimization: this.taapiService?.isProPlan || false,
-        bulk_enabled: this.taapiService?.bulkEnabled || false,
-        max_batch_size: this.maxBatchSize,
         danish_strategy: 'enabled',
-        downtrend_filter: 'enabled', // NEW
-        downtrend_filter_stats: this.getDowntrendFilterStats(), // NEW
+        scalping_system: 'enabled',
+        // 🎯 FIXED: Use correct property name
+        scalping_stats: this.scalpingSystem?.getScalpingStats?.() || { error: 'Not initialized' },
+        precision_timing: this.isPrecisionTimingReady() ? 'enabled' : 'disabled', // NEW
+        precision_ready: this.isPrecisionTimingReady(), // NEW
         confidence_threshold: this.danishConfig.MIN_CONFIDENCE_SCORE,
-        rsi_threshold: this.danishConfig.MOMENTUM_THRESHOLDS.rsi_overbought_avoid,
         taapi: this.taapiService ? {
           available: true,
           service_type: 'optimized_pro_plan',
@@ -1030,6 +1167,8 @@ debugDowntrendFilter(symbol, signal, technicalData, currentPrice) {
       };
     }
   }
+
+
   getDowntrendFilterStats() {
     const total = this.downtrendFilter.rejectionStats.total_checked;
     return {
