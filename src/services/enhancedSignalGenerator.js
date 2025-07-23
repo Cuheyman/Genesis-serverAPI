@@ -15,7 +15,8 @@ class EnhancedSignalGenerator {
     
 
 
-    this.scalpingSystem= new AdvancedScalpingSystem(this.taapiService);
+    // Initialize scalping system (will be properly initialized later with dependencies)
+    this.scalpingSystem = new AdvancedScalpingSystem(this.taapiService);
 
     this.binanceClient = null;
     this.offChainService = null;
@@ -319,6 +320,7 @@ async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
     const volumeRatio = technicalData?.volume_ratio || momentumSignal?.volume_analysis?.volume_ratio || 1.0;
     
     logger.info(`📊 Technical Data: RSI=${rsi}, ADX=${adx}, Volume Ratio=${volumeRatio}`);
+    logger.info(`🔍 DEBUG: Checking tier qualification for ${momentumSignal.confidence.toFixed(1)}% confidence signal`);
     
     // 🚀 NEW: ALWAYS analyze precision timing FIRST (even for low confidence signals)
     logger.info(`🎯 ANALYZING PRECISION TIMING for ${marketData.symbol} (confidence: ${momentumSignal.confidence}%)`);
@@ -383,11 +385,48 @@ async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       positionSize = 5; // 5% position for Tier 3
       wouldBeBuySignal = true;
       logger.info(`🎯 QUALIFIED FOR TIER 3: Conservative signal (${positionSize}% position)`);
+    } else {
+      // 🔍 DEBUG: Why tier qualification failed
+      logger.info(`❌ NO TIER QUALIFIED:`);
+      logger.info(`  Tier 1: conf=${momentumSignal.confidence.toFixed(1)}% (need 60%+), vol=${volumeRatio.toFixed(2)} (need 1.2+), adx=${adx} (need 25+), rsi=${rsi} (need 35-70)`);
+      logger.info(`  Tier 2: conf=${momentumSignal.confidence.toFixed(1)}% (need 65%+), vol=${volumeRatio.toFixed(2)} (need 1.1+), adx=${adx} (need 20+), rsi=${rsi} (need 30-75)`);
+      logger.info(`  Tier 3: conf=${momentumSignal.confidence.toFixed(1)}% (need 55-64%), vol=${volumeRatio.toFixed(2)} (need 1.1+), adx=${adx} (need 15+), rsi=${rsi} (need 30-75)`);
     }
+    
+    logger.info(`🔍 [DEBUG] wouldBeBuySignal=${wouldBeBuySignal}, signalTier=${signalTier || 'NONE'}`);
+    logger.info(`🔍 [DEBUG] Starting scalping enhancement check...`);
     
     // 🚀 Apply SCALPING ENHANCEMENT for tier-qualified signals
     if (wouldBeBuySignal) {
       logger.info(`🎯 [TIER-${signalTier}] Signal qualified for BUY - applying SCALPING ENHANCEMENT`);
+      
+      // Check if scalping system exists
+      if (!this.scalpingSystem) {
+        logger.warn(`⚠️ [DEBUG] Scalping system not initialized - using fallback standard mode`);
+        
+        // FALLBACK: Convert to BUY without scalping
+        const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
+          rsi, adx, volumeRatio
+        });
+        
+        return {
+          ...momentumSignal,
+          signal: 'BUY',
+          action: 'BUY',
+          strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
+          signal_tier: signalTier,
+          position_size_percent: positionSize,
+          danish_strategy_validated: true,
+          danish_compliance_score: danishComplianceScore,
+          danish_filter_applied: `${signalTier}_NO_SCALPING`,
+          precision_timing: precisionTiming,
+          precision_perfect: false,
+          precision_score: precisionTiming.precision_score || 0,
+          precision_waiting_for: [`Scalping system not available`],
+          entry_quality: signalTier === 'TIER_3_CONSERVATIVE' ? 'FAIR_CONSERVATIVE_SETUP' : 'GOOD_MODERATE_SETUP',
+          reasoning: `Danish ${signalTier}: HOLD→BUY conversion (${momentumSignal.confidence.toFixed(1)}% confidence, ${positionSize}% position) - NO SCALPING`
+        };
+      }
       
       // Apply scalping enhancement
       const scalpingEnhanced = await this.scalpingSystem.enhanceExistingSignal(
@@ -443,7 +482,7 @@ async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
           precision_timing: precisionTiming,
           precision_perfect: false,
           precision_score: precisionTiming.precision_score || 0,
-          precision_waiting_for: precisionTiming.waiting_for || ['Unknown factors'],
+          precision_waiting_for: precisionTiming.waiting_for || [`Need volume confirmation (currently ${volumeRatio.toFixed(2)}x) and stronger momentum`],
           micro_status: precisionTiming.micro_status,
           reasoning: `${signalTier} BLOCKED: Precision timing not ready - ${precisionTiming.reason}`,
           danish_filter_applied: 'PRECISION_TIMING_BLOCKED',
@@ -490,7 +529,7 @@ async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
         precision_timing: precisionTiming,
         precision_perfect: precisionTiming.perfect_timing,
         precision_score: precisionTiming.precision_score || 0,
-        precision_waiting_for: precisionTiming.waiting_for || ['Low base confidence'],
+        precision_waiting_for: [`Need ${this.danishConfig.MIN_CONFIDENCE_SCORE}%+ confidence (currently ${momentumSignal.confidence.toFixed(1)}%)`],
         micro_status: precisionTiming.micro_status,
         reasoning: `Danish Strategy: Confidence ${momentumSignal.confidence.toFixed(1)}% below minimum ${this.danishConfig.MIN_CONFIDENCE_SCORE}% - waiting for better setup`,
         danish_filter_applied: 'MIN_CONFIDENCE_NOT_MET',
@@ -570,7 +609,7 @@ async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
       precision_timing: precisionTiming,
       precision_perfect: precisionTiming.perfect_timing,
       precision_score: precisionTiming.precision_score || 0,
-      precision_waiting_for: precisionTiming.waiting_for || ['Failed tier qualification'],
+      precision_waiting_for: ['Failed Danish tier qualification - Need 55%+ confidence + volume spike + trend strength'],
       reasoning: `Danish Strategy: Signal ${momentumSignal.confidence.toFixed(1)}% confidence but failed tier qualification`,
       danish_filter_applied: 'TIER_QUALIFICATION_FAILED',
       strategy_type: 'DANISH_DUAL_TIER_STRATEGY',

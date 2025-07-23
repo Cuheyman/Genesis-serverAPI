@@ -542,8 +542,8 @@ class EnhancedMomentumStrategy {
         primary: {},
         short_term: {},
         long_term: {},
-      symbol: symbol
-    };
+        symbol: symbol
+      };
     });
     
     // Build construct for all symbols and all timeframes

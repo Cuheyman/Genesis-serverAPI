@@ -3,29 +3,27 @@
 // Replaces the restrictive downtrend filter with intelligent signal enhancement
 // ===============================================
 
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 const { PrecisionEntryTimer } = require('./precisionEntryTimer');
 
 class AdvancedScalpingSystem {
-  constructor(taapiService) {
+  constructor(taapiService, binanceClient = null, offChainService = null) {
     this.taapiService = taapiService;
-    this.precisionTimer = new PrecisionEntryTimer(
-        this.binanceClient, 
-        this.offChainService 
-      );
+    this.binanceClient = binanceClient;
+    this.offChainService = offChainService;
     
-
-  if (this.binanceClient && this.offChainService) {
-    this.precisionTimer = new PrecisionEntryTimer(
-      this.binanceClient,
-      this.offChainService
-    );
-    logger.info('🎯 Precision timer initialized in scalping system');
-  } else {
-    this.precisionTimer = null;
-    logger.warn('⚠️ Precision timer not initialized - missing dependencies');
-  }
+    // Only initialize precision timer if we have the required dependencies
+    if (this.binanceClient && this.offChainService) {
+      this.precisionTimer = new PrecisionEntryTimer(
+        this.binanceClient,
+        this.offChainService
+      );
+      logger.info('🎯 Precision timer initialized in scalping system');
+    } else {
+      this.precisionTimer = null;
+      logger.warn('⚠️ Precision timer not initialized - missing dependencies (binanceClient or offChainService)');
+    }
       
     this.activeScalps = new Map();
     this.profitTargets = {

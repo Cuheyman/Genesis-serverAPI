@@ -3,7 +3,7 @@
 // This is what creates 100% win rate with 0.4%-3.4% profits
 // ===============================================
 
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 class PrecisionEntryTimer {
   constructor(binanceClient, offChainService) {
