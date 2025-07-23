@@ -306,6 +306,51 @@ class OptimizedTaapiService {
       last_request: new Date(this.lastRequestTime).toISOString()
     };
   }
+
+  // Fallback method for single symbol indicators
+  async getSingleSymbolIndicators(symbol, timeframe = '1h', exchange = 'binance') {
+    try {
+      const indicators = ['RSI', 'MACD', 'ADX', 'BB', 'EMA'];
+      const results = {};
+      
+      // Make individual API calls for each indicator
+      for (const indicator of indicators) {
+        try {
+          const endpoint = `https://api.taapi.io/${indicator.toLowerCase()}`;
+          const params = {
+            secret: this.apiKey,
+            exchange: exchange,
+            symbol: `${symbol}`,
+            interval: timeframe
+          };
+          
+          const response = await axios.get(endpoint, { params });
+          results[indicator.toLowerCase()] = response.data;
+        } catch (error) {
+          logger.warn(`Failed to get ${indicator} for ${symbol}: ${error.message}`);
+          // Use default values on error
+          results[indicator.toLowerCase()] = this.getDefaultIndicatorValue(indicator);
+        }
+      }
+      
+      return results;
+    } catch (error) {
+      logger.error(`getSingleSymbolIndicators failed for ${symbol}: ${error.message}`);
+      throw error;
+    }
+  }
+  
+  // Helper method to provide default indicator values
+  getDefaultIndicatorValue(indicator) {
+    const defaults = {
+      'RSI': { value: 50 },
+      'MACD': { valueMACD: 0, valueMACDSignal: 0, valueMACDHist: 0 },
+      'ADX': { value: 20 },
+      'BB': { valueUpperBand: 0, valueMiddleBand: 0, valueLowerBand: 0 },
+      'EMA': { value: 0 }
+    };
+    return defaults[indicator] || { value: 0 };
+  }
 }
 
 module.exports = OptimizedTaapiService;

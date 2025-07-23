@@ -463,9 +463,20 @@ async function getValidSymbols() {
   return validSymbolsCache.symbols;
 }
 
-async function isValidSymbol(symbol) {
+// Enhanced symbol validation: checks for USDT and USDC pairs
+async function findValidSymbol(baseSymbol) {
   const validSymbols = await getValidSymbols();
-  return validSymbols.includes(symbol);
+  const usdtSymbol = baseSymbol.toUpperCase() + 'USDT';
+  const usdcSymbol = baseSymbol.toUpperCase() + 'USDC';
+  if (validSymbols.includes(usdtSymbol)) return usdtSymbol;
+  if (validSymbols.includes(usdcSymbol)) return usdcSymbol;
+  return null;
+}
+
+// Update isValidSymbol to use findValidSymbol
+async function isValidSymbol(symbol) {
+  const base = symbol.replace(/(USDT|USDC)$/i, '');
+  return !!(await findValidSymbol(base));
 }
 
 function getSymbolMetadata(symbol) {
@@ -3029,6 +3040,20 @@ try {
     enhancedSignalGenerator = new EnhancedSignalGenerator(taapiService);
     console.log('✅ EnhancedSignalGenerator instance created successfully');
     
+    // Initialize precision timing with required dependencies (async wrapper)
+    (async () => {
+      if (enhancedSignalGenerator && binanceClient && offChainDataService) {
+        try {
+          await enhancedSignalGenerator.initializePrecisionTiming(binanceClient, offChainDataService);
+          console.log('✅ Precision timing system initialized with full dependencies');
+        } catch (error) {
+          console.warn('⚠️ Precision timing initialization failed:', error.message);
+        }
+      } else {
+        console.warn('⚠️ Precision timing not initialized - missing dependencies');
+      }
+    })();
+    
   } else {
     console.warn('⚠️ TAAPI_SECRET is NOT configured - enhanced services will run in fallback mode');
     taapiService = null;
@@ -3481,11 +3506,33 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       });
     }
 
+    // Enhanced symbol validation: check for USDT/USDC
+    const baseSymbol = symbol.replace(/(USDT|USDC)$/i, '');
+    const validSymbol = await findValidSymbol(baseSymbol);
+    if (!validSymbol) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid symbol: ${symbol}`,
+        suggestion: 'Use an active USDT or USDC trading pair',
+        timestamp: Date.now()
+      });
+    }
+    console.log(`✅ Using valid symbol: ${validSymbol}`);
+
+    if (!MomentumValidationService) {
+      return res.status(503).json({
+        success: false,
+        error: 'Momentum services not available',
+        message: 'MomentumValidationService not loaded',
+        timestamp: Date.now()
+      });
+    }
+
     // Use enhanced momentum strategy with Python-inspired logic
     let finalSignal = null;
     
     try {
-      console.log(`🚀 [DEBUG] Step 1: Starting Enhanced Momentum Strategy for ${symbol} at ${new Date().toISOString()}`);
+      console.log(`🚀 [DEBUG] Step 1: Starting Enhanced Momentum Strategy for ${validSymbol} at ${new Date().toISOString()}`);
       
       // Import and initialize enhanced momentum strategy with error handling
       let MomentumStrategyIntegration;
@@ -3509,11 +3556,11 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       console.log(`✅ [DEBUG] Step 3: Integration instance created successfully`);
       
       // Get high win rate optimized signal
-      console.log(`📡 [DEBUG] Step 4: Calling getEnhancedSignalForPair(${symbol})...`);
+      console.log(`📡 [DEBUG] Step 4: Calling getEnhancedSignalForPair(${validSymbol})...`);
       const signalStartTime = Date.now();
       
       // Add timeout protection
-      const signalPromise = integration.getEnhancedSignalForPair(symbol);
+      const signalPromise = integration.getEnhancedSignalForPair(validSymbol);
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Signal generation timeout after 45 seconds')), 45000);
       });
@@ -3526,9 +3573,14 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       console.log(`🇩🇰 [DEBUG] Step 5: Applying Danish Strategy Filter with Precision Timing...`);
       
       try {
-        // Create a simple signal generator instance for the Danish filter
+        // Create a signal generator instance with proper dependencies for the Danish filter
         const EnhancedSignalGenerator = require('./services/enhancedSignalGenerator');
-        const danishFilter = new EnhancedSignalGenerator();
+        const danishFilter = new EnhancedSignalGenerator(taapiService);
+        
+        // Initialize precision timing if available
+        if (binanceClient && offChainDataService) {
+          await danishFilter.initializePrecisionTiming(binanceClient, offChainDataService);
+        }
         
         // Create minimal technical and market data for the filter (TIER 3 QUALIFYING VALUES)
         const technicalData = {
@@ -3540,7 +3592,7 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
         console.log(`🔍 [DEBUG] Technical data for Danish filter: RSI=${technicalData.rsi}, ADX=${technicalData.adx}, Vol=${technicalData.volume_ratio}`);
         
         const marketData = {
-          symbol: symbol || 'UNKNOWN',
+          symbol: validSymbol || 'UNKNOWN',
           current_price: 45000,
           volume_24h: 1000000
         };
@@ -3554,12 +3606,19 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
         
         // Merge the Danish filter results
         if (filteredSignal) {
+          // CRITICAL: Copy the signal decision from Danish filter!
+          enhancedSignal.signal = filteredSignal.signal || enhancedSignal.signal;
+          enhancedSignal.action = filteredSignal.action || enhancedSignal.action;
+          enhancedSignal.position_size_percent = filteredSignal.position_size_percent || 0;
+          enhancedSignal.signal_tier = filteredSignal.signal_tier;
+          
           enhancedSignal.precision_timing = filteredSignal.precision_timing || true;
           enhancedSignal.precision_perfect = filteredSignal.precision_perfect || false;
           enhancedSignal.precision_score = filteredSignal.precision_score || enhancedSignal.confidence;
           enhancedSignal.micro_signals = filteredSignal.micro_signals;
           enhancedSignal.precision_waiting_for = filteredSignal.precision_waiting_for || [`Tier qualification pending (${enhancedSignal.confidence.toFixed(1)}%)`];
           enhancedSignal.danish_filter_applied = true;
+          enhancedSignal.converted_hold_to_buy = filteredSignal.converted_hold_to_buy || false;
           
           console.log(`✅ [DEBUG] Step 5: Danish filter applied successfully - Precision Score: ${enhancedSignal.precision_score}`);
           console.log(`🔍 [DEBUG] Precision waiting for: ${JSON.stringify(enhancedSignal.precision_waiting_for)}`);
@@ -3577,7 +3636,7 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       console.log(`\n🎯 ===== ENHANCED STRATEGY SUCCESS =====`);
       console.log(`✅ Enhanced momentum signal generated:`, {
         signal: enhancedSignal.signal,
-        symbol: symbol,
+        symbol: validSymbol,
         confidence: enhancedSignal.confidence,
         quality: enhancedSignal.entry_quality,
         volume_confirmed: enhancedSignal.volume_confirmation,
@@ -3594,8 +3653,8 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
 
       // 🔧 ADD NULL SAFETY CHECK
       if (!enhancedSignal) {
-        console.log(`❌ ERROR: Enhanced signal is null for ${symbol || 'UNKNOWN'}`);
-        throw new Error(`Enhanced signal generation returned null for ${symbol || 'UNKNOWN'}`);
+        console.log(`❌ ERROR: Enhanced signal is null for ${validSymbol || 'UNKNOWN'}`);
+        throw new Error(`Enhanced signal generation returned null for ${validSymbol || 'UNKNOWN'}`);
       }
 
       console.log(`📈 Signal: ${enhancedSignal.signal || 'UNKNOWN'}`);
@@ -3809,13 +3868,13 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       position_size_percent: positionSize, // 🆕 AGGRESSIVE POSITION SIZE
       tier: tier, // 🆕 TIER NUMBER
       aggressive_mode: true, // 🆕 INDICATES 100% EQUITY MODE
-      symbol: symbol || 'UNKNOWN',
+      symbol: validSymbol || 'UNKNOWN',
       timeframe: timeframe || '1h',
       enhanced_by: finalSignal.enhanced_by || 'momentum_endpoint_aggressive',
       reasoning: finalSignal.reasoning || 'Danish momentum strategy with aggressive dual-tier sizing',
       strategy_type: 'DANISH_AGGRESSIVE_MOMENTUM_STRATEGY', // 🆕 UPDATED STRATEGY TYPE
       metadata: {
-        symbol: symbol,
+        symbol: validSymbol,
         timeframe: timeframe,
         processing_time_ms: Date.now() - startTime,
         api_version: 'momentum_v1.1_aggressive',
@@ -3827,7 +3886,7 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
 
     console.log(`\n✅ ===== AGGRESSIVE MOMENTUM RESPONSE SENT =====`);
     console.log(`📈 Signal: ${finalSignal.signal}`);
-    console.log(`📊 Symbol: ${symbol}`);
+    console.log(`📊 Symbol: ${validSymbol}`);
     console.log(`🎯 Confidence: ${finalSignal.confidence}%`);
     console.log(`🏆 Entry Quality: ${entryQuality}`);
     console.log(`💰 Position Size: ${positionSize}% (Tier ${tier})`);
@@ -3856,7 +3915,7 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
 
     // Return fallback instead of error
     const fallbackMomentumResponse = {
-      symbol: symbol || 'UNKNOWN',
+      symbol: validSymbol || 'UNKNOWN',
       momentum_analysis: { isValid: true, confidence: 75 },
       market_data: {
         current_price: 45000,

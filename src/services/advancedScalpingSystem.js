@@ -5,7 +5,7 @@
 
 const logger = require('../utils/logger');
 
-const { PrecisionEntryTimer } = require('./precisionEntryTimer');
+const PrecisionEntryTimer = require('./precisionEntryTimer');
 
 class AdvancedScalpingSystem {
   constructor(taapiService, binanceClient = null, offChainService = null) {
