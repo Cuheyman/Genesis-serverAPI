@@ -12,12 +12,16 @@ const fetch = require('node-fetch');
 const path = require('path');
 require('dotenv').config();
 
+// Add this line to define the Binance API base URL
+const BINANCE_API_BASE = process.env.BINANCE_API_BASE || 'https://api.binance.com/api';
+
 // Import standard services
 const OffChainDataService = require('./services/offChainDataService');
 const offChainDataService = new OffChainDataService();
 const riskParameterService = require('./services/riskParameterService');
 const signalReasoningEngine = require('./services/signalReasoningEngine');
 const botIntegrationService = require('./services/botIntegrationService');
+const { MomentumStrategyIntegration } = require('./services/enhancedMomentumStrategy');
 
 // Import momentum services
 let MomentumValidationService = null;
@@ -3457,6 +3461,522 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
       timestamp: Date.now()
     });
   }
+});
+
+
+// Add this to your Express API server
+// Required dependencies: axios
+
+
+// Guide endpoint for quick asset screening with tier-specific criteria
+app.get('/api/v1/tier-matched-assets', authenticateAPI, async (req, res) => {
+  try {
+    // Define tier-specific criteria
+    const tierCriteria = {
+      tier1: {
+        minVolume: 10000000,      // 10M USDT daily volume
+        minVolumeRatio: 2.0,      // 2x average volume (high activity)
+        minPriceMomentum: 1.5,    // 1.5% positive momentum
+        maxRSI: 75,               // Not overbought
+        minRSI: 30,               // Not oversold
+        minOrderImbalance: 0.15,  // Strong buy pressure
+        minScore: 75              // High confidence score
+      },
+      tier2: {
+        minVolume: 5000000,       // 5M USDT daily volume
+        minVolumeRatio: 1.5,      // 1.5x average volume
+        minPriceMomentum: 0.5,    // 0.5% positive momentum
+        maxRSI: 80,               // Slightly more relaxed
+        minRSI: 25,
+        minOrderImbalance: 0.05,  // Moderate buy pressure
+        minScore: 60              // Medium confidence score
+      },
+      tier3: {
+        minVolume: 1000000,       // 1M USDT daily volume
+        minVolumeRatio: 1.2,      // 1.2x average volume
+        minPriceMomentum: -0.5,   // Can be slightly negative
+        maxRSI: 85,               // More relaxed
+        minRSI: 20,
+        minOrderImbalance: -0.05, // Can have slight sell pressure
+        minScore: 50              // Lower confidence score
+      }
+    };
+
+    const recommendedAssets = {
+      tier1_candidates: [],
+      tier2_candidates: [],
+      tier3_candidates: []
+    };
+    
+    // Allow override of tier criteria via query params
+    const customMinVolume = req.query.min_volume ? parseFloat(req.query.min_volume) : null;
+    const excludeStablecoins = req.query.exclude_stablecoins !== 'false'; // Default true
+    
+    // Fetch all tradeable USDT pairs from Binance
+    const allAssets = await getTradableUSDTPairs(excludeStablecoins);
+    
+    console.log(`Starting enhanced screening for ${allAssets.length} USDT pairs`);
+    
+    // Get 24hr volume data for all assets first (single API call)
+    const volumeData = await get24hrVolumeData();
+    
+    // Pre-filter assets by minimum acceptable volume (tier3 minimum)
+    const minAcceptableVolume = customMinVolume || tierCriteria.tier3.minVolume;
+    const volumeFilteredAssets = allAssets.filter(asset => {
+      const volume = volumeData[asset] || 0;
+      return volume >= minAcceptableVolume;
+    });
+    
+    console.log(`Volume filtered to ${volumeFilteredAssets.length} assets with volume > ${minAcceptableVolume} USDT`);
+    
+    // Initialize the momentum strategy integration
+    const momentumIntegration = new MomentumStrategyIntegration();
+
+    // Parallel processing with volume data and momentum signal
+    const screeningPromises = volumeFilteredAssets.map(async asset => {
+      try {
+        const signalResult = await momentumIntegration.getEnhancedSignalForPair(asset);
+        return { asset, ...signalResult };
+      } catch (e) {
+        console.error(`Error screening ${asset}:`, e.message);
+        return null;
+      }
+    });
+    const screeningResults = await Promise.all(screeningPromises);
+
+    // Categorize assets into tiers based on momentum signal confidence and signal type
+    let totalProcessed = 0;
+    let buySignals = 0;
+    let holdSignals = 0;
+    
+    screeningResults.forEach(result => {
+      totalProcessed++;
+      if (!result) {
+        console.log(`❌ Skipping null result`);
+        return;
+      }
+      
+      if (result.signal === 'buy') {
+        buySignals++;
+        if (result.confidence >= tierCriteria.tier1.minScore) {
+          recommendedAssets.tier1_candidates.push({ symbol: result.asset, confidence: result.confidence, signal: result.signal });
+        } else if (result.confidence >= tierCriteria.tier2.minScore) {
+          recommendedAssets.tier2_candidates.push({ symbol: result.asset, confidence: result.confidence, signal: result.signal });
+        } else if (result.confidence >= tierCriteria.tier3.minScore) {
+          recommendedAssets.tier3_candidates.push({ symbol: result.asset, confidence: result.confidence, signal: result.signal });
+        }
+      } else {
+        holdSignals++;
+        // Debug: Show first few hold signals
+        if (holdSignals <= 3) {
+          console.log(`🔍 Hold signal for ${result.asset}: confidence=${result.confidence}, signal=${result.signal}`);
+        }
+      }
+    });
+
+    console.log(`📊 Screening Summary:`);
+    console.log(`   Total processed: ${totalProcessed}`);
+    console.log(`   Buy signals: ${buySignals}`);
+    console.log(`   Hold signals: ${holdSignals}`);
+    console.log(`   Tier 1 candidates: ${recommendedAssets.tier1_candidates.length}`);
+    console.log(`   Tier 2 candidates: ${recommendedAssets.tier2_candidates.length}`);
+    console.log(`   Tier 3 candidates: ${recommendedAssets.tier3_candidates.length}`);
+
+    // Print a summary of assets and their tiers
+    const tierSummary = [];
+    Object.entries(recommendedAssets).forEach(([tier, candidates]) => {
+      candidates.forEach(candidate => {
+        tierSummary.push({ symbol: candidate.symbol, tier, confidence: candidate.confidence, signal: candidate.signal });
+      });
+    });
+    console.log('Tier-matched assets summary:');
+    tierSummary.forEach(entry => {
+      console.log(`Asset: ${entry.symbol}, Tier: ${entry.tier}, Signal: ${entry.signal}, Confidence: ${entry.confidence}`);
+    });
+    
+    res.json({
+      success: true,
+      candidates: recommendedAssets,
+      total_candidates: Object.values(recommendedAssets).flat().length,
+      total_assets_screened: volumeFilteredAssets.length,
+      total_assets_available: allAssets.length,
+      tier_criteria: tierCriteria,
+      processing_time_ms: Date.now() - req.startTime,
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    console.error('Tier-matched-assets error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: Date.now()
+    });
+  }
+});
+
+// Enhanced screening with exact metrics
+async function performEnhancedScreening(asset, currentVolume, tierCriteria) {
+  try {
+    // Get comprehensive market data
+    const [priceData, orderBook] = await Promise.all([
+      getBinanceKlines(asset, '4h', 50),  // Last 50 4h candles
+      getBinanceOrderBook(asset, 20)      // Deeper order book
+    ]);
+    
+    // Price calculations
+    const currentPrice = parseFloat(priceData[priceData.length - 1].close);
+    const price4hAgo = parseFloat(priceData[priceData.length - 2].close);
+    const price24hAgo = parseFloat(priceData[priceData.length - 6].close);
+    
+    // Price momentum
+    const priceMomentum4h = ((currentPrice - price4hAgo) / price4hAgo) * 100;
+    const priceMomentum24h = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+    
+    // Volume analysis
+    const avgVolume = calculateAverageVolume(priceData.slice(-20));
+    const volumeRatio = currentVolume / avgVolume;
+    
+    // Technical indicators
+    const rsi = calculateRSI(priceData.slice(-14));
+    const volatility = calculateVolatility(priceData.slice(-20));
+    const trendStrength = calculateTrendStrength(priceData.slice(-10));
+    
+    // Order book analysis
+    const orderBookAnalysis = analyzeOrderBook(orderBook);
+    
+    // Enhanced scoring based on multiple factors
+    let score = 50; // Base score
+    const reasoning = [];
+    
+    // Volume scoring (very important for liquidity)
+    if (currentVolume >= tierCriteria.tier1.minVolume) {
+      score += 15;
+      reasoning.push("Excellent liquidity");
+    } else if (currentVolume >= tierCriteria.tier2.minVolume) {
+      score += 10;
+      reasoning.push("Good liquidity");
+    } else if (currentVolume >= tierCriteria.tier3.minVolume) {
+      score += 5;
+      reasoning.push("Adequate liquidity");
+    }
+    
+    // Volume surge scoring
+    if (volumeRatio > 3) {
+      score += 15;
+      reasoning.push("Major volume surge");
+    } else if (volumeRatio > 2) {
+      score += 10;
+      reasoning.push("Strong volume increase");
+    } else if (volumeRatio > 1.5) {
+      score += 5;
+      reasoning.push("Above average volume");
+    }
+    
+    // Momentum scoring
+    if (priceMomentum4h > 3 && priceMomentum24h > 5) {
+      score += 15;
+      reasoning.push("Strong bullish momentum");
+    } else if (priceMomentum4h > 1.5) {
+      score += 10;
+      reasoning.push("Positive momentum");
+    } else if (priceMomentum4h > 0.5) {
+      score += 5;
+      reasoning.push("Slight upward movement");
+    } else if (priceMomentum4h < -2) {
+      score -= 10;
+      reasoning.push("Bearish momentum");
+    }
+    
+    // RSI scoring
+    if (rsi >= 60 && rsi <= 70) {
+      score += 10;
+      reasoning.push("RSI in bullish zone");
+    } else if (rsi > 70 && rsi <= 75) {
+      score += 5;
+      reasoning.push("RSI approaching overbought");
+    } else if (rsi > 80) {
+      score -= 10;
+      reasoning.push("RSI overbought");
+    } else if (rsi < 30) {
+      score -= 5;
+      reasoning.push("RSI oversold");
+    }
+    
+    // Order book scoring
+    if (orderBookAnalysis.imbalance > 0.2) {
+      score += 10;
+      reasoning.push("Strong buy pressure");
+    } else if (orderBookAnalysis.imbalance > 0.1) {
+      score += 5;
+      reasoning.push("Moderate buy pressure");
+    } else if (orderBookAnalysis.imbalance < -0.2) {
+      score -= 10;
+      reasoning.push("Strong sell pressure");
+    }
+    
+    // Trend strength scoring
+    if (trendStrength > 0.7) {
+      score += 10;
+      reasoning.push("Strong trend");
+    } else if (trendStrength > 0.5) {
+      score += 5;
+      reasoning.push("Moderate trend");
+    }
+    
+    // Volatility adjustment
+    if (volatility > 0.15) {
+      score -= 5;
+      reasoning.push("High volatility");
+    } else if (volatility < 0.05) {
+      score += 5;
+      reasoning.push("Stable price action");
+    }
+    
+    // Ensure score is within bounds
+    score = Math.max(0, Math.min(100, score));
+    
+    return {
+      score,
+      volume: currentVolume,
+      volumeRatio,
+      priceMomentum: priceMomentum4h,
+      rsi,
+      orderImbalance: orderBookAnalysis.imbalance,
+      volatility,
+      trendStrength,
+      reasoning: reasoning.join("; ")
+    };
+    
+  } catch (error) {
+    console.error(`Enhanced screening error for ${asset}:`, error);
+    return {
+      score: 0,
+      volume: 0,
+      volumeRatio: 0,
+      priceMomentum: 0,
+      rsi: 50,
+      orderImbalance: 0,
+      volatility: 0,
+      trendStrength: 0,
+      reasoning: "Screening failed"
+    };
+  }
+}
+
+// Fetch all active USDT trading pairs from Binance
+async function getTradableUSDTPairs(excludeStablecoins = true) {
+  try {
+    const response = await axios.get(`${BINANCE_API_BASE}/v3/exchangeInfo`);
+    const exchangeInfo = response.data;
+    
+    // Stablecoins to exclude (comprehensive list)
+    const stablecoins = [
+      'BUSDUSDT', 'USDCUSDT', 'TUSDUSDT', 'PAXUSDT', 'HUSDUSDT', 
+      'GUSDUSDT', 'SUSDUSDT', 'ORSUSDT', 'DAIUSDT', 'EURUSDT',
+      'GBPUSDT', 'AUDUSDT', 'NZDUSDT', 'JPYUSDT', 'CHFUSDT',
+      'CADUSDT', 'MXNUSDT', 'TRYUSDT', 'RUBUSDT', 'ZARUSDT',
+      'USDPUSDT', 'USTUSDT', 'FRAXUSDT', 'LUSDUSDT', 'ALUSDUSDT'
+    ];
+
+    console.log('Total symbols from Binance:', exchangeInfo.symbols.length);
+    console.log('First 5 symbols:', exchangeInfo.symbols.slice(0, 5));
+
+    let filteredSymbols = exchangeInfo.symbols;
+    
+    // Filter for USDT pairs
+    filteredSymbols = filteredSymbols.filter(symbol => symbol.quoteAsset === 'USDT');
+    console.log('After quoteAsset===USDT:', filteredSymbols.length);
+
+    // Filter for trading status
+    filteredSymbols = filteredSymbols.filter(symbol => symbol.status === 'TRADING');
+    console.log('After status===TRADING:', filteredSymbols.length);
+
+    // Filter for spot trading allowed
+    filteredSymbols = filteredSymbols.filter(symbol => symbol.isSpotTradingAllowed);
+    console.log('After isSpotTradingAllowed:', filteredSymbols.length);
+
+    // Filter for not leveraged tokens
+    filteredSymbols = filteredSymbols.filter(symbol => !['BEAR', 'BULL', 'DOWN', 'UP'].some(token => symbol.symbol.includes(token)));
+    console.log('After not leveraged:', filteredSymbols.length);
+
+    // Filter for SPOT permission
+    filteredSymbols = filteredSymbols.filter(symbol =>
+    symbol.permissions.length === 0 || symbol.permissions.includes('SPOT')
+    );
+    console.log('After permissions check (empty or includes \"SPOT\"):', filteredSymbols.length);
+
+    // Filter for not stablecoin if needed
+    if (excludeStablecoins) {
+      filteredSymbols = filteredSymbols.filter(symbol => !stablecoins.includes(symbol.symbol));
+      console.log('After excludeStablecoins:', filteredSymbols.length);
+    }
+
+    // If still zero, print out why for first 10 USDT pairs
+    if (filteredSymbols.length === 0) {
+      const usdtSymbols = exchangeInfo.symbols.filter(symbol => symbol.quoteAsset === 'USDT');
+      console.log('Debugging first 10 USDT pairs:');
+      usdtSymbols.slice(0, 10).forEach(symbol => {
+        console.log({
+          symbol: symbol.symbol,
+          status: symbol.status,
+          isSpotTradingAllowed: symbol.isSpotTradingAllowed,
+          permissions: symbol.permissions,
+          isStablecoin: stablecoins.includes(symbol.symbol)
+        });
+      });
+    }
+
+    const usdtPairs = filteredSymbols.map(symbol => symbol.symbol).sort();
+    console.log(`Found ${usdtPairs.length} tradeable USDT pairs`);
+    return usdtPairs;
+    
+  } catch (error) {
+    console.error('Error fetching Binance exchange info:', error);
+    
+    // Fallback to major pairs if API fails
+    console.log('Using fallback asset list');
+    return [
+      'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT',
+      'DOGEUSDT', 'MATICUSDT', 'SOLUSDT', 'DOTUSDT', 'LTCUSDT',
+      'AVAXUSDT', 'LINKUSDT', 'UNIUSDT', 'ATOMUSDT', 'XLMUSDT'
+    ];
+  }
+}
+
+// Get 24hr volume data for all symbols
+async function get24hrVolumeData() {
+  try {
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/24hr');
+    const tickers = response.data;
+    
+    const volumeMap = {};
+    tickers.forEach(ticker => {
+      if (ticker.symbol.endsWith('USDT')) {
+        volumeMap[ticker.symbol] = parseFloat(ticker.quoteVolume);
+      }
+    });
+    
+    return volumeMap;
+    
+  } catch (error) {
+    console.error('Error fetching volume data:', error);
+    return {};
+  }
+}
+
+// Helper functions
+async function getBinanceKlines(symbol, interval, limit) {
+  const response = await axios.get('https://api.binance.com/api/v3/klines', {
+    params: { symbol, interval, limit }
+  });
+  return response.data.map(k => ({
+    open: parseFloat(k[1]),
+    high: parseFloat(k[2]),
+    low: parseFloat(k[3]),
+    close: parseFloat(k[4]),
+    volume: parseFloat(k[5])
+  }));
+}
+
+async function getBinanceOrderBook(symbol, limit) {
+  const response = await axios.get('https://api.binance.com/api/v3/depth', {
+    params: { symbol, limit }
+  });
+  return response.data;
+}
+
+function calculateAverageVolume(candles) {
+  const volumes = candles.map(c => c.volume);
+  return volumes.reduce((sum, vol) => sum + vol, 0) / volumes.length;
+}
+
+function calculateRSI(candles) {
+  let gains = 0;
+  let losses = 0;
+  
+  for (let i = 1; i < candles.length; i++) {
+    const change = candles[i].close - candles[i-1].close;
+    if (change > 0) {
+      gains += change;
+    } else {
+      losses += Math.abs(change);
+    }
+  }
+  
+  const avgGain = gains / (candles.length - 1);
+  const avgLoss = losses / (candles.length - 1);
+  
+  if (avgLoss === 0) return 100;
+  
+  const rs = avgGain / avgLoss;
+  const rsi = 100 - (100 / (1 + rs));
+  
+  return Math.round(rsi * 100) / 100;
+}
+
+function calculateVolatility(candles) {
+  const returns = [];
+  for (let i = 1; i < candles.length; i++) {
+    const ret = (candles[i].close - candles[i-1].close) / candles[i-1].close;
+    returns.push(ret);
+  }
+  
+  const mean = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
+  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - mean, 2), 0) / returns.length;
+  const stdDev = Math.sqrt(variance);
+  
+  return Math.round(stdDev * 10000) / 10000;
+}
+
+function calculateTrendStrength(candles) {
+  // Simple trend strength based on consecutive higher highs/lows
+  let upMoves = 0;
+  let downMoves = 0;
+  
+  for (let i = 1; i < candles.length; i++) {
+    if (candles[i].close > candles[i-1].close && candles[i].high > candles[i-1].high) {
+      upMoves++;
+    } else if (candles[i].close < candles[i-1].close && candles[i].low < candles[i-1].low) {
+      downMoves++;
+    }
+  }
+  
+  const totalMoves = candles.length - 1;
+  const trendRatio = (upMoves - downMoves) / totalMoves;
+  
+  return Math.abs(trendRatio);
+}
+
+function analyzeOrderBook(orderBook) {
+  const bids = orderBook.bids.slice(0, 10);
+  const asks = orderBook.asks.slice(0, 10);
+  
+  const totalBidVolume = bids.reduce((sum, [price, qty]) => sum + parseFloat(qty), 0);
+  const totalAskVolume = asks.reduce((sum, [price, qty]) => sum + parseFloat(qty), 0);
+  
+  const imbalance = (totalBidVolume - totalAskVolume) / (totalBidVolume + totalAskVolume);
+  
+  const bidDepth = bids.length;
+  const askDepth = asks.length;
+  
+  const spread = asks[0] && bids[0] ? 
+    (parseFloat(asks[0][0]) - parseFloat(bids[0][0])) / parseFloat(bids[0][0]) : 0;
+  
+  return {
+    imbalance,
+    bidDepth,
+    askDepth,
+    spread,
+    totalBidVolume,
+    totalAskVolume
+  };
+}
+
+// Middleware to track request time
+app.use((req, res, next) => {
+  req.startTime = Date.now();
+  next();
 });
 
 // ===============================================
