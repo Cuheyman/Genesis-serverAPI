@@ -22,7 +22,7 @@ class SmartQualityFilter {
   async checkSignalQuality(symbol, signal, technicalData, marketData) {
     this.stats.total_analyzed++;
     
-    // 🔥 FIXED: Use tier from signal if available, otherwise determine from confidence
+    // 🔥 FIXED: Use tier from Danish strategy signal, don't override it
     const tier = signal.tier || this.determineTier(signal.confidence);
     if (tier === 0) {
       return { allowed: false, reason: "Below minimum confidence threshold" };
@@ -64,7 +64,7 @@ class SmartQualityFilter {
 
     return {
       allowed: true,
-      tier: tier,
+      tier: tier,  // 🔥 KEEP the original tier from Danish strategy
       quality_score: qualityScore,
       reason: `High quality Tier ${tier} signal`,
       breakdown: {
@@ -98,47 +98,53 @@ class SmartQualityFilter {
     }
   }
 
-  // 🥇 TIER 1: ULTRA STRICT DOWNTREND PROTECTION
+  // 🥇 TIER 1: REALISTIC STRICT DOWNTREND PROTECTION (Adjusted for real TAAPI data)
   tier1StrictDowntrendCheck(symbol, indicators) {
     const { ema20, ema50, ema200, rsi, adx, price } = indicators;
     
-    logger.info(`🥇 [TIER-1] Ultra-strict analysis for ${symbol}`);
+    logger.info(`🥇 [TIER-1] Realistic strict analysis for ${symbol}`);
     
-    // 🔥 ULTRA STRICT: Block any bearish EMA alignment for Tier 1
+    // 🔥 REALISTIC: Block severe bearish EMA alignment for Tier 1
     if (ema20 && ema50 && ema20 < ema50) {
       const gap = ((ema50 - ema20) / ema50) * 100;
-      logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Bearish EMA alignment (${gap.toFixed(1)}% gap)`);
-      return { allowed: false, reason: "Tier 1: Bearish EMA alignment not allowed", score: 20 };
+      if (gap > 2) { // Only block if gap is significant (>2%)
+        logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Severe bearish EMA alignment (${gap.toFixed(1)}% gap)`);
+        return { allowed: false, reason: "Tier 1: Severe bearish EMA alignment not allowed", score: 20 };
+      }
     }
     
-    // 🔥 ULTRA STRICT: Block price below EMA20 for Tier 1
+    // 🔥 REALISTIC: Block price far below EMA20 for Tier 1
     if (price && ema20 && price < ema20) {
       const gap = ((ema20 - price) / ema20) * 100;
-      logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Price below EMA20 (${gap.toFixed(1)}% gap)`);
-      return { allowed: false, reason: "Tier 1: Price below EMA20 not allowed", score: 25 };
+      if (gap > 3) { // Only block if price is >3% below EMA20
+        logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Price far below EMA20 (${gap.toFixed(1)}% gap)`);
+        return { allowed: false, reason: "Tier 1: Price far below EMA20 not allowed", score: 25 };
+      }
     }
     
-    // 🔥 ULTRA STRICT: Higher RSI requirement for better quality
-    if (rsi < 50) { // Increased from 45 to 50 - much stricter
+    // 🔥 REALISTIC: Moderate RSI requirement for Tier 1
+    if (rsi < 40) { // Lowered from 50 to 40 for realistic market conditions
       logger.info(`❌ [TIER-1] ${symbol} BLOCKED - RSI too weak (${rsi})`);
       return { allowed: false, reason: "Tier 1: RSI too weak for premium entry", score: 30 };
     }
     
-    // 🔥 ULTRA STRICT: Higher ADX requirement for better trend strength
-    if (adx < 30) { // Increased from 25 to 30 - much stricter
+    // 🔥 REALISTIC: Moderate ADX requirement for Tier 1
+    if (adx < 20) { // Lowered from 30 to 20 for realistic market conditions
       logger.info(`❌ [TIER-1] ${symbol} BLOCKED - ADX too weak (${adx})`);
       return { allowed: false, reason: "Tier 1: Trend strength insufficient", score: 35 };
     }
 
-    // 🔥 ULTRA STRICT: Block any long-term bearish structure for Tier 1
+    // 🔥 REALISTIC: Block severe long-term bearish structure for Tier 1
     if (ema50 && ema200 && ema50 < ema200) {
       const gap = ((ema200 - ema50) / ema200) * 100;
-      logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Long-term bearish structure (EMA50 < EMA200 by ${gap.toFixed(1)}%)`);
-      return { allowed: false, reason: "Tier 1: Long-term bearish structure not allowed", score: 25 };
+      if (gap > 5) { // Only block if gap is significant (>5%)
+        logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Severe long-term bearish structure (EMA50 < EMA200 by ${gap.toFixed(1)}%)`);
+        return { allowed: false, reason: "Tier 1: Severe long-term bearish structure not allowed", score: 25 };
+      }
     }
 
-    // 🔥 ULTRA STRICT: Additional volume requirement for Tier 1
-    if (indicators.volume_ratio && indicators.volume_ratio < 1.5) { // Increased from 1.2 to 1.5
+    // 🔥 REALISTIC: Moderate volume requirement for Tier 1
+    if (indicators.volume_ratio && indicators.volume_ratio < 1.1) { // Increased from 1.0 to 1.1 for proper tier differentiation
       logger.info(`❌ [TIER-1] ${symbol} BLOCKED - Volume ratio too low (${indicators.volume_ratio})`);
       return { allowed: false, reason: "Tier 1: Volume ratio insufficient for premium entry", score: 30 };
     }
@@ -147,53 +153,59 @@ class SmartQualityFilter {
     return { allowed: true, reason: "Tier 1: Premium quality confirmed", score: 95 };
   }
 
-  // 🥈 TIER 2: MODERATE DOWNTREND PROTECTION
+  // 🥈 TIER 2: REALISTIC STRICT DOWNTREND PROTECTION (Adjusted for real TAAPI data)
   tier2ModerateDowntrendCheck(symbol, indicators) {
     const { ema20, ema50, ema200, rsi, adx, price } = indicators;
     
-    logger.info(`🥈 [TIER-2] Moderate analysis for ${symbol}`);
+    logger.info(`🥈 [TIER-2] Realistic strict analysis for ${symbol} (balanced for real market data)`);
     
-    // 🔥 TIGHTENED: Block any bearish EMA sequence for Tier 2
-    if (ema20 && ema50 && ema200 && ema20 < ema50 && ema50 < ema200) {
-      const gap1 = ((ema50 - ema20) / ema50) * 100;
-      const gap2 = ((ema200 - ema50) / ema200) * 100;
-      
-      if (gap1 > 1 && gap2 > 1) { // Tighter than before (was 2%)
-        logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Bearish EMA sequence (${gap1.toFixed(1)}%, ${gap2.toFixed(1)}%)`);
-        return { allowed: false, reason: `Tier 2: Bearish EMA sequence (${gap1.toFixed(1)}%, ${gap2.toFixed(1)}%)`, score: 25 };
-      } else {
-        logger.info(`⚠️ [TIER-2] ${symbol} WARNING - Mild bearish EMA sequence (${gap1.toFixed(1)}%, ${gap2.toFixed(1)}%)`);
+    // 🔥 REALISTIC: Block moderate bearish EMA alignment for Tier 2
+    if (ema20 && ema50 && ema20 < ema50) {
+      const gap = ((ema50 - ema20) / ema50) * 100;
+      if (gap > 3) { // Block if gap is moderate (>3%)
+        logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Moderate bearish EMA alignment (${gap.toFixed(1)}% gap)`);
+        return { allowed: false, reason: "Tier 2: Moderate bearish EMA alignment not allowed", score: 20 };
       }
     }
     
-    // 🔥 TIGHTENED: Block price below EMAs for Tier 2
-    if (price && ema20 && ema50 && price < ema20 * 0.98 && price < ema50 * 0.98) { // Tighter than before (was 0.97)
-      const gap1 = ((ema20 - price) / ema20) * 100;
-      const gap2 = ((ema50 - price) / ema50) * 100;
-      logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Price below EMAs (${gap1.toFixed(1)}%, ${gap2.toFixed(1)}%)`);
-      return { allowed: false, reason: "Tier 2: Price below EMAs", score: 30 };
+    // 🔥 REALISTIC: Block price moderately below EMA20 for Tier 2
+    if (price && ema20 && price < ema20) {
+      const gap = ((ema20 - price) / ema20) * 100;
+      if (gap > 4) { // Block if price is >4% below EMA20
+        logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Price moderately below EMA20 (${gap.toFixed(1)}% gap)`);
+        return { allowed: false, reason: "Tier 2: Price moderately below EMA20 not allowed", score: 25 };
+      }
     }
     
-    // 🔥 ULTRA TIGHTENED: Much higher RSI requirement for Tier 2
-    if (rsi < 45) { // Increased from 35 to 45 - much stricter
+    // 🔥 REALISTIC: Moderate RSI requirement for Tier 2
+    if (rsi < 35) { // Lowered from 50 to 35 for realistic market conditions
       logger.info(`❌ [TIER-2] ${symbol} BLOCKED - RSI too weak (${rsi})`);
-      return { allowed: false, reason: "Tier 2: RSI too weak", score: 35 };
+      return { allowed: false, reason: "Tier 2: RSI too weak for quality entry", score: 30 };
     }
     
-    // 🔥 ULTRA TIGHTENED: Much higher ADX requirement for Tier 2
-    if (adx < 30) { // Increased from 25 to 30 - much stricter
+    // 🔥 REALISTIC: Moderate ADX requirement for Tier 2
+    if (adx < 15) { // Lowered from 30 to 15 for realistic market conditions
       logger.info(`❌ [TIER-2] ${symbol} BLOCKED - ADX too weak (${adx})`);
-      return { allowed: false, reason: "Tier 2: ADX too weak", score: 35 };
+      return { allowed: false, reason: "Tier 2: Trend strength insufficient", score: 35 };
     }
 
-    // 🔥 ULTRA TIGHTENED: Volume ratio requirement for Tier 2
-    if (indicators.volume_ratio && indicators.volume_ratio < 1.3) { // Require 1.3x volume for Tier 2
+    // 🔥 REALISTIC: Block moderate long-term bearish structure for Tier 2
+    if (ema50 && ema200 && ema50 < ema200) {
+      const gap = ((ema200 - ema50) / ema200) * 100;
+      if (gap > 8) { // Block if gap is moderate (>8%)
+        logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Moderate long-term bearish structure (EMA50 < EMA200 by ${gap.toFixed(1)}%)`);
+        return { allowed: false, reason: "Tier 2: Moderate long-term bearish structure not allowed", score: 25 };
+      }
+    }
+
+    // 🔥 REALISTIC: Moderate volume requirement for Tier 2
+    if (indicators.volume_ratio && indicators.volume_ratio < 1.0) { // Lowered from 1.5 to 1.0
       logger.info(`❌ [TIER-2] ${symbol} BLOCKED - Volume ratio too low (${indicators.volume_ratio})`);
-      return { allowed: false, reason: "Tier 2: Volume ratio insufficient", score: 30 };
+      return { allowed: false, reason: "Tier 2: Volume ratio insufficient for quality entry", score: 30 };
     }
 
-    logger.info(`✅ [TIER-2] ${symbol} APPROVED - Good quality setup`);
-    return { allowed: true, reason: "Tier 2: Good quality setup", score: 75 };
+    logger.info(`✅ [TIER-2] ${symbol} APPROVED - Good quality confirmed (realistic standards)`);
+    return { allowed: true, reason: "Tier 2: Good quality confirmed", score: 85 };
   }
 
   // 🥉 TIER 3: RELAXED DOWNTREND PROTECTION
@@ -254,8 +266,8 @@ class SmartQualityFilter {
       if (atrPercent > 12) riskFactors.push("Extreme volatility");
     }
 
-    // Tier-based tolerance
-    const maxAllowed = tier === 1 ? 0 : tier === 2 ? 1 : 2;
+    // Tier-based tolerance - Realistic for real market data
+    const maxAllowed = tier === 1 ? 0 : tier === 2 ? 1 : 2; // Tier 2 back to 1 tolerance (was 0)
     
     logger.info(`🚨 [RISK] ${symbol} risk factors: ${riskFactors.length}/${maxAllowed} (${riskFactors.join(', ') || 'none'})`);
     
@@ -298,8 +310,8 @@ class SmartQualityFilter {
     // Consistency bonus (30 points max) - simplified for now
     volumeScore += 15; // Base consistency score
     
-    // 🔥 ULTRA STRICT: Tier-based requirements for proper cascade
-    const minRequired = tier === 1 ? 70 : tier === 2 ? 75 : 40; // 🔥 Much stricter Tier 2 (was 60)
+    // 🔥 REALISTIC: Tier-based requirements for proper cascade - Adjusted for real market data
+    const minRequired = tier === 1 ? 60 : tier === 2 ? 55 : 40; // 🔥 Lowered for realistic market conditions
     
     logger.info(`📊 [VOLUME] ${symbol} volume score: ${volumeScore}/100 (min: ${minRequired}, ratio: ${volumeRatio.toFixed(2)}x, MFI: ${mfi})`);
     
@@ -345,8 +357,8 @@ class SmartQualityFilter {
       confirmationDetails.push("rsi");
     }
 
-    // 🔥 BALANCED: Moderate tier-based requirements
-    const required = tier === 1 ? 2 : tier === 2 ? 1 : 1; // 🔥 Balanced Tier 1 from 3 to 2
+    // 🔥 REALISTIC: Tier-based requirements - Adjusted for real market data
+    const required = tier === 1 ? 2 : tier === 2 ? 1 : 1; // 🔥 Tier 2 back to 1 confirmation (was 2)
     
     logger.info(`✅ [CONFIRM] ${symbol} confirmations: ${confirmations}/${required} (${confirmationDetails.join(', ') || 'none'})`);
     

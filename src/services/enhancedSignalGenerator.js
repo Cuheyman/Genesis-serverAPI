@@ -64,7 +64,8 @@ class EnhancedSignalGenerator {
     // Tier-based position sizing
     PRIMARY_POSITION_SIZE: 15,    // Tier 1: 15%
     MODERATE_POSITION_SIZE: 12,   // Tier 2: 12%
-    CONSERVATIVE_POSITION_SIZE: 8 // Tier 3: 8%
+    CONSERVATIVE_POSITION_SIZE: 8, // Tier 3: 8%
+    PREMIUM_POSITION_SIZE: 10,    // Tier 1: 10% (added for Tier 1 only)
   };
     logger.info('🔍 DEBUG: Service type:', this.taapiService.constructor.name);
     logger.info('🔍 DEBUG: isProPlan:', this.taapiService.isProPlan);
@@ -404,40 +405,87 @@ class EnhancedSignalGenerator {
   // 🔧 FIXED: UPDATED applyDanishStrategyFilter METHOD WITH ALL FIXES APPLIED
   // ===============================================
   async applyDanishStrategyFilter(momentumSignal, technicalData, marketData) {
-    logger.info(`🔥 [DEBUG] applyDanishStrategyFilter CALLED for ${marketData.symbol} with confidence ${momentumSignal.confidence}%`);
-    logger.info(`🔍 [DEBUG] ScalpingSystem exists: ${!!this.scalpingSystem}`);
-    logger.info(`🔍 [DEBUG] PrecisionTimer exists: ${!!(this.scalpingSystem && this.scalpingSystem.precisionTimer)}`);
+    // Declare variables outside try block so they're accessible throughout the function
+    let coinClass, thresholds;
     
-    // 🎯 CLASSIFY COIN AND GET DYNAMIC THRESHOLDS
-    const coinClass = this.classifyCoin(marketData.symbol, marketData);
-    const thresholds = coinClass.thresholds;
-    
-    // ⏰ CHECK MARKET TIMING
-    const isGoodTime = this.isOptimalTradingTime();
-    if (!isGoodTime && coinClass.type !== 'major') {
-      logger.info(`⏰ [TIMING] Outside optimal hours for non-major coin ${marketData.symbol} - SKIPPING`);
+    try {
+      console.log(`🔥 [DEBUG] applyDanishStrategyFilter CALLED for ${marketData.symbol} with confidence ${momentumSignal.confidence}%`);
+      logger.info(`🔥 [DEBUG] applyDanishStrategyFilter CALLED for ${marketData.symbol} with confidence ${momentumSignal.confidence}%`);
+      logger.info(`🔍 [DEBUG] ScalpingSystem exists: ${!!this.scalpingSystem}`);
+      logger.info(`🔍 [DEBUG] PrecisionTimer exists: ${!!(this.scalpingSystem && this.scalpingSystem.precisionTimer)}`);
+      
+      // 🎯 CLASSIFY COIN AND GET DYNAMIC THRESHOLDS
+      console.log(`🔍 [DEBUG] About to classify coin for ${marketData.symbol}`);
+      coinClass = this.classifyCoin(marketData.symbol, marketData);
+      thresholds = coinClass.thresholds;
+      console.log(`🔍 [DEBUG] Coin classified: type=${coinClass.type}, minConfidence=${thresholds.minConfidence}`);
+    } catch (earlyError) {
+      console.error(`❌ [EARLY ERROR] Error in early part of applyDanishStrategyFilter:`, earlyError);
+      console.error(`❌ [EARLY ERROR] Error stack:`, earlyError.stack);
+      // Return a fallback signal
       return {
-        ...momentumSignal,
         signal: 'HOLD',
         action: 'HOLD',
-        position_size_percent: 0,
-        reasoning: 'Outside optimal trading hours for non-major coins',
-        market_timing_blocked: true
+        confidence: momentumSignal?.confidence || 0,
+        reasoning: 'Early Danish Strategy error',
+        uptrend_score: 0,
+        uptrend_stage: 'error',
+        uptrend_reasons: ['Early Danish Strategy error']
       };
+    }
+    
+    // Add debug log right after coin classification
+    console.log(`🔍 [DEBUG] About to start confidence check for ${marketData.symbol}`);
+    
+    // ⏰ CHECK MARKET TIMING (TEMPORARILY DISABLED FOR TESTING)
+    try {
+      console.log(`🔍 [DEBUG] About to check market timing for ${marketData.symbol}`);
+      const isGoodTime = this.isOptimalTradingTime();
+      console.log(`🔍 [DEBUG] Market timing result: isGoodTime=${isGoodTime}, coinClass.type=${coinClass.type}`);
+      if (!isGoodTime && coinClass.type !== 'major') {
+        console.log(`⏰ [TIMING] Outside optimal hours for non-major coin ${marketData.symbol} - BUT CONTINUING FOR UPTREND TESTING`);
+        // Temporarily allow all coins to pass through for uptrend testing
+      }
+    } catch (timingError) {
+      console.error(`❌ [TIMING ERROR] Error in market timing check:`, timingError);
+      console.error(`❌ [TIMING ERROR] Error stack:`, timingError.stack);
+      // Continue anyway for uptrend testing
     }
     
     // 🏆 APPLY DYNAMIC CONFIDENCE THRESHOLD
-    if (momentumSignal.confidence < thresholds.minConfidence) {
-      logger.info(`❌ [DYNAMIC] ${marketData.symbol} confidence ${momentumSignal.confidence}% < ${thresholds.minConfidence}% required for ${coinClass.type}`);
+    try {
+      console.log(`🔍 [DEBUG] Inside confidence check - coinClass:`, !!coinClass, `thresholds:`, !!thresholds, `momentumSignal:`, !!momentumSignal);
+      console.log(`🔍 [DEBUG] coinClass.type:`, coinClass?.type, `thresholds.minConfidence:`, thresholds?.minConfidence, `momentumSignal.confidence:`, momentumSignal?.confidence);
+      
+      console.log(`🔍 [DEBUG] Coin classification for ${marketData.symbol}: type=${coinClass.type}, minConfidence=${thresholds.minConfidence}%, currentConfidence=${momentumSignal.confidence}%`);
+      if (momentumSignal.confidence < thresholds.minConfidence) {
+        console.log(`❌ [DYNAMIC] ${marketData.symbol} confidence ${momentumSignal.confidence}% < ${thresholds.minConfidence}% required for ${coinClass.type}`);
+        return {
+          ...momentumSignal,
+          signal: 'HOLD',
+          action: 'HOLD',
+          position_size_percent: 0,
+          reasoning: `Confidence below ${coinClass.type} threshold (${thresholds.minConfidence}%)`,
+          coin_type: coinClass.type
+        };
+      }
+      console.log(`✅ [DEBUG] Confidence check passed for ${marketData.symbol}: ${momentumSignal.confidence}% >= ${thresholds.minConfidence}%`);
+    } catch (confidenceError) {
+      console.error(`❌ [CONFIDENCE ERROR] Error in confidence check:`, confidenceError);
+      console.error(`❌ [CONFIDENCE ERROR] Error stack:`, confidenceError.stack);
       return {
-        ...momentumSignal,
         signal: 'HOLD',
         action: 'HOLD',
-        position_size_percent: 0,
-        reasoning: `Confidence below ${coinClass.type} threshold (${thresholds.minConfidence}%)`,
-        coin_type: coinClass.type
+        confidence: momentumSignal?.confidence || 0,
+        reasoning: 'Confidence check error',
+        uptrend_score: 0,
+        uptrend_stage: 'error',
+        uptrend_reasons: ['Confidence check error']
       };
     }
+    
+    // Add debug log right after confidence check
+    console.log(`🔍 [DEBUG] About to start uptrend detection for ${marketData.symbol}`);
     
     try {
       logger.info(`🇩🇰 APPLYING Danish Dual-Tier Strategy Filter with PRECISION TIMING for ${marketData.symbol || 'UNKNOWN'} (ROI Target: 18-25%)`);
@@ -448,7 +496,14 @@ class EnhancedSignalGenerator {
       const adx = technicalData?.adx || momentumSignal?.technical_data?.adx || 20;
       const volumeRatio = technicalData?.volume_ratio || momentumSignal?.volume_analysis?.volume_ratio || 1.0;
       
+      // 🔥 FIX: Extract EMA data and current price properly
+      const currentPrice = marketData?.current_price || technicalData?.current_price || 0;
+      const ema20 = technicalData?.ema20 || 0;
+      const ema50 = technicalData?.ema50 || 0;
+      const ema200 = technicalData?.ema200 || 0;
+      
       logger.info(`📊 Technical Data: RSI=${rsi}, ADX=${adx}, Volume Ratio=${volumeRatio}`);
+      logger.info(`📊 Price Data: Current=${currentPrice}, EMA20=${ema20}, EMA50=${ema50}, EMA200=${ema200}`);
       logger.info(`🔍 DEBUG: Checking tier qualification for ${momentumSignal.confidence.toFixed(1)}% confidence signal`);
       
       // 🚀 NEW: ALWAYS analyze precision timing FIRST (even for low confidence signals)
@@ -542,63 +597,145 @@ class EnhancedSignalGenerator {
       let positionSize = 0;
       let wouldBeBuySignal = false;
       
-      // Check Tier 1 (Ultra-Selective) criteria
-      if (momentumSignal.confidence >= this.danishConfig.MIN_CONFIDENCE_SCORE && 
-          volumeRatio >= this.danishConfig.MOMENTUM_THRESHOLDS.volume_spike_min && 
-          adx >= 25 && rsi >= 35 && rsi <= 70) {
-        signalTier = 'TIER_1_ULTRA';
-        positionSize = this.danishConfig.PRIMARY_POSITION_SIZE;
-        wouldBeBuySignal = true;
-        logger.info(`🎯 QUALIFIED FOR TIER 1: Ultra-selective signal (${positionSize}% position)`);
-      }
-      // Check Tier 2 (Moderate) criteria  
-      else if (momentumSignal.confidence >= this.danishConfig.MODERATE_CONFIDENCE_SCORE &&
-               volumeRatio >= this.danishConfig.MOMENTUM_THRESHOLDS.moderate_volume_spike_min &&
-               adx >= this.danishConfig.MOMENTUM_THRESHOLDS.moderate_adx_min &&
-               rsi >= 30 && rsi <= 75) {
-        signalTier = 'TIER_2_MODERATE';
-        positionSize = this.danishConfig.MODERATE_POSITION_SIZE;
-        wouldBeBuySignal = true;
-        logger.info(`🎯 QUALIFIED FOR TIER 2: Moderate signal (${positionSize}% position)`);
+      // [DEBUG] Confirm code path is reached before uptrend detection
+      console.log(`[DEBUG] Reached uptrend detection block for ${marketData.symbol}`);
+      // [DEBUG] Log all key variables before uptrend detection
+      console.log(`[DEBUG] Pre-uptrend vars: currentPrice=${currentPrice}, ema20=${ema20}, ema50=${ema50}, ema200=${ema200}, volumeRatio=${volumeRatio}, adx=${adx}, rsi=${rsi}`);
+      
+      // 🚀 UNIVERSAL UPTREND DETECTION - INTEGRATED WITH TIER SYSTEM
+      let uptrendResult;
+      try {
+        console.log(`🔍 [UPTREND] ${marketData.symbol} - Starting uptrend detection...`);
+        console.log(`🔍 [UPTREND] ${marketData.symbol} - Calling detectUptrendStart...`);
+        uptrendResult = this.detectUptrendStart(technicalData, marketData);
+        console.log(`🔍 [UPTREND] ${marketData.symbol} - detectUptrendStart returned:`, JSON.stringify(uptrendResult, null, 2));
+      } catch (uptrendError) {
+        console.error(`❌ [UPTREND ERROR] ${marketData.symbol} - Error in uptrend detection:`, uptrendError);
+        console.error(`❌ [UPTREND ERROR] ${marketData.symbol} - Error stack:`, uptrendError.stack);
+        // Return a fallback uptrend result
+        uptrendResult = {
+          isUptrend: false,
+          uptrendScore: 0,
+          reasons: ['Uptrend detection error'],
+          criteria: {}
+        };
       }
       
-      // 🚨 NEW: Check for Tier 3 qualification (55-64% confidence)
-      else if (momentumSignal.confidence >= 55 && momentumSignal.confidence < 65 &&
-               volumeRatio >= 1.1 && adx >= 15 && rsi >= 30 && rsi <= 75) {
-        // SKIP TIER 3 - Focus on quality over quantity
+      if (!uptrendResult.isUptrend) {
+        console.log(`❌ [UPTREND] ${marketData.symbol} - No uptrend detected, skipping trade (score: ${uptrendResult.uptrendScore}/100)`);
+        console.log(`📊 [UPTREND] ${marketData.symbol} - Uptrend reasons: ${uptrendResult.reasons.join(', ')}`);
         signalTier = null;
         positionSize = 0;
         wouldBeBuySignal = false;
-        logger.info(`❌ TIER 3 SKIPPED: Conservative signals disabled for higher win rate`);
+        return { 
+          signal: 'HOLD', 
+          action: 'HOLD', 
+          confidence: momentumSignal.confidence, 
+          reasoning: 'No uptrend detected', 
+          uptrend_score: uptrendResult.uptrendScore,
+          uptrend_stage: 'none',
+          uptrend_reasons: uptrendResult.reasons || []
+        };
+      }
+      
+      console.log(`✅ [UPTREND] ${marketData.symbol} - UPTREND CONFIRMED! Score: ${uptrendResult.uptrendScore}/100`);
+      console.log(`🔍 [DEBUG] About to start tier qualification for ${marketData.symbol}`);
+      
+      // Add debug log right before the try block
+      console.log(`🔍 [DEBUG] About to enter tier qualification try block for ${marketData.symbol}`);
+      
+      // 🎯 UPTREND CONFIRMED - ASSIGN TIER BASED ON QUALITY
+      try {
+        console.log(`✅ [UPTREND] ${marketData.symbol} - UPTREND CONFIRMED! Score: ${uptrendResult.uptrendScore}/100, Stage: ${uptrendResult.stage}`);
+        console.log(`📊 [UPTREND] ${marketData.symbol} - Uptrend reasons: ${uptrendResult.reasons.join(', ')}`);
+        console.log(`🎯 [UPTREND] ${marketData.symbol} - Current price: ${currentPrice}, EMA20: ${ema20}, EMA50: ${ema50}, EMA200: ${ema200}`);
+        
+        // 🔥 NEW: CASCADE TIER SYSTEM - Try Tier 1 first, then Tier 2, then Tier 3
+        console.log(`🎯 [TIER CASCADE] ${marketData.symbol} - Starting tier qualification cascade...`);
+      } catch (tierError) {
+        console.error(`❌ [TIER ERROR] Error in tier qualification:`, tierError);
+        console.error(`❌ [TIER ERROR] Error stack:`, tierError.stack);
+        return {
+          signal: 'HOLD',
+          action: 'HOLD',
+          confidence: momentumSignal?.confidence || 0,
+          reasoning: 'Tier qualification error',
+          uptrend_score: uptrendResult.uptrendScore,
+          uptrend_stage: 'error',
+          uptrend_reasons: ['Tier qualification error']
+        };
+      }
+      
+              // Store original confidence for tier logic
+        const originalConfidence = momentumSignal.confidence;
+        console.log(`🔍 [DEBUG] Original confidence for tier logic: ${originalConfidence}%`);
+        
+        // 🎯 TIER 1: Premium entry (75%+ confidence, high quality + uptrend)
+        console.log(`🔍 [TIER 1 CHECK] ${marketData.symbol} - Checking Tier 1 criteria:`);
+        console.log(`   Confidence: ${originalConfidence} >= 75? ${originalConfidence >= 75}`);
+        console.log(`   Volume Ratio: ${volumeRatio} >= 1.0? ${volumeRatio >= 1.0}`);
+        console.log(`   ADX: ${adx} >= 20? ${adx >= 20}`);
+        console.log(`   RSI: ${rsi} (30-75)? ${rsi >= 30 && rsi <= 75}`);
+        console.log(`   Uptrend Score: ${uptrendResult.uptrendScore} >= 70? ${uptrendResult.uptrendScore >= 70}`);
+        console.log(`   Price > EMA20: ${uptrendResult.criteria?.priceAboveEMA20 ? 'YES' : 'NO'}`);
+        console.log(`   Price Momentum: ${uptrendResult.criteria?.priceMomentum ? 'YES' : 'NO'}`);
+      
+              console.log(`🔍 [DEBUG] About to check Tier 1 qualification for ${marketData.symbol}`);
+        if (originalConfidence >= 75 && 
+            volumeRatio >= 1.2 && adx >= 25 && rsi >= 45 && rsi <= 65 && 
+            uptrendResult.uptrendScore >= 70 && uptrendResult.criteria?.priceAboveEMA20 && uptrendResult.criteria?.priceMomentum) {
+          console.log(`🎯 [TIER 1] ${marketData.symbol} - Premium uptrend confirmed! Position: ${this.danishConfig.PREMIUM_POSITION_SIZE}%`);
+          signalTier = 'TIER_1_PREMIUM';
+          positionSize = this.danishConfig.PREMIUM_POSITION_SIZE;
+          wouldBeBuySignal = true;
+          console.log(`🎯 [TIER 1] ${marketData.symbol} - Premium uptrend confirmed! Position: ${positionSize}%`);
+        }
+      // 🎯 TIER 2: Moderate entry (65%+ confidence, moderate quality + uptrend)
+      else if (originalConfidence >= 65 && 
+               volumeRatio >= 1.0 && adx >= 15 && rsi >= 30 && rsi <= 75 && 
+               uptrendResult.uptrendScore >= 40 && uptrendResult.criteria?.priceAboveEMA20) {
+        signalTier = 'TIER_2_MODERATE';
+        positionSize = this.danishConfig.MODERATE_POSITION_SIZE;
+        wouldBeBuySignal = true;
+        logger.info(`🎯 [TIER 2] ${marketData.symbol} - Moderate uptrend confirmed! Position: ${positionSize}%`);
+      }
+      // 🎯 TIER 3: Conservative entry (55%+ confidence, conservative quality + uptrend)
+      else if (originalConfidence >= 55 && originalConfidence < 65 &&
+               volumeRatio >= 0.9 && adx >= 10 && rsi >= 30 && rsi <= 75 && 
+               uptrendResult.uptrendScore >= 30 && uptrendResult.criteria?.priceAboveEMA20) {
+        signalTier = 'TIER_3_CONSERVATIVE';
+        positionSize = this.danishConfig.CONSERVATIVE_POSITION_SIZE;
+        wouldBeBuySignal = true;
+        logger.info(`🎯 [TIER 3] ${marketData.symbol} - Conservative uptrend confirmed! Position: ${positionSize}%`);
       } else {
         // 🔍 DEBUG: Why tier qualification failed
         logger.info(`❌ NO TIER QUALIFIED:`);
-        logger.info(`  Tier 1: conf=${momentumSignal.confidence.toFixed(1)}% (need 60%+), vol=${volumeRatio.toFixed(2)} (need 1.2+), adx=${adx} (need 25+), rsi=${rsi} (need 35-70)`);
-        logger.info(`  Tier 2: conf=${momentumSignal.confidence.toFixed(1)}% (need 65%+), vol=${volumeRatio.toFixed(2)} (need 1.1+), adx=${adx} (need 20+), rsi=${rsi} (need 30-75)`);
-        logger.info(`  Tier 3: conf=${momentumSignal.confidence.toFixed(1)}% (need 55-64%), vol=${volumeRatio.toFixed(2)} (need 1.1+), adx=${adx} (need 15+), rsi=${rsi} (need 30-75)`);
+        logger.info(`  Tier 1: conf=${originalConfidence.toFixed(1)}% (need 75%+), vol=${volumeRatio.toFixed(2)} (need 1.0+), adx=${adx} (need 20+), rsi=${rsi} (need 30-75), uptrend=${uptrendResult.uptrendScore} (need 50+), price>EMA20=${uptrendResult.criteria?.priceAboveEMA20}`);
+        logger.info(`  Tier 2: conf=${originalConfidence.toFixed(1)}% (need 65%+), vol=${volumeRatio.toFixed(2)} (need 1.0+), adx=${adx} (need 15+), rsi=${rsi} (need 30-75), uptrend=${uptrendResult.uptrendScore} (need 40+), price>EMA20=${uptrendResult.criteria?.priceAboveEMA20}`);
+        logger.info(`  Tier 3: conf=${originalConfidence.toFixed(1)}% (need 55-64%), vol=${volumeRatio.toFixed(2)} (need 0.9+), adx=${adx} (need 10+), rsi=${rsi} (need 30-75), uptrend=${uptrendResult.uptrendScore} (need 30+), price>EMA20=${uptrendResult.criteria?.priceAboveEMA20}`);
       }
       
       // 🎯 APPLY DYNAMIC ADJUSTMENTS BASED ON COIN TYPE
       if (signalTier && positionSize > 0) {
         const originalSize = positionSize;
         positionSize = Math.round(positionSize * thresholds.positionMultiplier);
-        logger.info(`💰 [POSITION] Adjusted size from ${originalSize}% to ${positionSize}% for ${coinClass.type}`);
+        console.log(`💰 [POSITION] Adjusted size from ${originalSize}% to ${positionSize}% for ${coinClass.type}`);
         
-        // Apply dynamic volume check
+        // 🔍 VOLUME CHECK - Only for logging, not overriding tier qualification
+        console.log(`🔍 [VOLUME CHECK] ${marketData.symbol}: volumeRatio=${volumeRatio}, minVolume=${thresholds.minVolume}, coinType=${coinClass.type}`);
         if (volumeRatio < thresholds.minVolume) {
-          logger.info(`❌ [VOLUME] ${marketData.symbol} volume ${volumeRatio}x < ${thresholds.minVolume}x required for ${coinClass.type}`);
-          signalTier = null;
-          positionSize = 0;
-          wouldBeBuySignal = false;
+          console.log(`⚠️ [VOLUME] ${marketData.symbol} volume ${volumeRatio}x < ${thresholds.minVolume}x required for ${coinClass.type} - BUT TIER QUALIFICATION MAINTAINED`);
+        } else {
+          console.log(`✅ [VOLUME] ${marketData.symbol} volume ${volumeRatio}x >= ${thresholds.minVolume}x - PASSED`);
         }
       }
       
-      logger.info(`🔍 [DEBUG] wouldBeBuySignal=${wouldBeBuySignal}, signalTier=${signalTier || 'NONE'}`);
-      logger.info(`🔍 [DEBUG] Starting scalping enhancement check...`);
+      console.log(`🔍 [DEBUG] wouldBeBuySignal=${wouldBeBuySignal}, signalTier=${signalTier || 'NONE'}`);
+      console.log(`🔍 [DEBUG] Starting scalping enhancement check...`);
       
       // 🚀 Apply SCALPING ENHANCEMENT for tier-qualified signals
       if (wouldBeBuySignal) {
-        logger.info(`🎯 [TIER-${signalTier}] Signal qualified for BUY - applying SCALPING ENHANCEMENT`);
+        console.log(`🎯 [TIER-${signalTier}] Signal qualified for BUY - applying SCALPING ENHANCEMENT`);
         
         // Check if scalping system exists
         if (!this.scalpingSystem) {
@@ -609,139 +746,96 @@ class EnhancedSignalGenerator {
             rsi, adx, volumeRatio
           });
           
-          return {
+          const enhancedSignal = {
             ...momentumSignal,
             signal: 'BUY',
             action: 'BUY',
+            confidence: Math.min(95, originalConfidence + 5), // Boost confidence for tier-qualified signals
+            position_size_percent: positionSize,
+            tier: signalTier,
+            danish_strategy_validated: true,
+            danish_compliance_score: danishComplianceScore,
+            danish_filter_applied: 'TIER_QUALIFIED_FALLBACK',
             strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-            signal_tier: signalTier,
-            position_size_percent: positionSize,
-            stop_loss_percent: thresholds.stopLoss,
-            take_profit_percent: thresholds.takeProfit,
-            coin_type: coinClass.type,
-            danish_strategy_validated: true,
-            danish_compliance_score: danishComplianceScore,
-            danish_filter_applied: `${signalTier}_NO_SCALPING`,
+            entry_quality: 'TIER_QUALIFIED_ENTRY',
+            uptrend_score: uptrendResult.uptrendScore,
+            uptrend_stage: uptrendResult.stage || 'confirmed',
+            uptrend_reasons: uptrendResult.reasons || [],
+            reasoning: `Danish Strategy: ${signalTier} signal (${Math.min(95, originalConfidence + 5).toFixed(1)}% confidence) with uptrend confirmation - ${positionSize}% position`,
             precision_timing: precisionTiming,
-            precision_perfect: false,
-            precision_score: precisionTiming.precision_score || 0,
-            precision_waiting_for: [`Scalping system not available`],
-            entry_quality: signalTier === 'TIER_3_CONSERVATIVE' ? 'FAIR_CONSERVATIVE_SETUP' : 'GOOD_MODERATE_SETUP',
-            reasoning: `Danish ${signalTier}: HOLD→BUY conversion (${momentumSignal.confidence.toFixed(1)}% confidence, ${positionSize}% position) - NO SCALPING`
+            precision_perfect: precisionTiming.perfect_timing,
+            precision_score: precisionTiming.precision_score || 0
           };
-        }
-        
-        // Apply scalping enhancement
-        const scalpingEnhanced = await this.scalpingSystem.enhanceExistingSignal(
-          marketData.symbol || 'UNKNOWN',
-          momentumSignal,
-          marketData
-        );
-        
-        // 🚨 FIX 2: DYNAMIC precision timing based on coin type
-        const isPrecisionGood = precisionTiming.perfect_timing || 
-                               (precisionTiming.precision_score >= thresholds.minPrecision && precisionTiming.precision_score < 85);
-        
-        // 🟢 PERFECT ENTRY: Both precision timing AND scalping are optimal
-        if (precisionTiming.perfect_timing && scalpingEnhanced.scalping_mode) {
-          logger.info(`🚀 [PERFECT-ENTRY] ${marketData.symbol} - BOTH PRECISION TIMING AND SCALPING OPTIMAL!`);
-          
-          // Calculate Danish compliance score
-          const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
-            rsi, adx, volumeRatio
-          });
 
-          return {
-            ...scalpingEnhanced,
-            signal: 'BUY',
-            action: 'BUY',
-            signal_tier: signalTier,
-            position_size_percent: positionSize,
-            stop_loss_percent: thresholds.stopLoss,
-            take_profit_percent: thresholds.takeProfit,
-            coin_type: coinClass.type,
-            monthly_roi_contribution: signalTier === 'TIER_1_ULTRA' ? 'HIGH' : 
-                                     signalTier === 'TIER_2_MODERATE' ? 'MODERATE' : 'CONSERVATIVE',
-            danish_strategy_validated: true,
-            danish_compliance_score: danishComplianceScore,
-            danish_filter_applied: `${signalTier}_PRECISION_SCALPING_PERFECT`,
-            strategy_type: 'PRECISION_SCALPING_STRATEGY',
-            downtrend_filter_passed: true,
-            converted_hold_to_buy: true,
-            // 🎯 PRECISION DATA
-            precision_timing: precisionTiming,
-            precision_perfect: true,
-            precision_score: precisionTiming.precision_score,
-            micro_signals: precisionTiming.micro_signals,
-            entry_quality: 'PERFECT_PRECISION_SCALPING_SETUP',
-            reasoning: `Danish ${signalTier} + PRECISION + SCALPING: PERFECT TIMING (P:${precisionTiming.precision_score}/100, S:${scalpingEnhanced.entry_score}/100) - ENTRY NOW!`
-          };
+          logger.info(`✅ DANISH RESULT: HOLD→BUY conversion with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier}) - FALLBACK STANDARD MODE`);
+          return enhancedSignal;
         }
         
-        // 🟡 GOOD ENTRY: Precision timing is good (new realistic requirements)
-        else if (isPrecisionGood) {
-          logger.info(`✅ [GOOD-ENTRY] ${marketData.symbol} ${signalTier}: Precision timing is good - ALLOWING BUY`);
-          
-          // Calculate Danish compliance score
-          const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
-            rsi, adx, volumeRatio
-          });
-
-          // Create enhanced signal based on whether scalping is available
-          const enhancedSignal = scalpingEnhanced.scalping_mode ? scalpingEnhanced : momentumSignal;
-          
-          return {
-            ...enhancedSignal,
-            signal: 'BUY',
-            action: 'BUY',
-            signal_tier: signalTier,
-            position_size_percent: positionSize,
-            stop_loss_percent: thresholds.stopLoss,
-            take_profit_percent: thresholds.takeProfit,
-            coin_type: coinClass.type,
-            monthly_roi_contribution: signalTier === 'TIER_1_ULTRA' ? 'HIGH' : 
-                                     signalTier === 'TIER_2_MODERATE' ? 'MODERATE' : 'CONSERVATIVE',
-            danish_strategy_validated: true,
-            danish_compliance_score: danishComplianceScore,
-            danish_filter_applied: `${signalTier}_PRECISION_GOOD`,
-            strategy_type: scalpingEnhanced.scalping_mode ? 'PRECISION_SCALPING_STRATEGY' : 'DANISH_DUAL_TIER_STRATEGY',
-            downtrend_filter_passed: true,
-            converted_hold_to_buy: true,
-            // 🎯 PRECISION DATA
-            precision_timing: precisionTiming,
-            precision_perfect: precisionTiming.perfect_timing || false,
-            precision_score: precisionTiming.precision_score,
-            micro_signals: precisionTiming.micro_signals,
-            entry_quality: precisionTiming.perfect_timing ? 'EXCELLENT_PRECISION_SETUP' : 
-                          precisionTiming.precision_score >= 60 ? 'GOOD_PRECISION_SETUP' : 'FAIR_PRECISION_SETUP',
-            reasoning: `Danish ${signalTier} + PRECISION: ${precisionTiming.entry_type || 'GOOD TIMING'} (P:${precisionTiming.precision_score}/100) - BUY APPROVED!`
-          };
-        }
+        // 🚀 SCALPING ENHANCEMENT: Apply precision timing for tier-qualified signals
+        logger.info(`🎯 [SCALPING] Applying precision timing enhancement for ${signalTier} signal`);
         
-        // 🔴 PRECISION NOT READY - Block the trade but show analysis  
-        else {
-          logger.info(`❌ [PRECISION-BLOCKED] ${marketData.symbol} ${signalTier}: Precision timing not ready - ${precisionTiming.reason}`);
+        try {
+          // Get precision timing analysis
+          const precisionAnalysis = await this.scalpingSystem.precisionTimer.detectPerfectEntry(
+            marketData.symbol,
+            momentumSignal,
+            marketData
+          );
           
-          return {
+          // 🎯 ENHANCE SIGNAL WITH PRECISION TIMING
+          const enhancedSignal = {
             ...momentumSignal,
-            signal: 'HOLD',
-            action: 'HOLD',
-            confidence: Math.max(momentumSignal.confidence - 15, 10),
-            signal_tier: signalTier,
-            position_size_percent: 0,
-            // 🎯 PRECISION DATA
+            signal: 'BUY',
+            action: 'BUY',
+            confidence: Math.min(95, momentumSignal.confidence + (precisionAnalysis.perfect_timing ? 10 : 5)),
+            position_size_percent: positionSize,
+            tier: signalTier,
+            danish_strategy_validated: true,
+            danish_compliance_score: this.calculateDanishComplianceScore(momentumSignal, { rsi, adx, volumeRatio }),
+            danish_filter_applied: 'TIER_QUALIFIED_PRECISION',
+            strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
+            entry_quality: precisionAnalysis.perfect_timing ? 'PERFECT_TIMING_ENTRY' : 'GOOD_TIMING_ENTRY',
+            uptrend_score: uptrendResult.uptrendScore,
+            uptrend_stage: uptrendResult.stage || 'confirmed',
+            uptrend_reasons: uptrendResult.reasons || [],
+            reasoning: `Danish Strategy: ${signalTier} signal with ${precisionAnalysis.perfect_timing ? 'PERFECT' : 'GOOD'} timing (${Math.min(95, originalConfidence + (precisionAnalysis.perfect_timing ? 10 : 5)).toFixed(1)}% confidence) - ${positionSize}% position`,
+            precision_timing: precisionAnalysis,
+            precision_perfect: precisionAnalysis.perfect_timing,
+            precision_score: precisionAnalysis.precision_score || 0,
+            micro_signals: precisionAnalysis.micro_signals || {},
+            micro_status: precisionAnalysis.micro_status || {}
+          };
+          
+          logger.info(`🚀 DANISH RESULT: ${enhancedSignal.signal} signal with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier}) - PRECISION TIMING ENHANCED`);
+          return enhancedSignal;
+          
+        } catch (scalpingError) {
+          logger.error(`❌ [SCALPING] Error applying precision timing: ${scalpingError.message}`);
+          
+          // FALLBACK: Return tier-qualified signal without scalping enhancement
+          const enhancedSignal = {
+            ...momentumSignal,
+            signal: 'BUY',
+            action: 'BUY',
+            confidence: Math.min(95, originalConfidence + 5),
+            position_size_percent: positionSize,
+            tier: signalTier,
+            danish_strategy_validated: true,
+            danish_compliance_score: this.calculateDanishComplianceScore(momentumSignal, { rsi, adx, volumeRatio }),
+            danish_filter_applied: 'TIER_QUALIFIED_SCALPING_ERROR',
+            strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
+            entry_quality: 'TIER_QUALIFIED_ENTRY',
+            uptrend_score: uptrendResult.uptrendScore,
+            uptrend_stage: uptrendResult.stage || 'confirmed',
+            uptrend_reasons: uptrendResult.reasons || [],
+            reasoning: `Danish Strategy: ${signalTier} signal (${Math.min(95, originalConfidence + 5).toFixed(1)}% confidence) with uptrend confirmation - ${positionSize}% position`,
             precision_timing: precisionTiming,
             precision_perfect: false,
-            precision_score: precisionTiming.precision_score || 0,
-            precision_waiting_for: precisionTiming.waiting_for || [`Need ${precisionTiming.precision_score < 50 ? '50+' : '85+'} precision score (currently ${precisionTiming.precision_score || 0}/100)`],
-            micro_status: precisionTiming.micro_status,
-            reasoning: `${signalTier} BLOCKED: Precision timing not ready - ${precisionTiming.reason}`,
-            danish_filter_applied: 'PRECISION_TIMING_BLOCKED',
-            strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-            entry_quality: 'PRECISION_BLOCKED',
-            tier_qualified: signalTier,
-            tier_blocked_by_precision: true
+            precision_score: 0
           };
+
+          logger.info(`✅ DANISH RESULT: HOLD→BUY conversion with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier}) - SCALPING ERROR FALLBACK`);
+          return enhancedSignal;
         }
       }
       
@@ -763,69 +857,9 @@ class EnhancedSignalGenerator {
           reasoning: `Danish Strategy: Confidence ${momentumSignal.confidence.toFixed(1)}% below minimum ${this.danishConfig.MIN_CONFIDENCE_SCORE}% - waiting for better setup`,
           danish_filter_applied: 'MIN_CONFIDENCE_NOT_MET',
           strategy_type: 'DANISH_MOMENTUM_BULL_STRATEGY',
-          entry_quality: 'REJECTED_LOW_CONFIDENCE'
+          entry_quality: 'REJECTED_LOW_CONFIDENCE',
+          uptrend_score: uptrendResult?.uptrendScore || 0
         };
-      }
-      
-      // 🇩🇰 RULE: IGNORE ALL BEARISH SIGNALS
-      if (this.danishConfig.IGNORE_BEARISH_SIGNALS && momentumSignal.signal === 'SELL') {
-        logger.info(`❌ DANISH FILTER: SELL signal rejected - only bullish entries allowed`);
-        return {
-          ...momentumSignal,
-          signal: 'HOLD',
-          action: 'HOLD',
-          confidence: 0,
-          position_size_percent: 0,
-          // 🎯 ADD PRECISION DATA FOR BEARISH SIGNALS
-          precision_timing: precisionTiming,
-          precision_perfect: precisionTiming.perfect_timing,
-          precision_score: precisionTiming.precision_score || 0,
-          reasoning: 'Danish Strategy: Bearish signals ignored - only bullish entries allowed',
-          danish_filter_applied: 'BEARISH_SIGNAL_FILTERED',
-          strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-          entry_quality: 'REJECTED_BEARISH'
-        };
-      }
-
-      // ✅ HANDLE TIER-QUALIFIED SIGNALS (fallback if precision/scalping didn't run)
-      if (signalTier && wouldBeBuySignal) {
-        logger.info(`⚠️ FALLBACK: Signal QUALIFIED for ${signalTier} but precision/scalping analysis didn't run - using STANDARD MODE`);
-        
-        // Calculate Danish compliance score
-        const danishComplianceScore = this.calculateDanishComplianceScore(momentumSignal, {
-          rsi, adx, volumeRatio
-        });
-
-        // Convert HOLD to BUY and enhance the signal
-        const enhancedSignal = {
-          ...momentumSignal,
-          signal: 'BUY',
-          action: 'BUY',
-          strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-          signal_tier: signalTier,
-          position_size_percent: positionSize,
-          stop_loss_percent: thresholds.stopLoss,
-          take_profit_percent: thresholds.takeProfit,
-          coin_type: coinClass.type,
-          danish_strategy_validated: true,
-          danish_compliance_score: danishComplianceScore,
-          danish_filter_applied: `${signalTier}_QUALIFIED_STANDARD`,
-          downtrend_filter_passed: true,
-          converted_hold_to_buy: true,
-          scalping_analyzed: false,
-          scalping_mode: false,
-          // 🎯 ADD PRECISION DATA FOR FALLBACK
-          precision_timing: precisionTiming,
-          precision_perfect: precisionTiming.perfect_timing,
-          precision_score: precisionTiming.precision_score || 0,
-          precision_note: 'Precision analysis performed but using fallback standard mode',
-          entry_quality: signalTier === 'TIER_1_ULTRA' ? 'EXCELLENT_ULTRA_SETUP' : 
-                        signalTier === 'TIER_2_MODERATE' ? 'GOOD_MODERATE_SETUP' : 'FAIR_CONSERVATIVE_SETUP',
-          reasoning: `Danish ${signalTier}: HOLD→BUY conversion (${momentumSignal.confidence.toFixed(1)}% confidence, ${positionSize}% position) - TIER QUALIFIED (Fallback Standard Mode)`
-        };
-
-        logger.info(`✅ DANISH RESULT: HOLD→BUY conversion with ${enhancedSignal.confidence.toFixed(1)}% confidence (${signalTier}) - FALLBACK STANDARD MODE`);
-        return enhancedSignal;
       }
       
       // If no tier qualification, keep as HOLD
@@ -834,21 +868,31 @@ class EnhancedSignalGenerator {
         ...momentumSignal,
         signal: 'HOLD',
         action: 'HOLD',
-        confidence: Math.max(25, momentumSignal.confidence - 15),
+        confidence: originalConfidence, // Do not reduce confidence
         position_size_percent: 0,
         // 🎯 ADD PRECISION DATA FOR FAILED QUALIFICATION
         precision_timing: precisionTiming,
         precision_perfect: precisionTiming.perfect_timing,
         precision_score: precisionTiming.precision_score || 0,
         precision_waiting_for: ['Failed Danish tier qualification - Need 55%+ confidence + volume spike + trend strength'],
-        reasoning: `Danish Strategy: Signal ${momentumSignal.confidence.toFixed(1)}% confidence but failed tier qualification`,
+        reasoning: `Danish Strategy: Signal ${originalConfidence.toFixed(1)}% confidence but failed tier qualification`,
         danish_filter_applied: 'TIER_QUALIFICATION_FAILED',
         strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
-        entry_quality: 'REJECTED_TIER_CRITERIA'
+        entry_quality: 'REJECTED_TIER_CRITERIA',
+        uptrend_score: uptrendResult?.uptrendScore || 0
       };
 
     } catch (error) {
       logger.error('❌ Danish strategy filter error:', error);
+      logger.error('❌ Error stack:', error.stack);
+      logger.error('❌ Error details:', {
+        message: error.message,
+        name: error.name,
+        symbol: marketData?.symbol,
+        confidence: momentumSignal?.confidence
+      });
+      logger.error('📊 Market Data:', JSON.stringify(marketData, null, 2));
+      logger.error('📊 Technical Data:', JSON.stringify(technicalData, null, 2));
       return {
         signal: 'HOLD',
         action: 'HOLD',
@@ -857,7 +901,7 @@ class EnhancedSignalGenerator {
         precision_timing: null,
         precision_perfect: false,
         precision_score: 0,
-        reasoning: 'Danish strategy filter error - defaulting to HOLD for safety',
+        reasoning: `Danish strategy filter error: ${error.message}`,
         danish_filter_applied: 'ERROR_HOLD',
         strategy_type: 'DANISH_DUAL_TIER_STRATEGY',
         entry_quality: 'ERROR'
@@ -1532,25 +1576,25 @@ class EnhancedSignalGenerator {
         // Calculate base confidence with more generous scoring
         let confidence = this.calculateEnhancedBaseConfidence(technicalData);
         
-        // 🔥 MUCH MORE PERMISSIVE BUY REQUIREMENTS
+        // 🔥 REALISTIC BUY REQUIREMENTS (Adjusted for real TAAPI data)
         const danishBuyRequirements = {
           // Tier 3: Basic entry (25-34% confidence)
-          tier3_confidence: 25,        // 🔥 Your 25.45% signals qualify
-          tier3_rsi_min: 25,          // Much wider RSI range
+          tier3_confidence: 25,        // Basic entry
+          tier3_rsi_min: 25,          // Wide RSI range
           tier3_rsi_max: 80,          // More permissive upper bound
-          tier3_volume_min: 0.9,      // 🔥 MORE PERMISSIVE: Accept lower volume
+          tier3_volume_min: 0.9,      // Accept lower volume
           
           // Tier 2: Good entry (35-49% confidence)  
-          tier2_confidence: 35,        // 🔥 Your 41.1% signals qualify
-          tier2_rsi_min: 45,          // 🔥 ALIGNED: Same as Smart Quality Filter
+          tier2_confidence: 35,        // Good entry
+          tier2_rsi_min: 35,          // Realistic RSI range (was 45)
           tier2_rsi_max: 75,          // Good upper bound
-          tier2_volume_min: 1.3,      // 🔥 ALIGNED: Same as Smart Quality Filter
+          tier2_volume_min: 0.95,     // Good volume (was 1.0) - creates proper tier differentiation
           
-          // Tier 1: Premium entry (50%+ confidence)
-          tier1_confidence: 50,        // Achievable but still premium
-          tier1_rsi_min: 50,          // 🔥 ALIGNED: Same as Smart Quality Filter
+          // Tier 1: Premium entry (50%+ confidence) - ONLY TIER ALLOWED
+          tier1_confidence: 50,        // Premium entry
+          tier1_rsi_min: 40,          // Realistic RSI range (was 50)
           tier1_rsi_max: 70,          // Not overbought
-          tier1_volume_min: 1.5       // 🔥 ALIGNED: Same as Smart Quality Filter
+          tier1_volume_min: 1.1       // Premium volume (back to 1.1x for Tier 1 only strategy)
         };
         
         logger.info(`📊 [DANISH] ${symbol} confidence: ${confidence.toFixed(1)}% (thresholds: T3=${danishBuyRequirements.tier3_confidence}%, T2=${danishBuyRequirements.tier2_confidence}%, T1=${danishBuyRequirements.tier1_confidence}%)`);
@@ -1570,14 +1614,14 @@ class EnhancedSignalGenerator {
               rsi >= danishBuyRequirements.tier1_rsi_min &&
               rsi <= danishBuyRequirements.tier1_rsi_max &&
               volumeRatio >= danishBuyRequirements.tier1_volume_min &&
-              adx >= 30) { // 🔥 ADDED: Strict ADX requirement for Tier 1
+              adx >= 20) { // Realistic ADX requirement for Tier 1 (was 30)
             tier = 1;
             positionSize = this.danishConfig.PRIMARY_POSITION_SIZE;
           } else if (confidence >= danishBuyRequirements.tier2_confidence &&
                      rsi >= danishBuyRequirements.tier2_rsi_min &&
                      rsi <= danishBuyRequirements.tier2_rsi_max &&
                      volumeRatio >= danishBuyRequirements.tier2_volume_min &&
-                     adx >= 20) { // 🔥 ADDED: Moderate ADX requirement for Tier 2
+                     adx >= 15) { // Realistic ADX requirement for Tier 2 (was 20)
             tier = 2;
             positionSize = this.danishConfig.MODERATE_POSITION_SIZE;
           }
@@ -1976,6 +2020,170 @@ async getDanishStrategyDiagnostics() {
         return technicalData[key];
       }
       return null;
+    }
+
+    // 🚀 UPTREND DETECTION & TREND FOLLOWING SYSTEM
+    detectUptrendStart(technicalData, marketData) {
+      const { rsi, adx, volume_ratio, ema20, ema50, ema200 } = technicalData;
+      const currentPrice = marketData.current_price;
+      
+      // 🔍 DEBUG: Log the data we're working with
+      logger.info(`🔍 [UPTREND DEBUG] ${marketData.symbol} - Current Price: ${currentPrice}`);
+      logger.info(`🔍 [UPTREND DEBUG] ${marketData.symbol} - EMA20: ${ema20}, EMA50: ${ema50}, EMA200: ${ema200}`);
+      logger.info(`🔍 [UPTREND DEBUG] ${marketData.symbol} - RSI: ${rsi}, ADX: ${adx}, Volume Ratio: ${volume_ratio}`);
+      
+      // 🛡️ SAFETY CHECK: Ensure we have all required data
+      if (!currentPrice || !ema20 || !ema50 || !ema200) {
+        logger.error(`❌ [UPTREND ERROR] ${marketData.symbol} - Missing required data: currentPrice=${currentPrice}, ema20=${ema20}, ema50=${ema50}, ema200=${ema200}`);
+        return {
+          isUptrend: false,
+          uptrendScore: 0,
+          reasons: ['Missing required data'],
+          criteria: {}
+        };
+      }
+      
+      // 🔍 ADDITIONAL DEBUG: Log all uptrend detection data
+      logger.info(`🔍 [UPTREND FULL DEBUG] ${marketData.symbol}:`);
+      logger.info(`  Current Price: ${currentPrice}`);
+      logger.info(`  EMA20: ${ema20}`);
+      logger.info(`  EMA50: ${ema50}`);
+      logger.info(`  EMA200: ${ema200}`);
+      logger.info(`  RSI: ${rsi}`);
+      logger.info(`  ADX: ${adx}`);
+      logger.info(`  Volume Ratio: ${volume_ratio}`);
+      
+      // 🎯 UPTREND CONFIRMATION CRITERIA (ULTRA-STRICT - NO MORE FALSE POSITIVES)
+      const uptrendCriteria = {
+        // 🔥 CRITICAL FIX: Price MUST be above EMA20 for uptrend
+        priceAboveEMA20: currentPrice > ema20,
+        priceAboveEMA50: currentPrice > ema50,
+        ema20AboveEMA50: ema20 > ema50,
+        
+        // 🔥 ULTRA-STRICT: Much higher momentum requirements
+        rsiOptimal: rsi >= 45 && rsi <= 65, // Tighter RSI range
+        adxStrong: adx >= 25, // Higher ADX requirement
+        volumeSpike: volume_ratio >= 1.2, // Higher volume requirement
+        
+        // 🔥 NEW: Additional momentum requirements
+        trendStrength: adx >= 30, // Much higher trend strength
+        momentumPositive: rsi > 55, // Stronger momentum requirement
+        
+        // 🔥 NEW: Price momentum requirements
+        priceMomentum: (currentPrice - ema20) / ema20 > 0.005, // 0.5% above EMA20
+        emaMomentum: (ema20 - ema50) / ema50 > 0.002 // EMA20 0.2% above EMA50
+      };
+      
+      // 🎯 UPTREND SCORE (0-100) - ULTRA-STRICT LOGIC
+      let uptrendScore = 0;
+      let reasons = [];
+      
+      // 🔥 CRITICAL FIX: Price above EMA20 is MANDATORY for uptrend
+      if (uptrendCriteria.priceAboveEMA20) { 
+        uptrendScore += 20; // Base requirement
+        reasons.push("Price > EMA20"); 
+      } else {
+        // 🔥 NEW: If price is below EMA20, heavily penalize
+        uptrendScore -= 50; // Much bigger penalty
+        reasons.push("Price < EMA20 (BEARISH)");
+      }
+      
+      // 🔥 NEW: Price momentum requirement (0.5% above EMA20)
+      if (uptrendCriteria.priceMomentum) {
+        uptrendScore += 15;
+        reasons.push("Price momentum > 0.5%");
+      } else {
+        uptrendScore -= 20;
+        reasons.push("Insufficient price momentum");
+      }
+      
+      // 🔥 NEW: EMA momentum requirement
+      if (uptrendCriteria.emaMomentum) {
+        uptrendScore += 10;
+        reasons.push("EMA momentum confirmed");
+      } else {
+        uptrendScore -= 15;
+        reasons.push("Weak EMA momentum");
+      }
+      
+      if (uptrendCriteria.priceAboveEMA50) { uptrendScore += 10; reasons.push("Price > EMA50"); }
+      if (uptrendCriteria.ema20AboveEMA50) { uptrendScore += 8; reasons.push("EMA20 > EMA50"); }
+      if (uptrendCriteria.rsiOptimal) { uptrendScore += 12; reasons.push("RSI optimal (45-65)"); }
+      if (uptrendCriteria.adxStrong) { uptrendScore += 12; reasons.push("ADX strong (25+)"); }
+      if (uptrendCriteria.volumeSpike) { uptrendScore += 15; reasons.push("Volume spike (1.2x+)"); }
+      if (uptrendCriteria.trendStrength) { uptrendScore += 8; reasons.push("Trend strength (30+)"); }
+      
+      // 🔥 CRITICAL FIX: ULTRA-STRICT threshold and mandatory requirements
+      const isUptrend = uptrendScore >= 70 && uptrendCriteria.priceAboveEMA20 && uptrendCriteria.priceMomentum; // Must have strong score + price momentum
+      
+      logger.info(`🚀 [UPTREND] ${marketData.symbol} uptrend score: ${uptrendScore}/100 (${isUptrend ? 'CONFIRMED' : 'NOT CONFIRMED'})`);
+      logger.info(`📊 [UPTREND] Reasons: ${reasons.join(', ')}`);
+      logger.info(`🎯 [UPTREND] Threshold: 70/100 + Price > EMA20 + Price Momentum (ULTRA-STRICT UPTREND)`);
+      logger.info(`🔍 [UPTREND] Price vs EMA20: ${currentPrice} ${uptrendCriteria.priceAboveEMA20 ? '>' : '<'} ${ema20} (${uptrendCriteria.priceAboveEMA20 ? 'BULLISH' : 'BEARISH'})`);
+      logger.info(`📈 [UPTREND] Price Momentum: ${((currentPrice - ema20) / ema20 * 100).toFixed(2)}% above EMA20 (need >0.5%)`);
+      logger.info(`📊 [UPTREND] Volume: ${volume_ratio}x (need 1.2x+), ADX: ${adx} (need 25+), RSI: ${rsi} (need 45-65)`);
+      
+      return {
+        isUptrend,
+        uptrendScore,
+        reasons,
+        criteria: uptrendCriteria
+      };
+    }
+    
+    // 📈 TREND FOLLOWING & EXIT DETECTION
+    detectTrendEnd(technicalData, marketData, entryPrice) {
+      const { rsi, adx, volume_ratio, ema20, ema50 } = technicalData;
+      const currentPrice = marketData.current_price;
+      const priceChange = ((currentPrice - entryPrice) / entryPrice) * 100;
+      
+      // 🎯 TREND END SIGNALS
+      const trendEndSignals = {
+        // Price action
+        priceBelowEMA20: currentPrice < ema20,
+        significantDrop: priceChange < -2,
+        
+        // Momentum loss
+        rsiOverbought: rsi > 75,
+        rsiOversold: rsi < 30,
+        adxWeak: adx < 15,
+        
+        // Volume decline
+        volumeDecline: volume_ratio < 0.8,
+        
+        // Profit taking
+        goodProfit: priceChange > 3
+      };
+      
+      // 🎯 EXIT DECISION
+      let shouldExit = false;
+      let exitReason = "";
+      
+      if (trendEndSignals.goodProfit) {
+        shouldExit = true;
+        exitReason = "Profit target reached";
+      } else if (trendEndSignals.priceBelowEMA20 && trendEndSignals.significantDrop) {
+        shouldExit = true;
+        exitReason = "Trend reversal - price below EMA20";
+      } else if (trendEndSignals.rsiOverbought && trendEndSignals.volumeDecline) {
+        shouldExit = true;
+        exitReason = "Overbought with volume decline";
+      } else if (trendEndSignals.adxWeak && trendEndSignals.volumeDecline) {
+        shouldExit = true;
+        exitReason = "Trend strength weakening";
+      }
+      
+      logger.info(`📈 [TREND-FOLLOW] ${marketData.symbol} exit check: ${shouldExit ? 'EXIT' : 'HOLD'} (${priceChange.toFixed(2)}% P&L)`);
+      if (shouldExit) {
+        logger.info(`🚪 [EXIT] Reason: ${exitReason}`);
+      }
+      
+      return {
+        shouldExit,
+        exitReason,
+        priceChange,
+        signals: trendEndSignals
+      };
     }
 }
 

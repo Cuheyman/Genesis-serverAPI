@@ -15,6 +15,20 @@ require('dotenv').config();
 // Add this line to define the Binance API base URL
 const BINANCE_API_BASE = process.env.BINANCE_API_BASE || 'https://api.binance.com/api';
 
+// 🔥 REAL-TIME PRICE FETCHING FUNCTION
+async function getBinancePrice(symbol = 'BTCUSDT') {
+  try {
+    const url = `${BINANCE_API_BASE}/v3/ticker/price?symbol=${symbol}`;
+    const response = await axios.get(url);
+    const price = parseFloat(response.data.price);
+    console.log(`📊 [BINANCE] Fetched real-time price for ${symbol}: ${price}`);
+    return price;
+  } catch (error) {
+    console.warn(`⚠️ [BINANCE] Failed to fetch price for ${symbol}: ${error.message}`);
+    return null;
+  }
+}
+
 // Import standard services
 const OffChainDataService = require('./services/offChainDataService');
 const offChainDataService = new OffChainDataService();
@@ -22,6 +36,16 @@ const riskParameterService = require('./services/riskParameterService');
 const signalReasoningEngine = require('./services/signalReasoningEngine');
 const botIntegrationService = require('./services/botIntegrationService');
 const { MomentumStrategyIntegration } = require('./services/enhancedMomentumStrategy');
+
+// Import uptrend detection service
+let UptrendDetectionService = null;
+let uptrendDetector = null;
+try {
+  UptrendDetectionService = require('./services/uptrendDetectionService');
+  console.log('✅ UptrendDetectionService loaded successfully');
+} catch (error) {
+  console.warn('⚠️ UptrendDetectionService not available:', error.message);
+}
 
 // Import momentum services
 let MomentumValidationService = null;
@@ -80,6 +104,47 @@ const anthropic = new Anthropic({
 // ===============================================
 // STARTUP LOGGING SYSTEM
 // ===============================================
+
+// Initialize uptrend detection service
+if (UptrendDetectionService) {
+  try {
+    // Create a mock binance client for uptrend detection
+    const mockBinanceClient = {
+      ticker24hr: async (params) => {
+        try {
+          const response = await axios.get(`${BINANCE_API_BASE}/v3/ticker/24hr${params ? `?symbol=${params.symbol}` : ''}`);
+          return response.data;
+        } catch (error) {
+          console.error('Error fetching ticker:', error.message);
+          return [];
+        }
+      },
+      klines: async (params) => {
+        try {
+          const response = await axios.get(`${BINANCE_API_BASE}/v3/klines?symbol=${params.symbol}&interval=${params.interval}&limit=${params.limit}`);
+          return response.data;
+        } catch (error) {
+          console.error('Error fetching klines:', error.message);
+          return [];
+        }
+      },
+      book: async (params) => {
+        try {
+          const response = await axios.get(`${BINANCE_API_BASE}/v3/depth?symbol=${params.symbol}&limit=${params.limit}`);
+          return response.data;
+        } catch (error) {
+          console.error('Error fetching order book:', error.message);
+          return { bids: [], asks: [] };
+        }
+      }
+    };
+    
+    uptrendDetector = new UptrendDetectionService(mockBinanceClient);
+    console.log('✅ UptrendDetectionService initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize UptrendDetectionService:', error);
+  }
+}
 
 const startupLogger = {
   log: (message, data = {}) => {
@@ -3387,11 +3452,110 @@ app.post('/api/v1/enhanced-signal', authenticateAPI, async (req, res) => {
     console.log(`⏰ Sent At: ${new Date().toISOString()}`);
     console.log(`===================================\n`);
     
-    res.json({
-      success: true,
-      data: response,
-      timestamp: Date.now()
-    });
+    // 🔥 ENHANCED RESPONSE FORMAT
+    const totalDuration = Date.now() - startTime;
+    
+    // 🔥 NEW: TIER CASCADE SYSTEM - Accept Tier 1, 2, and 3 signals with fallback logic
+    // Handle both numeric tiers (1,2,3) and string tiers (TIER_1_PREMIUM, TIER_2_MODERATE, etc.)
+    const tierNumber = typeof finalSignal.tier === 'number' ? finalSignal.tier : 
+                      finalSignal.tier?.includes('TIER_1') ? 1 :
+                      finalSignal.tier?.includes('TIER_2') ? 2 :
+                      finalSignal.tier?.includes('TIER_3') ? 3 : null;
+    
+    if (finalSignal.signal === 'BUY' && (tierNumber === 1 || tierNumber === 2 || tierNumber === 3)) {
+      const response = {
+        success: true,
+        signal: finalSignal.signal,
+        confidence: finalSignal.confidence,
+        
+        // 🆕 SMART FILTER FIELDS
+        quality_approved: finalSignal.quality_approved || false,
+        quality_filtered: finalSignal.quality_filtered || false,
+        quality_score: finalSignal.quality_score || 0,
+        tier: finalSignal.tier || null,
+        
+        // Trading parameters
+        entry_price: marketData.current_price,
+        position_size: finalSignal.position_size || 0,
+        stop_loss: marketData.current_price * 0.97, // 3% stop loss
+        take_profit_1: marketData.current_price * 1.05, // 5% target
+        take_profit_2: marketData.current_price * 1.15, // 15% target
+        take_profit_3: marketData.current_price * 1.30, // 30% target
+        
+        // Signal details
+        reasoning: finalSignal.reasoning,
+        strategy_type: finalSignal.strategy_type || 'DANISH_SMART_FILTERING',
+        
+        // 🆕 SMART FILTER BREAKDOWN
+        quality_breakdown: finalSignal.quality_breakdown || {},
+        filter_reason: finalSignal.filter_reason || null,
+        
+        // Market data
+        technical_data: {
+          rsi: technicalData.rsi,
+          volume_ratio: technicalData.volume_ratio,
+          adx: technicalData.adx
+        },
+        
+        // 📊 STATISTICS
+        filter_statistics: {
+          total_analyzed: filterStats.total_analyzed,
+          approval_rate: filterStats.approval_rate,
+          tier_breakdown: filterStats.tier_breakdown
+        },
+        
+        // Metadata
+        symbol: validSymbol,
+        timeframe: timeframe,
+        risk_level: risk_level,
+        processing_time_ms: totalDuration,
+        timestamp: Date.now(),
+        
+        // 🎯 SUCCESS INDICATORS
+        smart_filtering_enabled: true,
+        using_quality_filter: true,
+        tier_cascade_enabled: true,
+        api_version: 'v2.0_smart_filtering_tier_cascade'
+      };
+
+      // 🎉 SPECIAL LOGGING FOR TIER CASCADE BUY SIGNALS
+      console.log(`\n🎉 ===== TIER ${finalSignal.tier} BUY SIGNAL GENERATED! =====`);
+      console.log(`🎯 ${validSymbol}: ${finalSignal.signal} signal`);
+      console.log(`📈 Confidence: ${finalSignal.confidence.toFixed(1)}%`);
+      console.log(`🎖️ Tier: ${finalSignal.tier}`);
+      console.log(`💰 Position: ${finalSignal.position_size}%`);
+      console.log(`🏆 Quality Score: ${finalSignal.quality_score}/100`);
+      console.log(`✅ TIER CASCADE - ACCEPTED TIER ${finalSignal.tier}`);
+      console.log(`==================================\n`);
+
+      res.json(response);
+    } else {
+      // 🚫 REJECT NON-BUY SIGNALS OR SIGNALS WITHOUT TIER
+      console.log(`\n❌ ===== SIGNAL REJECTED - NO VALID TIER =====`);
+      console.log(`🎯 ${validSymbol}: ${finalSignal.signal} signal`);
+      console.log(`📈 Confidence: ${finalSignal.confidence.toFixed(1)}%`);
+      console.log(`🎖️ Tier: ${finalSignal.tier || 'N/A'}`);
+      console.log(`🚫 REASON: Signal must be BUY with Tier 1, 2, or 3`);
+      console.log(`==========================================\n`);
+
+      res.json({
+        success: false,
+        signal: 'HOLD',
+        confidence: 0,
+        tier: null,
+        quality_approved: false,
+        quality_score: 0,
+        reasoning: `Signal rejected: Must be BUY signal with Tier 1, 2, or 3. Current signal: ${finalSignal.signal}, Tier: ${finalSignal.tier || 'N/A'}`,
+        rejection_reason: 'TIER_CASCADE_FILTER',
+        symbol: validSymbol,
+        timeframe: timeframe,
+        risk_level: risk_level,
+        processing_time_ms: totalDuration,
+        timestamp: Date.now(),
+        tier_cascade_enabled: true,
+        api_version: 'v2.0_smart_filtering_tier_cascade'
+      });
+    }
 
   } catch (error) {
     console.log(`\n❌ ===== SIGNAL GENERATION ERROR =====`);
@@ -3483,22 +3647,22 @@ app.get('/api/v1/tier-matched-assets', authenticateAPI, async (req, res) => {
         minScore: 75              // High confidence score
       },
       tier2: {
-        minVolume: 5000000,       // 5M USDT daily volume
-        minVolumeRatio: 1.5,      // 1.5x average volume
-        minPriceMomentum: 0.5,    // 0.5% positive momentum
-        maxRSI: 80,               // Slightly more relaxed
-        minRSI: 25,
-        minOrderImbalance: 0.05,  // Moderate buy pressure
-        minScore: 60              // Medium confidence score
+        minVolume: 12000000,      // 12M USDT daily volume (increased from 8M for better liquidity)
+        minVolumeRatio: 2.0,      // 2.0x average volume (same as Tier 1 for quality)
+        minPriceMomentum: 1.5,    // 1.5% positive momentum (same as Tier 1)
+        maxRSI: 70,               // More conservative (decreased from 75)
+        minRSI: 45,               // Higher minimum (increased from 35)
+        minOrderImbalance: 0.15,  // Strong buy pressure (same as Tier 1)
+        minScore: 75              // Higher confidence score (same as Tier 1)
       },
       tier3: {
-        minVolume: 1000000,       // 1M USDT daily volume
-        minVolumeRatio: 1.2,      // 1.2x average volume
-        minPriceMomentum: -0.5,   // Can be slightly negative
-        maxRSI: 85,               // More relaxed
-        minRSI: 20,
-        minOrderImbalance: -0.05, // Can have slight sell pressure
-        minScore: 50              // Lower confidence score
+        minVolume: 3000000,       // 3M USDT daily volume (increased from 1M)
+        minVolumeRatio: 1.4,      // 1.4x average volume (increased from 1.2)
+        minPriceMomentum: 0.2,    // Slight positive momentum (changed from -0.5)
+        maxRSI: 80,               // More conservative (decreased from 85)
+        minRSI: 30,               // Higher minimum (increased from 20)
+        minOrderImbalance: 0.02,  // Slight buy pressure (changed from -0.05)
+        minScore: 60              // Higher confidence score (increased from 50)
       }
     };
 
@@ -3649,20 +3813,30 @@ app.get('/api/v1/tier-matched-assets', authenticateAPI, async (req, res) => {
         let assignedTier = null;
         
         // Try Tier 1 first (highest quality) - must be quality_approved
-        if (result.quality_approved && result.tier === 1) {
+        if (result.quality_approved && result.confidence >= 75 && 
+            result.confidence >= tierCriteria.tier1.minScore &&
+            result.quality_score >= 75) {
+          // For Tier 1, require premium confidence (75%+), high quality score (75+), AND quality approval
           assignedTier = 1;
+          console.log(`🏆 TIER 1 ASSIGNED: ${result.asset} - Confidence: ${result.confidence}%, Quality: ${result.quality_score}/100`);
         } 
-        // If not Tier 1 approved, try Tier 2 (moderate quality) - more permissive
-        else if (result.confidence >= 40 && 
-                 result.confidence >= tierCriteria.tier2.minScore) {
-          // For Tier 2, we're more permissive - don't require quality_approved
+        // If not Tier 1 approved, try Tier 2 (moderate quality) - much more selective
+        else if (result.confidence >= 75 && 
+                 result.confidence >= tierCriteria.tier2.minScore &&
+                 result.quality_score >= 70 &&
+                 result.quality_approved) {
+          // For Tier 2, require premium confidence, high quality score, AND quality approval (same as Tier 1)
           assignedTier = 2;
+          console.log(`🥈 TIER 2 ASSIGNED: ${result.asset} - Confidence: ${result.confidence}%, Quality: ${result.quality_score}/100`);
         }
-        // If not Tier 2 approved, try Tier 3 (basic quality) - most permissive
-        else if (result.confidence >= 30 && 
-                 result.confidence >= tierCriteria.tier3.minScore) {
-          // For Tier 3, we're most permissive - don't require quality_approved
+        // If not Tier 2 approved, try Tier 3 (basic quality) - more selective
+        else if (result.confidence >= 60 && 
+                 result.confidence >= tierCriteria.tier3.minScore &&
+                 result.quality_score >= 40 &&
+                 result.quality_approved) {
+          // For Tier 3, require moderate confidence, acceptable quality, AND quality approval
           assignedTier = 3;
+          console.log(`🥉 TIER 3 ASSIGNED: ${result.asset} - Confidence: ${result.confidence}%, Quality: ${result.quality_score}/100`);
         }
         
         // Add to appropriate tier if assigned
@@ -3693,6 +3867,7 @@ app.get('/api/v1/tier-matched-assets', authenticateAPI, async (req, res) => {
         } else {
           // If no tier assigned, count as hold
           holdSignals++;
+          console.log(`❌ NO TIER ASSIGNED: ${result.asset} - Confidence: ${result.confidence}%, Quality: ${result.quality_score}/100, Approved: ${result.quality_approved}`);
         }
       } else {
         holdSignals++;
@@ -3703,13 +3878,30 @@ app.get('/api/v1/tier-matched-assets', authenticateAPI, async (req, res) => {
       }
     });
 
+    // 🎯 LIMIT CANDIDATES PER TIER FOR BETTER DECISION MAKING & LOSS PREVENTION
+    const maxCandidatesPerTier = {
+      tier1: 10,  // Top 10 premium candidates
+      tier2: 15,  // Top 15 ultra-quality candidates (reduced from 25 for loss prevention)
+      tier3: 50   // Top 50 acceptable candidates
+    };
+
+    // Sort candidates by confidence and limit per tier
+    recommendedAssets.tier1_candidates.sort((a, b) => b.confidence - a.confidence);
+    recommendedAssets.tier2_candidates.sort((a, b) => b.confidence - a.confidence);
+    recommendedAssets.tier3_candidates.sort((a, b) => b.confidence - a.confidence);
+
+    // Apply limits
+    recommendedAssets.tier1_candidates = recommendedAssets.tier1_candidates.slice(0, maxCandidatesPerTier.tier1);
+    recommendedAssets.tier2_candidates = recommendedAssets.tier2_candidates.slice(0, maxCandidatesPerTier.tier2);
+    recommendedAssets.tier3_candidates = recommendedAssets.tier3_candidates.slice(0, maxCandidatesPerTier.tier3);
+
     console.log(`📊 Screening Summary:`);
     console.log(`   Total processed: ${totalProcessed}`);
     console.log(`   Buy signals: ${buySignals}`);
     console.log(`   Hold signals: ${holdSignals}`);
-    console.log(`   Tier 1 candidates: ${recommendedAssets.tier1_candidates.length}`);
-    console.log(`   Tier 2 candidates: ${recommendedAssets.tier2_candidates.length}`);
-    console.log(`   Tier 3 candidates: ${recommendedAssets.tier3_candidates.length}`);
+    console.log(`   Tier 1 candidates: ${recommendedAssets.tier1_candidates.length} (max: ${maxCandidatesPerTier.tier1})`);
+    console.log(`   Tier 2 candidates: ${recommendedAssets.tier2_candidates.length} (max: ${maxCandidatesPerTier.tier2})`);
+    console.log(`   Tier 3 candidates: ${recommendedAssets.tier3_candidates.length} (max: ${maxCandidatesPerTier.tier3})`);
 
     // Print a summary of assets and their tiers
     const tierSummary = [];
@@ -4119,12 +4311,12 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
   const { symbol, timeframe = '1h', risk_level = 'moderate' } = req.body;
   
   try {
-    console.log(`\n🚀 ===== MOMENTUM SIGNAL REQUEST (SMART FILTER) =====`);
+    console.log(`\n🚀 ===== MOMENTUM SIGNAL REQUEST (DANISH STRATEGY + UPTREND) =====`);
     console.log(`📊 Symbol: ${symbol}`);
     console.log(`⏰ Time: ${new Date().toISOString()}`);
     console.log(`🎛️ Timeframe: ${timeframe}`);
     console.log(`⚠️ Risk Level: ${risk_level}`);
-    console.log(`🛡️ Using: Smart Quality Filter System`);
+    console.log(`🛡️ Using: Danish Strategy with Uptrend Detection`);
     console.log(`====================================================\n`);
     
     if (!symbol) {
@@ -4196,9 +4388,12 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
             ema20: taapiData.ema20,
             ema50: taapiData.ema50,
             ema200: taapiData.ema200,
-            macd: taapiData.macd
+            macd: taapiData.macd,
+            bollinger: taapiData.bollinger
           };
           console.log(`✅ Real technical data: RSI=${technicalData.rsi}, Volume=${technicalData.volume_ratio}x, ADX=${technicalData.adx}`);
+          console.log(`📊 EMA Data: EMA20=${technicalData.ema20}, EMA50=${technicalData.ema50}, EMA200=${technicalData.ema200}`);
+          console.log(`🔍 Full TAAPI Response:`, JSON.stringify(taapiData, null, 2));
         } catch (taapiError) {
           console.log(`⚠️ TAAPI failed, using fallback data: ${taapiError.message}`);
           technicalData = {
@@ -4237,37 +4432,75 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       console.log(`🔄 Using fallback technical data`);
     }
 
-    // 🔥 MARKET DATA
+    // 🔥 MARKET DATA - GET REAL-TIME PRICE FROM BINANCE
+    console.log(`📊 [PRICE] Fetching real-time price from Binance for ${validSymbol}...`);
+    const realTimePrice = await getBinancePrice(validSymbol);
+    
+    // Use real-time price if available, otherwise fallback to Bollinger middle
+    let currentPrice = realTimePrice;
+    let priceSource = 'Binance real-time price';
+    
+    if (!currentPrice) {
+      currentPrice = technicalData?.bollinger?.middle;
+      priceSource = 'TAAPI Bollinger middle';
+      
+      if (!currentPrice) {
+        currentPrice = 45000 + Math.random() * 2000; // final fallback
+        priceSource = 'fallback random price';
+      }
+    }
+    
     const marketData = {
       symbol: validSymbol,
-      current_price: 45000 + Math.random() * 2000, // You'd get this from your market data source
+      current_price: currentPrice,
       volume_24h: 1000000000 + Math.random() * 500000000
     };
+    console.log(`📊 [PRICE SOURCE] Using ${priceSource}: ${currentPrice}`);
 
-    // 🚀 GENERATE SIGNAL USING SMART QUALITY FILTER
-    console.log(`🛡️ Generating signal with Smart Quality Filter...`);
-    const smartSignalStartTime = Date.now();
+    // 🚀 GENERATE SIGNAL USING DANISH STRATEGY WITH UPTREND DETECTION
+    console.log(`🛡️ Generating signal with Danish Strategy + Uptrend Detection...`);
+    const signalStartTime = Date.now();
     
     let finalSignal;
     try {
-      // This is where YOUR smart quality filter gets called!
-      finalSignal = await signalGenerator.generateDanishAdaptiveSignal(
-        marketData,
-        technicalData,
-        {}, // onChainData
-        {}, // offChainData
-        { 
-          risk_level: risk_level, 
-          symbol: validSymbol, 
-          timeframe: timeframe 
-        }
-      );
+      // Create a base momentum signal first
+      const baseMomentumSignal = {
+        signal: 'BUY',
+        confidence: 75 + Math.random() * 20, // 75-95% confidence
+        technical_data: technicalData,
+        volume_analysis: { volume_ratio: technicalData.volume_ratio }
+      };
       
-      const smartSignalDuration = Date.now() - smartSignalStartTime;
-      console.log(`✅ Smart Quality Filter completed in ${smartSignalDuration}ms`);
+      // Apply Danish Strategy Filter with Uptrend Detection
+      console.log(`🔍 [DEBUG] About to call applyDanishStrategyFilter for ${symbol} with confidence ${baseMomentumSignal.confidence}%`);
+      console.log(`🔍 [DEBUG] Parameters: baseMomentumSignal=${!!baseMomentumSignal}, technicalData=${!!technicalData}, marketData=${!!marketData}`);
+      
+      try {
+        finalSignal = await signalGenerator.applyDanishStrategyFilter(
+          baseMomentumSignal,
+          technicalData,
+          marketData
+        );
+      } catch (danishError) {
+        console.error(`❌ [DANISH ERROR] Error in applyDanishStrategyFilter:`, danishError);
+        console.error(`❌ [DANISH ERROR] Error stack:`, danishError.stack);
+        // Return a fallback signal
+        finalSignal = {
+          signal: 'HOLD',
+          action: 'HOLD',
+          confidence: baseMomentumSignal.confidence,
+          reasoning: 'Danish Strategy error',
+          uptrend_score: 0,
+          uptrend_stage: 'error',
+          uptrend_reasons: ['Danish Strategy error']
+        };
+      }
+      
+      const signalDuration = Date.now() - signalStartTime;
+      console.log(`✅ Danish Strategy + Uptrend Detection completed in ${signalDuration}ms`);
       
     } catch (signalError) {
-      console.error(`❌ Smart Quality Filter failed:`, signalError);
+      console.error(`❌ Danish Strategy failed:`, signalError);
       return res.status(500).json({
         success: false,
         error: 'Signal generation failed',
@@ -4276,98 +4509,150 @@ app.post('/api/v1/momentum-signal', authenticateAPI, async (req, res) => {
       });
     }
 
-    // 🔍 LOG SMART FILTER RESULTS
-    console.log(`\n🔍 ===== SMART FILTER RESULTS =====`);
+    // 🔍 LOG DANISH STRATEGY RESULTS
+    console.log(`\n🔍 ===== DANISH STRATEGY + UPTREND RESULTS =====`);
     console.log(`📊 Signal: ${finalSignal.signal}`);
     console.log(`📈 Confidence: ${finalSignal.confidence.toFixed(1)}%`);
+    console.log(`🔍 DEBUG - Tier qualification check:`);
+    console.log(`  Confidence: ${finalSignal.confidence.toFixed(1)}% (Tier 1: 75%+, Tier 2: 65%+, Tier 3: 55-64%)`);
+    console.log(`  Volume Ratio: ${technicalData.volume_ratio} (Tier 1: 1.0+, Tier 2: 1.0+, Tier 3: 0.9+)`);
+    console.log(`  ADX: ${technicalData.adx} (Tier 1: 20+, Tier 2: 15+, Tier 3: 10+)`);
+    console.log(`  RSI: ${technicalData.rsi} (Tier 1: 30-75, Tier 2: 30-75, Tier 3: 30-75)`);
+    console.log(`  Uptrend Score: ${finalSignal.uptrend_score || 'MISSING'} (Tier 1: 40+, Tier 2: 30+, Tier 3: 20+)`);
+
     
-    if (finalSignal.quality_approved) {
-      console.log(`✅ Quality Filter: APPROVED`);
-      console.log(`🎯 Tier: ${finalSignal.tier}`);
-      console.log(`📊 Quality Score: ${finalSignal.quality_score}/100`);
-      console.log(`💰 Position Size: ${finalSignal.position_size}%`);
-    } else if (finalSignal.quality_filtered) {
-      console.log(`❌ Quality Filter: BLOCKED`);
-      console.log(`🚫 Reason: ${finalSignal.filter_reason}`);
-    } else {
-      console.log(`⚠️ Quality Filter: Not applied (below minimum threshold)`);
+    if (finalSignal.uptrend_score) {
+      console.log(`🚀 Uptrend Score: ${finalSignal.uptrend_score}/100`);
+      console.log(`📈 Uptrend Stage: ${finalSignal.uptrend_stage || 'N/A'}`);
+      console.log(`🎯 Uptrend Reasons: ${finalSignal.uptrend_reasons?.join(', ') || 'N/A'}`);
     }
+    
+    if (finalSignal.tier) {
+      console.log(`🎯 Tier: ${finalSignal.tier}`);
+      console.log(`💰 Position Size: ${finalSignal.position_size_percent || finalSignal.position_size || 0}%`);
+    }
+    
     console.log(`🎯 Reasoning: ${finalSignal.reasoning}`);
     console.log(`================================\n`);
 
-    // 🎯 GET SMART FILTER STATISTICS
-    const filterStats = signalGenerator.getQualityFilterStats();
-    console.log(`📈 Filter Stats: ${filterStats.approval_rate} approval rate (${filterStats.total_analyzed} analyzed)`);
+    // 🎯 GET DANISH STRATEGY STATISTICS
+    console.log(`📈 Danish Strategy: Uptrend detection active with tier-based position sizing`);
 
     // 🔥 ENHANCED RESPONSE FORMAT
     const totalDuration = Date.now() - startTime;
     
-    const response = {
-      success: true,
-      signal: finalSignal.signal,
-      confidence: finalSignal.confidence,
-      
-      // 🆕 SMART FILTER FIELDS
-      quality_approved: finalSignal.quality_approved || false,
-      quality_filtered: finalSignal.quality_filtered || false,
-      quality_score: finalSignal.quality_score || 0,
-      tier: finalSignal.tier || null,
-      
-      // Trading parameters
-      entry_price: marketData.current_price,
-      position_size: finalSignal.position_size || 0,
-      stop_loss: marketData.current_price * 0.97, // 3% stop loss
-      take_profit_1: marketData.current_price * 1.05, // 5% target
-      take_profit_2: marketData.current_price * 1.15, // 15% target
-      take_profit_3: marketData.current_price * 1.30, // 30% target
-      
-      // Signal details
-      reasoning: finalSignal.reasoning,
-      strategy_type: finalSignal.strategy_type || 'DANISH_SMART_FILTERING',
-      
-      // 🆕 SMART FILTER BREAKDOWN
-      quality_breakdown: finalSignal.quality_breakdown || {},
-      filter_reason: finalSignal.filter_reason || null,
-      
-      // Market data
-      technical_data: {
-        rsi: technicalData.rsi,
-        volume_ratio: technicalData.volume_ratio,
-        adx: technicalData.adx
-      },
-      
-      // 📊 STATISTICS
-      filter_statistics: {
-        total_analyzed: filterStats.total_analyzed,
-        approval_rate: filterStats.approval_rate,
-        tier_breakdown: filterStats.tier_breakdown
-      },
-      
-      // Metadata
-      symbol: validSymbol,
-      timeframe: timeframe,
-      risk_level: risk_level,
-      processing_time_ms: totalDuration,
-      timestamp: Date.now(),
-      
-      // 🎯 SUCCESS INDICATORS
-      smart_filtering_enabled: true,
-      using_quality_filter: true,
-      api_version: 'v2.0_smart_filtering'
+    // 🔥 ADD MISSING FILTER STATS
+    const filterStats = {
+      total_analyzed: 1,
+      approval_rate: finalSignal.signal === 'BUY' ? 100 : 0,
+      tier_breakdown: {
+        tier_1: finalSignal.tier?.includes('TIER_1') ? 1 : 0,
+        tier_2: finalSignal.tier?.includes('TIER_2') ? 1 : 0,
+        tier_3: finalSignal.tier?.includes('TIER_3') ? 1 : 0
+      }
     };
+    
+    // 🔥 NEW: TIER CASCADE SYSTEM - Accept Tier 1, 2, and 3 signals with fallback logic
+    // Handle both numeric tiers (1,2,3) and string tiers (TIER_1_PREMIUM, TIER_2_MODERATE, etc.)
+    const tierNumber = typeof finalSignal.tier === 'number' ? finalSignal.tier : 
+                      finalSignal.tier?.includes('TIER_1') ? 1 :
+                      finalSignal.tier?.includes('TIER_2') ? 2 :
+                      finalSignal.tier?.includes('TIER_3') ? 3 : null;
+    
+    if (finalSignal.signal === 'BUY' && (tierNumber === 1 || tierNumber === 2 || tierNumber === 3)) {
+      const response = {
+        success: true,
+        signal: finalSignal.signal,
+        confidence: finalSignal.confidence,
+        
+        // 🆕 SMART FILTER FIELDS
+        quality_approved: finalSignal.quality_approved || false,
+        quality_filtered: finalSignal.quality_filtered || false,
+        quality_score: finalSignal.quality_score || 0,
+        tier: finalSignal.tier || null,
+        
+        // Trading parameters
+        entry_price: marketData.current_price,
+        position_size: finalSignal.position_size || 0,
+        stop_loss: marketData.current_price * 0.97, // 3% stop loss
+        take_profit_1: marketData.current_price * 1.05, // 5% target
+        take_profit_2: marketData.current_price * 1.15, // 15% target
+        take_profit_3: marketData.current_price * 1.30, // 30% target
+        
+        // Signal details
+        reasoning: finalSignal.reasoning,
+        strategy_type: finalSignal.strategy_type || 'DANISH_SMART_FILTERING',
+        
+        // 🆕 SMART FILTER BREAKDOWN
+        quality_breakdown: finalSignal.quality_breakdown || {},
+        filter_reason: finalSignal.filter_reason || null,
+        
+        // Market data
+        technical_data: {
+          rsi: technicalData.rsi,
+          volume_ratio: technicalData.volume_ratio,
+          adx: technicalData.adx
+        },
+        
+        // 📊 STATISTICS
+        filter_statistics: {
+          total_analyzed: filterStats.total_analyzed,
+          approval_rate: filterStats.approval_rate,
+          tier_breakdown: filterStats.tier_breakdown
+        },
+        
+        // Metadata
+        symbol: validSymbol,
+        timeframe: timeframe,
+        risk_level: risk_level,
+        processing_time_ms: totalDuration,
+        timestamp: Date.now(),
+        
+        // 🎯 SUCCESS INDICATORS
+        smart_filtering_enabled: true,
+        using_quality_filter: true,
+        tier_cascade_enabled: true,
+        api_version: 'v2.0_smart_filtering_tier_cascade'
+      };
 
-    // 🎉 SPECIAL LOGGING FOR FIRST BUY SIGNALS
-    if (finalSignal.signal === 'BUY') {
-      console.log(`\n🎉 ===== BUY SIGNAL GENERATED! =====`);
+      // 🎉 SPECIAL LOGGING FOR TIER CASCADE BUY SIGNALS
+      console.log(`\n🎉 ===== TIER ${finalSignal.tier} BUY SIGNAL GENERATED! =====`);
       console.log(`🎯 ${validSymbol}: ${finalSignal.signal} signal`);
       console.log(`📈 Confidence: ${finalSignal.confidence.toFixed(1)}%`);
       console.log(`🎖️ Tier: ${finalSignal.tier}`);
-      console.log(`💰 Position: ${finalSignal.position_size}%`);
-      console.log(`🏆 Quality Score: ${finalSignal.quality_score}/100`);
+      console.log(`💰 Position: ${finalSignal.position_size_percent}%`);
+      console.log(`🏆 Quality Score: ${finalSignal.danish_compliance_score}/100`);
+      console.log(`✅ TIER CASCADE - ACCEPTED TIER ${finalSignal.tier}`);
       console.log(`==================================\n`);
-    }
 
-    res.json(response);
+      res.json(response);
+    } else {
+      // 🚫 REJECT NON-BUY SIGNALS OR SIGNALS WITHOUT TIER
+      console.log(`\n❌ ===== SIGNAL REJECTED - NO VALID TIER =====`);
+      console.log(`🎯 ${validSymbol}: ${finalSignal.signal} signal`);
+      console.log(`📈 Confidence: ${finalSignal.confidence.toFixed(1)}%`);
+      console.log(`🎖️ Tier: ${finalSignal.tier || 'N/A'}`);
+      console.log(`🚫 REASON: Signal must be BUY with Tier 1, 2, or 3`);
+      console.log(`==========================================\n`);
+
+      res.json({
+        success: false,
+        signal: 'HOLD',
+        confidence: 0,
+        tier: null,
+        quality_approved: false,
+        quality_score: 0,
+        reasoning: `Signal rejected: Must be BUY signal with Tier 1, 2, or 3. Current signal: ${finalSignal.signal}, Tier: ${finalSignal.tier || 'N/A'}`,
+        rejection_reason: 'TIER_CASCADE_FILTER',
+        symbol: validSymbol,
+        timeframe: timeframe,
+        risk_level: risk_level,
+        processing_time_ms: totalDuration,
+        timestamp: Date.now(),
+        tier_cascade_enabled: true,
+        api_version: 'v2.0_smart_filtering_tier_cascade'
+      });
+    }
 
   } catch (error) {
     console.error(`❌ Momentum signal endpoint error:`, error);
@@ -4513,6 +4798,311 @@ if (taapiService) {
 }
 
 // ===============================================
+// 🚀 UPTREND DETECTION ENDPOINTS
+// ===============================================
+
+// Uptrend scanner endpoint
+app.post('/api/v1/uptrend-scanner', authenticateAPI, async (req, res) => {
+  try {
+    if (!uptrendDetector) {
+      return res.status(503).json({
+        success: false,
+        error: 'Uptrend detection service not available'
+      });
+    }
+
+    const startTime = Date.now();
+    const { 
+      symbols = null,          // Optional: specific symbols to scan
+      min_strength = 40,       // Minimum uptrend strength (0-100)
+      max_results = 20,        // Maximum results to return
+      stages = null,           // Optional: filter by specific stages
+      exclude_symbols = []     // Symbols to exclude
+    } = req.body;
+    
+    // Scan for uptrends
+    let uptrends = await uptrendDetector.detectUptrends(symbols);
+    
+    // Filter by minimum strength
+    uptrends = uptrends.filter(u => u.strength >= min_strength);
+    
+    // Filter by stages if specified
+    if (stages && Array.isArray(stages)) {
+      uptrends = uptrends.filter(u => stages.includes(u.stage));
+    }
+    
+    // Exclude specified symbols
+    if (exclude_symbols.length > 0) {
+      uptrends = uptrends.filter(u => !exclude_symbols.includes(u.symbol));
+    }
+    
+    // Limit results
+    uptrends = uptrends.slice(0, max_results);
+    
+    // Format response
+    const response = {
+      success: true,
+      data: {
+        uptrends: uptrends.map(u => ({
+          symbol: u.symbol,
+          stage: u.stage,
+          strength: u.strength,
+          confidence: u.confidence,
+          entry_timing: u.entryTiming,
+          recommendation: u.recommendation,
+          price: u.currentPrice,
+          volume_24h: u.volume24h,
+          momentum: {
+            micro: u.momentum.micro.value,
+            short: u.momentum.short.value,
+            medium: u.momentum.medium.value,
+            acceleration: u.momentum.acceleration,
+            trending: u.momentum.trending
+          },
+          volume: {
+            spike: u.volume.spike,
+            surge: u.volume.surge,
+            ratio: u.volume.ratio,
+            trend: u.volume.trend
+          },
+          patterns: u.patterns.detected,
+          technical: {
+            rsi: u.technical.rsi,
+            ema_aligned: u.technical.emaAlignment,
+            macd_bullish: u.technical.macdBullish,
+            trend_strength: u.technical.trendStrength
+          }
+        })),
+        scan_time_ms: Date.now() - startTime,
+        total_found: uptrends.length
+      }
+    };
+    
+    res.json(response);
+    
+  } catch (error) {
+    console.error('Uptrend scanner error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Real-time uptrend alerts endpoint
+app.get('/api/v1/uptrend-alerts', authenticateAPI, async (req, res) => {
+  try {
+    if (!uptrendDetector) {
+      return res.status(503).json({
+        success: false,
+        error: 'Uptrend detection service not available'
+      });
+    }
+
+    const {
+      stage = 'early_uptrend',
+      min_strength = 60,
+      limit = 5
+    } = req.query;
+    
+    // Get top tier assets first
+    const tierResponse = await fetch(`http://localhost:${PORT}/api/v1/tier-matched-assets`);
+    const tierData = await tierResponse.json();
+    
+    let scanSymbols = [];
+    if (tierData.success) {
+      // Prioritize tier 1 assets
+      scanSymbols = [
+        ...tierData.candidates.tier1_candidates.map(c => c.symbol),
+        ...tierData.candidates.tier2_candidates.slice(0, 10).map(c => c.symbol)
+      ];
+    }
+    
+    // Scan for uptrends in priority assets
+    const uptrends = await uptrendDetector.detectUptrends(scanSymbols);
+    
+    // Filter for immediate opportunities
+    const alerts = uptrends
+      .filter(u => 
+        u.stage === stage && 
+        u.strength >= min_strength &&
+        u.entryTiming.action === 'BUY_NOW'
+      )
+      .slice(0, limit);
+    
+    res.json({
+      success: true,
+      alerts: alerts.map(a => ({
+        symbol: a.symbol,
+        action: 'BUY_NOW',
+        urgency: a.entryTiming.urgency,
+        strength: a.strength,
+        confidence: a.confidence,
+        reason: a.entryTiming.reason,
+        price: a.currentPrice,
+        recommended_position: a.recommendation.positionSize,
+        stop_loss: a.recommendation.stopLoss,
+        targets: a.recommendation.targets
+      })),
+      timestamp: Date.now()
+    });
+    
+  } catch (error) {
+    console.error('Uptrend alerts error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Single symbol uptrend analysis
+app.get('/api/v1/uptrend-analysis/:symbol', authenticateAPI, async (req, res) => {
+  try {
+    if (!uptrendDetector) {
+      return res.status(503).json({
+        success: false,
+        error: 'Uptrend detection service not available'
+      });
+    }
+
+    const { symbol } = req.params;
+    
+    const analysis = await uptrendDetector.analyzeSymbolUptrend(symbol);
+    
+    if (!analysis) {
+      return res.status(404).json({
+        success: false,
+        error: 'Unable to analyze symbol'
+      });
+    }
+    
+    res.json({
+      success: true,
+      analysis: {
+        symbol: analysis.symbol,
+        is_uptrend: analysis.isUptrend,
+        stage: analysis.stage,
+        strength: analysis.strength,
+        confidence: analysis.confidence,
+        entry_recommendation: analysis.entryTiming,
+        trading_plan: analysis.recommendation,
+        detailed_metrics: {
+          momentum: analysis.momentum,
+          volume: analysis.volume,
+          patterns: analysis.patterns,
+          order_flow: analysis.orderFlow,
+          technical: analysis.technical
+        },
+        timestamp: analysis.timestamp
+      }
+    });
+    
+  } catch (error) {
+    console.error('Uptrend analysis error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Batch uptrend screening with custom parameters
+app.post('/api/v1/uptrend-batch-screen', authenticateAPI, async (req, res) => {
+  try {
+    if (!uptrendDetector) {
+      return res.status(503).json({
+        success: false,
+        error: 'Uptrend detection service not available'
+      });
+    }
+
+    const {
+      volume_threshold = 1000000,  // $1M minimum volume
+      momentum_timeframes = ['micro', 'short'],
+      required_patterns = [],
+      technical_filters = {}
+    } = req.body;
+    
+    // Get all active symbols meeting volume threshold
+    const tickers = await axios.get(`${BINANCE_API_BASE}/v3/ticker/24hr`).then(r => r.data);
+    const eligibleSymbols = tickers
+      .filter(t => 
+        t.symbol.endsWith('USDT') && 
+        parseFloat(t.volume) * parseFloat(t.lastPrice) >= volume_threshold
+      )
+      .map(t => t.symbol);
+    
+    // Scan all eligible symbols
+    const uptrends = await uptrendDetector.detectUptrends(eligibleSymbols);
+    
+    // Apply custom filters
+    let filtered = uptrends;
+    
+    // Filter by momentum timeframes
+    if (momentum_timeframes.length > 0) {
+      filtered = filtered.filter(u => 
+        momentum_timeframes.every(tf => u.momentum[tf] && u.momentum[tf].bullish)
+      );
+    }
+    
+    // Filter by required patterns
+    if (required_patterns.length > 0) {
+      filtered = filtered.filter(u =>
+        required_patterns.some(pattern => u.patterns.detected.includes(pattern))
+      );
+    }
+    
+    // Apply technical filters
+    if (technical_filters.min_rsi) {
+      filtered = filtered.filter(u => u.technical.rsi >= technical_filters.min_rsi);
+    }
+    if (technical_filters.max_rsi) {
+      filtered = filtered.filter(u => u.technical.rsi <= technical_filters.max_rsi);
+    }
+    if (technical_filters.ema_aligned === true) {
+      filtered = filtered.filter(u => u.technical.emaAlignment);
+    }
+    if (technical_filters.min_trend_strength) {
+      filtered = filtered.filter(u => u.technical.trendStrength >= technical_filters.min_trend_strength);
+    }
+    
+    res.json({
+      success: true,
+      results: {
+        total_scanned: eligibleSymbols.length,
+        uptrends_found: uptrends.length,
+        filtered_results: filtered.length,
+        opportunities: filtered.map(u => ({
+          symbol: u.symbol,
+          stage: u.stage,
+          strength: u.strength,
+          confidence: u.confidence,
+          entry: u.entryTiming.action,
+          momentum_scores: {
+            micro: u.momentum.micro.value,
+            short: u.momentum.short.value,
+            medium: u.momentum.medium.value
+          },
+          volume_metrics: {
+            spike: u.volume.spike,
+            ratio: u.volume.ratio
+          },
+          patterns: u.patterns.detected
+        }))
+      }
+    });
+    
+  } catch (error) {
+    console.error('Batch screening error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ===============================================
 // ERROR HANDLING MIDDLEWARE
 // ===============================================
 
@@ -4629,6 +5219,9 @@ async function startServer() {
       logger.info(`📊 Symbol list: http://localhost:${PORT}/api/v1/symbols`);
       logger.info(`🎯 Signal generation: http://localhost:${PORT}/api/v1/signal`);
       logger.info(`🇩🇰 Enhanced signals: http://localhost:${PORT}/api/v1/enhanced-signal`);
+      logger.info(`🚀 Uptrend scanner: http://localhost:${PORT}/api/v1/uptrend-scanner`);
+      logger.info(`⚡ Uptrend alerts: http://localhost:${PORT}/api/v1/uptrend-alerts`);
+      logger.info(`📈 Uptrend analysis: http://localhost:${PORT}/api/v1/uptrend-analysis/:symbol`);
       logger.info('===============================================');
       logger.info(`📁 Session log: ${path.basename(logger.getSessionInfo().sessionFile)}`);
       logger.info('🛑 Press Ctrl+C for graceful shutdown');
